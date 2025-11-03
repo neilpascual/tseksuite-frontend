@@ -1,15 +1,16 @@
-import React from 'react'
+import { Outlet } from 'react-router'
+import SideBar from '../../components/admin/SideBar'
 
 function MainLayout() {
   return (
-    <div>
-        {/* Components Sidebar */}
-        <aside>
+    <div className='flex'>
 
-        </aside>
+        {/* Components Sidebar */}
+        <SideBar/>
+
         {/* Content here */}
         <section>
-
+            <Outlet/>
         </section>
     </div>
   )
