@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Add this import
-import Footer from "./Footer";
+import Footer from "../../components/applicant/Footer";
 
 const ApplicantOnboardingPage = () => {
   const [formData, setFormData] = useState({

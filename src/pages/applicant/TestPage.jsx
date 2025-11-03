@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ClockIcon from "../assets/Clock.svg";
 import CorrectIcon from "../assets/Correct.svg";
 import WrongIcon from "../assets/Wrong.svg";
-import Footer from "./Footer";
+import Footer from "../../components/applicant/Footer";
 
 const TestPage = () => {
   const [selectedAnswer, setSelectedAnswer] = useState(null);

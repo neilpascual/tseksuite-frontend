@@ -1,8 +1,9 @@
 import React from "react";
-import Card from "../../components/admin/Card";
-import FilterButton from "../../components/admin/FilterButton";
-import ExportButton from "../../components/admin/ExportButton";
-import Table from "../../components/admin/Table";
+import Card from "../components/admin/Card";
+import FilterButton from "../components/admin/FilterButton";
+import ExportButton from "../components/admin/ExportButton";
+import Table from "../components/admin/Table";
+import { useAuth } from "../hooks/useAuth";
 
 
 function DashboardPage() {
