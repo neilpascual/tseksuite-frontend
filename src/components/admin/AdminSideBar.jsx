@@ -14,12 +14,12 @@ import {
   LogOut,
 } from "lucide-react";
 import { useState } from "react";
+import { NavLink } from "react-router-dom";
 
 const AdminSideBar = () => {
   const [openApplicants, setOpenApplicants] = useState(false);
   const [openTrainings, setOpenTrainings] = useState(false);
   const [openAssessments, setOpenAssessments] = useState(false);
-
   return (
     <div className="h-screen">
       <div className="h-full w-full max-w-[100px] sm:max-w-[200px] md:max-w-[200px] lg:max-w-[300px] flex flex-col gap-6 text-[#2E99B0] border-r-2 border-gray-300 shadow-2xl py-6 px-4 sm:px-6 items-center sm:items-start">
@@ -165,5 +165,4 @@ const AdminSideBar = () => {
     </div>
   );
 };
-
 export default AdminSideBar;
