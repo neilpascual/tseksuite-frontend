@@ -8,11 +8,8 @@ import MainLayout from "./layouts/admin/MainLayout";
 import TestPage from "./pages/admin/ApplicantsTab/TestsPage";
 import ComingSoon from "./components/ComingSoon";
 import TestBankPage from "./pages/admin/AssesmentsTab/TestBankPage";
-// import NotFound from './components/NotFound'
-import ErrorMessage from "./pages/admin/ErrorMessage";
-import TestInstructions from "./pages/applicant/TestInstructions";
-import CompletedTestPage from "./pages/applicant/CompletedTestPage";
 
+import ErrorMessage from "./pages/admin/ErrorMessage";
 function App() {
   return (
     <BrowserRouter>
@@ -20,9 +17,8 @@ function App() {
       <Routes>
         {/* Applicant Routes */}
         <Route path="/" element={<ApplicantOnboardingPage />} />
-        <Route path="/instructions" element={<TestInstructions />} />
-        <Route path="/completed" element={<CompletedTestPage />} />
         <Route path="/auth/login" element={<LoginPage />} />
+
         {/* ProtectedRoutes */}
         {/* /admin protected routes */}
         <Route element={<AdminProtectedRoutes />}>
@@ -39,4 +35,5 @@ function App() {
     </BrowserRouter>
   );
 }
+
 export default App;
