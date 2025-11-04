@@ -1,13 +1,14 @@
-import { BrowserRouter, Routes, Route } from "react-router";
-import ApplicantOnboardingPage from "./pages/applicant/ApplicantOnboardingPage";
-import { Toaster } from "react-hot-toast";
-import AdminProtectedRoutes from "../routes/AdminProtectedRoutes";
-import DashboardPage from "./pages/DashboardPage";
-import LoginPage from "./pages/auth/LoginPage";
-import MainLayout from "./layouts/admin/MainLayout";
-import TestPage from "./pages/admin/ApplicantsTab/TestsPage";
-import ComingSoon from "./components/ComingSoon";
-import TestBankPage from "./pages/admin/AssesmentsTab/TestBankPage";
+import { BrowserRouter, Routes, Route } from 'react-router'
+import ApplicantOnboardingPage from './pages/applicant/ApplicantOnboardingPage'
+import { Toaster } from 'react-hot-toast'
+import AdminProtectedRoutes from '../routes/AdminProtectedRoutes'
+import DashboardPage from './pages/DashboardPage'
+import LoginPage from './pages/auth/LoginPage'
+import MainLayout from './layouts/admin/MainLayout'
+import TestPage from './pages/admin/ApplicantsTab/TestsPage'
+import ComingSoon from './components/ComingSoon'
+import TestBankPage from './pages/admin/AssesmentsTab/TestBankPage'
+// import NotFound from './components/NotFound'
 
 import ErrorMessage from "./pages/admin/ErrorMessage";
 function App() {
