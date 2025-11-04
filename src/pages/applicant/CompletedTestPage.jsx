@@ -1,5 +1,5 @@
 import React from "react";
-import Footer from "./Footer";
+import Footer from "../../components/applicant/Footer";
 
 const CompletedTestPage = () => {
   const handleComplete = () => {
@@ -23,11 +23,10 @@ const CompletedTestPage = () => {
 
           {/* Description */}
           <p className="text-gray-900 text-base sm:text-lg leading-relaxed mb-12 px-4">
-            Welcome! This short test will help us understand your current level
-            and areas for improvement. Take a moment to review the guidelines
-            below before you begin. Make sure you're in a quiet place with a
-            stable internet connection, and take your time to read each question
-            carefully.
+            You have successfully completed the assessment! Your results are being 
+            processed and will be available shortly. Thank you for taking the time 
+            to complete this test. We appreciate your effort and will review your 
+            performance carefully.
           </p>
 
           {/* Complete Button */}
@@ -36,7 +35,7 @@ const CompletedTestPage = () => {
             className="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-12 py-3.5 rounded-lg transition-colors duration-200 inline-flex items-center gap-2 text-lg"
             style={{ boxShadow: "4px 4px 0px 0px rgba(0, 0, 0, 1)" }}
           >
-            Complete
+            View Results
             <svg
               className="w-5 h-5"
               fill="none"

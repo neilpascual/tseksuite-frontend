@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Add this import
-import Footer from "./Footer";
+import Footer from "../../components/applicant/Footer";
 
 const ApplicantOnboardingPage = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
+    department: "",
   });
 
   const navigate = useNavigate(); // Add this hook
@@ -45,7 +46,7 @@ const ApplicantOnboardingPage = () => {
           <div className="flex-1 w-full lg:w-auto text-center lg:text-left">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 lg:mb-8">
               <span className="text-cyan-600">Welcome,</span>{" "}
-              <span className="text-black">Applicant!</span>
+              <span className="text-black">Candidate!</span>
             </h1>
 
             <div className="space-y-4 lg:space-y-6 text-gray-800 text-sm sm:text-base">
@@ -80,7 +81,7 @@ const ApplicantOnboardingPage = () => {
               className="bg-white rounded-2xl p-6 sm:p-8 relative border border-gray-200 mb-6 sm:mb-0"
               style={{ boxShadow: "4px 4px 0px 0px rgba(0, 0, 0, 1)" }}
             >
-              <h2 className="text-xl font-bold mb-1">Applicant Form</h2>
+              <h2 className="text-xl font-bold mb-1">Candidate Form</h2>
               <p className="text-gray-500 text-xs mb-6">
                 Please provide accurate details.
               </p>
@@ -122,6 +123,28 @@ const ApplicantOnboardingPage = () => {
                     onChange={handleChange}
                     className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 placeholder-gray-400 font-['Poppins']"
                   />
+                </div>
+                {/* Department */}
+                {/* added Department Field */}
+                <div className="mb-6 sm:mb-6">
+                  <label className="block text-[11px] sm:text-xs font-bold mb-2 text-gray-900">
+                    Department
+                  </label>
+                  <select
+                    name="department"
+                    value={formData.department}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2.5 text-sm sm:text-base border
+                       border-gray-300 rounded-md focus:outline-none
+                       focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500
+                        bg-white text-gray-700 font-['Poppins'] pr-10"
+                  >
+                    <option value="">Select department</option>
+                    <option value="HR">Human Resources</option>
+                    <option value="ENG">Engineering</option>
+                    <option value="FN">Finance</option>
+                    <option value="BO">Business Ops</option>
+                  </select>
                 </div>
 
                 {/* Submit Button - Hidden on mobile, visible on sm+ */}
