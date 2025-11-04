@@ -50,7 +50,7 @@ function MainLayout() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export default MainLayout;

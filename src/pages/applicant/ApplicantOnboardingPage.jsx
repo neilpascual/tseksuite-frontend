@@ -111,7 +111,7 @@ const ApplicantOnboardingPage = () => {
                 </div>
 
                 {/* Email Address */}
-                <div className="mb-6 sm:mb-8">
+                <div className="mb-6 sm:mb-4">
                   <label className="block text-xs font-bold mb-2 text-gray-900">
                     Email Address
                   </label>
@@ -146,6 +146,30 @@ const ApplicantOnboardingPage = () => {
                     <option value="BO">Business Ops</option>
                   </select>
                 </div>
+
+                {/* Department */}
+                {/* added Department Field */}
+                  <div className="mb-6 sm:mb-6">
+                    <label className="block text-[11px] sm:text-xs font-bold mb-2 text-gray-900">
+                      Department
+                    </label>
+                    <select
+                      name="department"
+                      value={formData.department}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2.5 text-sm sm:text-base border
+                       border-gray-300 rounded-md focus:outline-none 
+                       focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500
+                        bg-white text-gray-700 font-['Poppins'] pr-10"
+                    >
+                      <option value="">Select department</option>
+                      <option value="HR">Human Resources</option>
+                      <option value="ENG">Engineering</option>
+                      <option value="FN">Finance</option>
+                      <option value="BO">Business Ops</option>
+                    </select>
+                  </div>
+
 
                 {/* Submit Button - Hidden on mobile, visible on sm+ */}
                 <div className="hidden sm:flex justify-end">
