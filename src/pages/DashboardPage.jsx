@@ -41,11 +41,12 @@ function DashboardPage() {
       </div>
 
       {/* Table */}
-<div className="rounded-lg shadow-md bg-white overflow-x-auto">
-  <div className="min-w-[350px] sm:min-w-0">
-    <Table />
-  </div>
-</div>
+      <div className="rounded-lg shadow-md bg-white overflow-x-auto">
+        <div className="min-w-[350px] sm:min-w-0">
+          {/* mock table */}
+          <Table />
+        </div>
+      </div>
     </div>
     </>
   );
