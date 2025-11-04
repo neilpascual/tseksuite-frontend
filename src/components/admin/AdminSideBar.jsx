@@ -75,6 +75,23 @@ const AdminSideBar = () => {
             <div className="flex items-center gap-2">
               <NotepadText className="h-4 w-4" />
               <span className="text-sm">Results</span>
+
+            {/* Animated Submenu */}
+            <div
+              className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                openApplicants
+                  ? "max-h-[500px] opacity-100"
+                  : "max-h-0 opacity-0"
+              } flex flex-col gap-2 sm:pl-6`}
+            >
+              <div className="flex justify-center sm:items-center gap-2">
+                <Layers2 className="h-4 w-4 hidden sm:flex lg:h-5 lg:w-5" />
+                <span className="text-sm lg:text-md mt-2 sm:mt-0">Tests</span>
+              </div>
+              <div className="flex justify-center sm:items-center gap-2 sm:ml-2">
+                <NotepadText className="h-4 w-4 hidden sm:flex lg:h-5 lg:w-5" />
+                <span className="text-sm lg:text-md">Results</span>
+              </div>
             </div>
           </div>
         )}
@@ -109,6 +126,27 @@ const AdminSideBar = () => {
             <div className="flex items-center gap-2">
               <ArrowUpNarrowWide className="h-4 w-4" />
               <span className="text-sm">Progress</span>
+
+            {/* Animated Submenu */}
+            <div
+              className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                openTrainings
+                  ? "max-h-[500px] opacity-100"
+                  : "max-h-0 opacity-0"
+              } flex flex-col gap-2 sm:pl-6`}
+            >
+              <div className="flex justify-center sm:items-center gap-2">
+                <Package className="h-4 w-4 hidden sm:flex lg:h-5 lg:w-5" />
+                <span className="text-sm lg:text-md mt-2 sm:mt-0">Modules</span>
+              </div>
+              <div className="flex justify-center sm:items-center gap-2">
+                <NotepadText className="h-4 w-4 hidden sm:flex lg:h-5 lg:w-5" />
+                <span className="text-sm  lg:text-md">Tests</span>
+              </div>
+              <div className="flex justify-center sm:items-center gap-2">
+                <ArrowUpNarrowWide className="h-4 w-4 hidden sm:flex lg:h-5 lg:w-5" />
+                <span className="text-sm  lg:text-md">Progress</span>
+              </div>
             </div>
           </div>
         )}
@@ -139,6 +177,25 @@ const AdminSideBar = () => {
             <div className="flex items-center gap-2">
               <BrickWall className="h-4 w-4" />
               <span className="text-sm">Test Builder</span>
+
+            {/* Animated Submenu */}
+            <div
+              className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                openAssessments
+                  ? "max-h-[500px] opacity-100 translate-y-0"
+                  : "max-h-0 opacity-0 -translate-y-2"
+              } flex flex-col gap-2 sm:pl-6`}
+            >
+              <div className="flex justify-center sm:items-center gap-2">
+                <CreditCard className="h-4 w-4 hidden sm:flex lg:h-5 lg:w-5" />
+                <span className="text-sm lg:text-l mt-2 sm:mt-0">
+                  Test Bank
+                </span>
+              </div>
+              <div className="flex sm:items-center ml-3 sm:ml-0 gap-2">
+                <BrickWall className="h-4 w-4 hidden sm:flex lg:h-5 lg:w-5" />
+                <span className="text-sm lg:text-md">Test Builder</span>
+              </div>
             </div>
           </div>
         )}
