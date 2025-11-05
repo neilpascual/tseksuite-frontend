@@ -20,9 +20,7 @@ const SidebarLink = ({ to, label, icon, isOpen, toggleOpen }) => (
       <>
         <div className="flex items-center gap-2">
           {icon(isActive)}
-          <span className="font-bold text-sm sm:text-base hidden sm:inline">
-            {label}
-          </span>
+          <span className="font-bold text-sm sm:text-base">{label}</span>
         </div>
         {typeof isOpen === "boolean" &&
           (isOpen ? (

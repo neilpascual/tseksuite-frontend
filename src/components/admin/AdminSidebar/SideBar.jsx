@@ -24,8 +24,8 @@ const AdminSidebar = () => {
   const [openAssessments, setOpenAssessments] = useState(false);
 
   return (
-    <div className="h-screen">
-      <div className="h-full w-full max-w-[80px] sm:max-w-[200px] lg:max-w-[300px] flex flex-col gap-4 text-[#2E99B0] border-r-2 border-gray-300 shadow-2xl py-6 items-center sm:items-start">
+    <div className="h-screen ">
+      <div className="hidden sm:flex h-full w-full max-w-[80px] sm:max-w-[200px] lg:max-w-[300px]  flex-col gap-4 text-[#2E99B0] border-r-2 border-gray-300 shadow-2xl py-6 items-center sm:items-start">
         <SidebarHeader />
 
         <SidebarLink
@@ -83,13 +83,14 @@ const AdminSidebar = () => {
             isOpen={openTrainings}
             items={[
               {
-                icon: <Package className="h-4 w-4 hidden sm:flex " />,
-                label: "Modules",
-              },
-              {
                 icon: <NotepadText className="h-4 w-4 hidden sm:flex" />,
                 label: "Tests",
               },
+              {
+                icon: <Package className="h-4 w-4 hidden sm:flex " />,
+                label: "Modules",
+              },
+
               {
                 icon: <ArrowUpNarrowWide className="h-4 w-4 hidden sm:flex" />,
                 label: "Progress",
