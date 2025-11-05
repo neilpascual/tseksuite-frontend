@@ -60,6 +60,8 @@ const AdminSidebar = () => {
               {
                 icon: <NotepadText className="h-4 w-4 hidden sm:flex" />,
                 label: "Results",
+                //Neil: added to route results page
+                to: "/admin/applicants/results",
               },
             ]}
           />

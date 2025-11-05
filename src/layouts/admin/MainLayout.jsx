@@ -9,20 +9,20 @@ function MainLayout() {
   return (
     <div className="flex overflow-hidden">
       {/* Components Sidebar */}
-      <AdminSideBar />
+      {/* <AdminSideBar /> */}
 
       {/* Content here */}
-      <section className="h-screen w-full p-2 sm:px-5 sm:py-1 md:px-10 md:py-2.5 lg:px-15 lg:py-5 xl:px-35 xl:py-10 bg-[#F9FAFB] overflow-y-auto">
+      {/* <section className="h-screen w-full p-2 sm:px-5 sm:py-1 md:px-10 md:py-2.5 lg:px-15 lg:py-5 xl:px-35 xl:py-10 bg-[#F9FAFB] overflow-y-auto">
         <Outlet />
       </section>
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden"> */}
       {/* Mobile Sidebar Overlay */}
-      {sidebarOpen && (
+      {/* {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
-      )}
+      )} */}
 
       {/* Sidebar */}
       <div
