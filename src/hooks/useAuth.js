@@ -10,8 +10,6 @@ export function useAuth() {
     retry: false,
   });
 
-  console.log('AuthQuery', authQuery)
-
   const login = async (loginCredentials) => {
     try {
       const data = await loginUser(loginCredentials);

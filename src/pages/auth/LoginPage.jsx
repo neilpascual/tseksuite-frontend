@@ -8,7 +8,6 @@ function LoginPage() {
   const { login } = useAuth();
 
   const handleLogin = async () => {
-
     // const isLoggedIn = await fetchCurrentUser
     const data = await login({
       email: "francis.darang@getfullsuite.com",
@@ -33,7 +32,7 @@ function LoginPage() {
       <h1 className="text-2xl mb-4">Mock Admin Login</h1>
       <button
         onClick={handleLogin}
-        className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+        className="px-4 py-2 bg-blue-600 cursor-pointer text-white rounded-lg"
       >
         Login as Admin
       </button>
