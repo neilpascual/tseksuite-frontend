@@ -1,5 +1,5 @@
 import { Outlet } from "react-router";
-import AdminSideBar from "../../components/admin/AdminSideBar";
+import AdminSideBar from "../../components/admin/AdminSidebar/AdminSideBar";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
@@ -7,6 +7,14 @@ function MainLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
+    <div className="flex overflow-hidden">
+      {/* Components Sidebar */}
+      <AdminSideBar />
+
+      {/* Content here */}
+      <section className="h-screen w-full p-2 sm:px-5 sm:py-1 md:px-10 md:py-2.5 lg:px-15 lg:py-5 xl:px-35 xl:py-10 bg-[#F9FAFB] overflow-y-auto">
+        <Outlet />
+      </section>
     <div className="flex h-screen overflow-hidden">
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
@@ -50,7 +58,7 @@ function MainLayout() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default MainLayout;
