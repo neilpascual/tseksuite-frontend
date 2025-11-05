@@ -13,17 +13,21 @@ const SidebarFooter = () => {
   return (
     <div className="mt-auto w-full px-3">
       <div
-        className="flex items-center justify-center sm:justify-between bg-[#2E99B0] cursor-pointer rounded-xl py-3 lg:pl-3"
+        className="flex items-center justify-center sm:justify-between cursor-pointer sm:bg-[#2E99B0] rounded-xl py-3 lg:pl-3"
         onClick={handleLogout}
       >
-        <LogOut className="h-5 w-5 text-white sm:hidden" />
-        <div className="hidden sm:flex items-center gap-3 px-3">
+        <div className="flex sm:hidden items-center justify-center gap-2 bg-cyan-700 px-4 py-2 rounded-lg w-[30%]">
+          <LogOut className="h-5 w-5 text-white" />
+          <span className="text-white text-sm">Logout</span>
+        </div>
+
+        <div className="hidden sm:flex items-center gap-3 pl-2">
           <img
             src="/assets/Logo.png"
             alt="SuiteTest Logo"
             className="h-5 w-5"
           />
-          <span className="text-white text-sm sm:ml-10 lg:ml-5">Logout</span>
+          <span className="text-white text-sm sm:ml-9 lg:ml-4">Logout</span>
           <button>
             <img
               src="/assets/Launchpad.png"

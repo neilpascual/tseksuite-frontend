@@ -14,6 +14,7 @@ import SidebarHeader from "../SidebarHeader";
 import SidebarLink from "../SidebarLink";
 import SidebarSubmenu from "../SidebarSubmenu";
 import { useState } from "react";
+import SidebarFooter from "../SidebarFooter";
 
 const AdminTopBar = () => {
   const [expanded, setExpanded] = useState(false);
@@ -26,7 +27,7 @@ const AdminTopBar = () => {
 
     if (!expanded) return baseHeight;
 
-    let extraHeight = 180;
+    let extraHeight = 240;
 
     if (openApplicants) extraHeight += 70;
     if (openTrainings) extraHeight += 120;
@@ -163,6 +164,7 @@ const AdminTopBar = () => {
               ]}
             />
           )}
+          <SidebarFooter />
         </div>
       )}
     </div>
