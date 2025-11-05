@@ -39,8 +39,8 @@ const AdminSidebar = () => {
         />
 
         <SidebarLink
-          to="/admin/applicants"
-          label="Applicants"
+          to="/admin/examiners"
+          label="Examiners"
           icon={(active) => (
             <User
               className={`h-5 w-5 ${active ? "text-white" : "text-[#2E99B0]"}`}
@@ -56,13 +56,13 @@ const AdminSidebar = () => {
               {
                 icon: <Layers2 className="h-4 w-4 hidden sm:flex" />,
                 label: "Tests",
-                to: "/admin/applicants/",
+                to: "/admin/examiners/",
               },
               {
                 icon: <NotepadText className="h-4 w-4 hidden sm:flex" />,
                 label: "Results",
                 //Neil: added to route results page
-                to: "/admin/applicants/results",
+                to: "/admin/examiners/results",
               },
             ]}
           />
@@ -121,6 +121,7 @@ const AdminSidebar = () => {
               {
                 icon: <CreditCard className="h-4 w-4 hidden sm:flex" />,
                 label: "Test Bank",
+                to: "/admin/assessments",
               },
               {
                 icon: <BrickWall className="h-4 w-4 hidden sm:flex" />,

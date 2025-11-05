@@ -31,11 +31,11 @@ function App() {
         <Route element={<AdminProtectedRoutes />}>
           <Route path="admin" element={<MainLayout />}>
             <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="applicants" element={<TestPage />} />
+            <Route path="examiners" element={<TestPage />} />
             {/* added results route */}
-            <Route path="applicants/results" element={<ResultsPage />} />
+            <Route path="examiners/results" element={<ResultsPage />} />
             <Route path="trainings" element={<ComingSoon />} />
-            <Route path="assesments" element={<TestBankPage />} />
+            <Route path="assessments" element={<TestBankPage />} />
             {/*  */}
             {/* <Route path="admin/applicants/results" element={<ResultsPage />} /> */}
           </Route>
