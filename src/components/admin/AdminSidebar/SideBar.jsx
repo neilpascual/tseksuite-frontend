@@ -56,6 +56,7 @@ const AdminSidebar = () => {
               {
                 icon: <Layers2 className="h-4 w-4 hidden sm:flex" />,
                 label: "Tests",
+                to: "/admin/applicants/",
               },
               {
                 icon: <NotepadText className="h-4 w-4 hidden sm:flex" />,
@@ -85,15 +86,18 @@ const AdminSidebar = () => {
               {
                 icon: <NotepadText className="h-4 w-4 hidden sm:flex" />,
                 label: "Tests",
+                to: "/admin/trainings/tests",
               },
               {
                 icon: <Package className="h-4 w-4 hidden sm:flex " />,
                 label: "Modules",
+                to: "/admin/trainings/modules",
               },
 
               {
                 icon: <ArrowUpNarrowWide className="h-4 w-4 hidden sm:flex" />,
                 label: "Progress",
+                to: "/admin/trainings/progress",
               },
             ]}
           />

@@ -1,15 +1,15 @@
-import { BrowserRouter, Routes, Route } from 'react-router'
-import ApplicantOnboardingPage from './pages/applicant/ApplicantOnboardingPage'
-import { Toaster } from 'react-hot-toast'
-import AdminProtectedRoutes from '../routes/AdminProtectedRoutes'
-import DashboardPage from './pages/DashboardPage'
-import LoginPage from './pages/auth/LoginPage'
-import MainLayout from './layouts/admin/MainLayout'
-import TestPage from './pages/admin/ApplicantsTab/TestsPage'
+import { BrowserRouter, Routes, Route } from "react-router";
+import ApplicantOnboardingPage from "./pages/applicant/ApplicantOnboardingPage";
+import { Toaster } from "react-hot-toast";
+import AdminProtectedRoutes from "../routes/AdminProtectedRoutes";
+import DashboardPage from "./pages/DashboardPage";
+import LoginPage from "./pages/auth/LoginPage";
+import MainLayout from "./layouts/admin/MainLayout";
+import TestPage from "./pages/admin/ApplicantsTab/TestsPage";
 //added results page import
-import ResultsPage from './pages/admin/ApplicantsTab/ResultsPage'
-import ComingSoon from './components/ComingSoon'
-import TestBankPage from './pages/admin/AssesmentsTab/TestBankPage'
+import ResultsPage from "./pages/admin/ApplicantsTab/ResultsPage";
+import ComingSoon from "./components/ComingSoon";
+import TestBankPage from "./pages/admin/AssesmentsTab/TestBankPage";
 
 // import NotFound from './components/NotFound'
 import ErrorMessage from "./pages/admin/ErrorMessage";
@@ -30,7 +30,7 @@ function App() {
         {/* /admin protected routes */}
         <Route element={<AdminProtectedRoutes />}>
           <Route path="admin" element={<MainLayout />}>
-            <Route index path="dashboard" element={<DashboardPage />} />
+            <Route path="dashboard" element={<DashboardPage />} />
             <Route path="applicants" element={<TestPage />} />
             {/* added results route */}
             <Route path="applicants/results" element={<ResultsPage />} />
