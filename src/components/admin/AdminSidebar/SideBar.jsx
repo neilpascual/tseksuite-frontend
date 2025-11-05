@@ -62,7 +62,7 @@ const AdminSidebar = () => {
                 icon: <NotepadText className="h-4 w-4 hidden sm:flex" />,
                 label: "Results",
                 //Neil: added to route results page
-                to: "/admin/examiner/results",
+                to: "/admin/examiners/results",
               },
             ]}
           />
@@ -121,6 +121,7 @@ const AdminSidebar = () => {
               {
                 icon: <CreditCard className="h-4 w-4 hidden sm:flex" />,
                 label: "Test Bank",
+                to: "/admin/assessments",
               },
               {
                 icon: <BrickWall className="h-4 w-4 hidden sm:flex" />,

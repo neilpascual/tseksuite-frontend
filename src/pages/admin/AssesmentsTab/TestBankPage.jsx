@@ -311,14 +311,13 @@ const TestBankPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white p-4 lg:p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="h-screen w-full px-3 sm:px-6 md:px-8 py-6">
         {/* Header Section */}
         <div className="mb-6 lg:mb-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
             <div className="flex-1">
-              <h1 className="text-2xl lg:text-4xl font-bold bg-cyan-600 bg-clip-text text-transparent mb-2">
-                Department Management
+              <h1 className="text-[#2E99B0] text-md sm:text-md md:text-xl lg:text-2xl xl:text-3xl mb-6 font-['Poppins']">
+                Departments
               </h1>
               <p className="text-gray-600 text-sm lg:text-base">
                 Manage test bank departments and their status
@@ -522,7 +521,7 @@ const TestBankPage = () => {
             ))}
           </div>
         )}
-      </div>
+      
 
       {/* Add Modal */}
       {showAddModal && (

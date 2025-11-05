@@ -2,10 +2,31 @@ import Table from "../../../components/admin/Table";
 import React, { useEffect, useState } from 'react'
 import { Search } from "lucide-react";
 import { Filter } from "lucide-react";
+import { useMediaQuery } from "@mui/material";
 
 
 
 function TestsPage() {
+
+  const isMobile = useMediaQuery("(max-width:600px)");
+  const [data,setData] = useState([]);
+  const [isDataLoading,setIsDataLoading] = useState(false)
+
+  // table header cells
+  const headerCells =[
+    { id: "id", label: "ID"},
+    { id: "test_name", label: "Test Name"},
+    { id: "department", label: "Department" },
+    { id: "date", label: "Date"},
+  ]
+
+  //table columns
+  const columns = [
+    { id: "id", label: "ID" },
+    { id: "test_name", label: "Test Name" },
+    { id: "department",  label: "Department" },
+    { id: "date", label: "Date" },
+  ];
   
   return (
     <div className='h-screen w-full px-3 sm:px-6 md:px-8 py-6'>
@@ -37,12 +58,49 @@ function TestsPage() {
           </button>
     </div>
       {/* Table */}
-        <div className="rounded-lg shadow-md bg-white overflow-x-auto">
-          <div className="min-w-[350px] sm:min-w-0">
+        {/* <div className="rounded-lg shadow-md bg-white overflow-x-auto">
+          <div className="min-w-[350px] sm:min-w-0"> */}
               {/* mock table */}
-              <Table />
+              {/* <Table /> */}
+          {/* </div>
+        </div> */}
+                {data.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-12 h-12 text-slate-400 mb-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 16.5v-9A2.25 2.25 0 015.25 5.25h13.5A2.25 2.25 0 0121 7.5v9a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 16.5z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 7.5l9 6 9-6"
+                />
+              </svg>
+              <p className="text-slate-600 font-medium">No Tests Found</p>
+              <p className="text-slate-400 text-sm">Please check back later.</p>
+            </div>
+        ) : 
+          (
+            <div className="rounded-lg md:shadow-md bg-white overflow-x-auto mt-20">
+              {isMobile ? (
+                <MobileScrollableCards candidates={data}/>
+              ) : (
+                <div className="min-w-[350px] sm:min-w-0">
+                  <CandidateTable candidates={data} headerCells={headerCells} columns={columns} tableName={'Tests'}/>
+                </div>
+              )}
           </div>
-        </div>
+          )
+        }
     </div>
   )
 }
