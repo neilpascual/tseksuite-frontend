@@ -5,6 +5,7 @@ import ExaminersTable from "../../../components/admin/ExaminersTable";
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { useMediaQuery } from '@mui/material'
+import { getAllResults } from '../../../../api/api';
 
 function ResultsPage() {
 
@@ -13,20 +14,7 @@ function ResultsPage() {
 
   const isMobile = useMediaQuery("(max-width:600px)");
 
-  const transformResult = (result) => ({
-  id: result.result_id,
-  examiner_name: `${result.Examiner?.first_name || ""} ${result.Examiner?.last_name || ""}`,
-  email: result.Examiner?.email || "N/A",
-  department: result.Examiner?.Department?.dept_name || "N/A",
-  quiz_name: result.Quiz?.quiz_name || "N/A",
-  score: result.score ?? 0,
-  status: result.status,
-  date: new Date(result.created_at).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }),
-});
+
 
   const headerCells = [
                   { id: "id", label: "ID" },
@@ -55,15 +43,10 @@ function ResultsPage() {
   try {
     setIsLoading(true);
 
-    const res = await axios.get("http://localhost:3000/api/result/get");
+    const res = await getAllResults();
 
-    // Assuming your API returns an array in `res.data.data`
-    const formatted = res.data.data.map(transformResult);
-
-    console.log("Raw Results:", res.data.data);
-    console.log("Formatted Results:", formatted);
-
-    setData(formatted);
+    setData(res);
+    
   } catch (error) {
     console.error(error);
     toast.error("Failed to fetch results");

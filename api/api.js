@@ -1,4 +1,6 @@
 import axios from 'axios'
+import { transformResult } from '../helpers/helpers';
+import toast from 'react-hot-toast';
 
 export const fetchCurrentUser = async () => {
   const token = localStorage.getItem("token");
@@ -20,10 +22,6 @@ export const fetchCurrentUser = async () => {
 
 
 export const loginUser = async ( loginCredentials ) => {
-    // Query here the accont from the HRIS
-    // Or call the backend service that can fetch the hris
-
-    // const data = await axios.get('route for validating the account', loginCredentials);
 
     return {
         token: "thisissampletoken",
@@ -32,4 +30,20 @@ export const loginUser = async ( loginCredentials ) => {
         role: 'Admin',
         ...loginCredentials
     }
+}
+
+export const getAllResults = async() => {
+      try {
+
+        const res = await axios.get("http://localhost:3000/api/result/get");
+        if(!res) {console.log('Error, API')}
+
+        const formatted = res.data.data.map(transformResult);
+        
+        return formatted
+
+      } catch (error) {
+        console.error(error)
+        toast.error(error)
+      }
 }
