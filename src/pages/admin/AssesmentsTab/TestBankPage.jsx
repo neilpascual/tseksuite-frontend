@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Plus,
   MoreVertical,
@@ -8,6 +9,7 @@ import {
   Search,
   Filter,
 } from "lucide-react";
+import QuizManagement from "./QuizManagement";
 
 const TestBankPage = () => {
   const [departments, setDepartments] = useState([]);
@@ -22,6 +24,7 @@ const TestBankPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterActive, setFilterActive] = useState("all");
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
 
   const API_BASE_URL = "http://localhost:3000/api/department";
 
@@ -38,17 +41,12 @@ const TestBankPage = () => {
   const fetchDepartments = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/get`);
-      const result = await response.json();
-
-      if (response.ok) {
-        setDepartments(result.data || []);
-        setError(null);
-      } else {
-        setError(result.message || "Failed to fetch departments");
-      }
+      const response = await axios.get(`${API_BASE_URL}/get`);
+      
+      setDepartments(response.data.data || []);
+      setError(null);
     } catch (err) {
-      setError("Failed to connect to server");
+      setError(err.response?.data?.message || "Failed to fetch departments");
       console.error("Error fetching departments:", err);
     } finally {
       setLoading(false);
@@ -57,29 +55,17 @@ const TestBankPage = () => {
 
   const toggleActiveStatus = async (dept) => {
     try {
-      const response = await fetch(
+      await axios.patch(
         `${API_BASE_URL}/toggle-status/${dept.dept_id}`,
         {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            is_active: !dept.is_active,
-          }),
+          is_active: !dept.is_active,
         }
       );
 
-      const result = await response.json();
-
-      if (response.ok) {
-        await fetchDepartments();
-        setError(null);
-      } else {
-        setError(result.message || "Failed to update status");
-      }
+      await fetchDepartments();
+      setError(null);
     } catch (err) {
-      setError("Failed to connect to server");
+      setError(err.response?.data?.message || "Failed to update status");
       console.error("Error toggling status:", err);
     }
   };
@@ -251,29 +237,17 @@ const TestBankPage = () => {
     if (!newDeptName.trim()) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          dept_name: newDeptName,
-          is_active: true,
-        }),
+      await axios.post(`${API_BASE_URL}/create`, {
+        dept_name: newDeptName,
+        is_active: true,
       });
 
-      const result = await response.json();
-
-      if (response.ok) {
-        await fetchDepartments();
-        setNewDeptName("");
-        setShowAddModal(false);
-        setError(null);
-      } else {
-        setError(result.message || "Failed to create department");
-      }
+      await fetchDepartments();
+      setNewDeptName("");
+      setShowAddModal(false);
+      setError(null);
     } catch (err) {
-      setError("Failed to connect to server");
+      setError(err.response?.data?.message || "Failed to create department");
       console.error("Error creating department:", err);
     }
   };
@@ -282,31 +256,19 @@ const TestBankPage = () => {
     if (!editingDept || !editingDept.dept_name.trim()) return;
 
     try {
-      const response = await fetch(
+      await axios.put(
         `${API_BASE_URL}/update/${editingDept.dept_id}`,
         {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            dept_name: editingDept.dept_name,
-          }),
+          dept_name: editingDept.dept_name,
         }
       );
 
-      const result = await response.json();
-
-      if (response.ok) {
-        await fetchDepartments();
-        setShowEditModal(false);
-        setEditingDept(null);
-        setError(null);
-      } else {
-        setError(result.message || "Failed to update department");
-      }
+      await fetchDepartments();
+      setShowEditModal(false);
+      setEditingDept(null);
+      setError(null);
     } catch (err) {
-      setError("Failed to connect to server");
+      setError(err.response?.data?.message || "Failed to update department");
       console.error("Error updating department:", err);
     }
   };
@@ -315,25 +277,14 @@ const TestBankPage = () => {
     if (!deletingDept) return;
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/delete/${deletingDept.dept_id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      await axios.delete(`${API_BASE_URL}/delete/${deletingDept.dept_id}`);
 
-      const result = await response.json();
-
-      if (response.ok) {
-        await fetchDepartments();
-        setShowDeleteModal(false);
-        setDeletingDept(null);
-        setError(null);
-      } else {
-        setError(result.message || "Failed to delete department");
-      }
+      await fetchDepartments();
+      setShowDeleteModal(false);
+      setDeletingDept(null);
+      setError(null);
     } catch (err) {
-      setError("Failed to connect to server");
+      setError(err.response?.data?.message || "Failed to delete department");
       console.error("Error deleting department:", err);
     }
   };
@@ -349,11 +300,15 @@ const TestBankPage = () => {
     return matchesSearch && matchesFilter;
   });
 
-  const stats = {
-    total: departments.length,
-    active: departments.filter((d) => d.is_active).length,
-    inactive: departments.filter((d) => !d.is_active).length,
-  };
+  // If a department is selected, show the quiz management page
+  if (selectedDepartment) {
+    return (
+      <QuizManagement
+        department={selectedDepartment}
+        onBack={() => setSelectedDepartment(null)}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white p-4 lg:p-6">
@@ -462,7 +417,8 @@ const TestBankPage = () => {
             {filteredDepartments.map((dept) => (
               <div
                 key={dept.dept_id}
-                className={`bg-white rounded-2xl border-2 p-4 lg:p-6 transition-all duration-300 hover:shadow-lg lg:hover:shadow-xl hover:-translate-y-0.5 lg:hover:-translate-y-1 relative overflow-hidden ${
+                onClick={() => setSelectedDepartment(dept)}
+                className={`bg-white rounded-2xl border-2 p-4 lg:p-6 transition-all duration-300 hover:shadow-lg lg:hover:shadow-xl hover:-translate-y-0.5 lg:hover:-translate-y-1 relative overflow-hidden cursor-pointer ${
                   dept.is_active
                     ? "border-cyan-500"
                     : "border-gray-200 opacity-75"
@@ -493,7 +449,8 @@ const TestBankPage = () => {
                   {openMenuId === dept.dept_id && (
                     <div className="absolute right-0 mt-1 lg:mt-2 w-44 lg:w-48 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-20">
                       <button
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           toggleActiveStatus(dept);
                           setOpenMenuId(null);
                         }}
@@ -507,7 +464,8 @@ const TestBankPage = () => {
                         {dept.is_active ? "Deactivate" : "Activate"}
                       </button>
                       <button
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setEditingDept({ ...dept });
                           setShowEditModal(true);
                           setOpenMenuId(null);
@@ -519,7 +477,8 @@ const TestBankPage = () => {
                       </button>
                       <div className="border-t border-gray-100 my-1"></div>
                       <button
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setDeletingDept(dept);
                           setShowDeleteModal(true);
                           setOpenMenuId(null);
