@@ -26,17 +26,14 @@ function App() {
         <Route path="/instructions" element={<TestInstructions />} />
         <Route path="/completed" element={<CompletedTestPage />} />
         <Route path="/auth/login" element={<LoginPage />} />
-
         {/* ProtectedRoutes */}
         {/* /admin protected routes */}
         <Route element={<AdminProtectedRoutes />}>
           <Route path="admin" element={<MainLayout />}>
             <Route path="dashboard" element={<DashboardPage />} />
-
-            {/* buttons talaga ang mga yan, hindi navigation, pwede remove na to.
-            <Route path="examiners" />
-            <Route path="trainings" />
-            <Route path="assessments" /> */}
+            <Route path="examiners" element={<ComingSoon />} />
+            <Route path="trainings" element={<ComingSoon />} />
+            <Route path="assessments" element={<ComingSoon />} />
 
             {/* examiners submenu route */}
             <Route path="examiners/tests" element={<TestPage />} />

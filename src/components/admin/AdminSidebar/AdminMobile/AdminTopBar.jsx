@@ -156,7 +156,6 @@ const AdminTopBar = () => {
             toggleOpen={() => setOpenAssessments(!openAssessments)}
           />
           {openAssessments && (
-            <div onClick={() => setExpanded(false)}>
             <SidebarSubmenu
               isOpen={openAssessments}
               items={[
@@ -172,7 +171,6 @@ const AdminTopBar = () => {
                 },
               ]}
             />
-            </div>
           )}
           <SidebarFooter />
         </div>

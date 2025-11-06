@@ -14,8 +14,7 @@ const SidebarSubmenu = ({ isOpen, items }) => (
         className={({ isActive }) =>
           `flex items-center justify-center gap-2 px-3 py-1 text-sm cursor-pointer ${
             isActive
-            //nilagyan ko lang yung rounded-2xl para mas maganda yung effect sa submenu
-              ? "bg-[#2E99B0] text-white rounded-2xl"
+              ? "bg-[#2E99B0] text-white"
               : "text-gray-500 hover:bg-gray-100 "
           }`
         }
