@@ -72,7 +72,7 @@ const AdminTopBar = () => {
           </div>
 
           <SidebarLink
-            to="/admin/examiners"
+            // to="/admin/examiners"
             label="Examiners"
             icon={(active) => (
               <User
@@ -105,7 +105,7 @@ const AdminTopBar = () => {
           )}
 
           <SidebarLink
-            to="/admin/trainings"
+            // to="/admin/trainings"
             label="Trainings"
             icon={(active) => (
               <Captions
@@ -143,7 +143,7 @@ const AdminTopBar = () => {
           )}
 
           <SidebarLink
-            to="/admin/assessments"
+            // to="/admin/assessments"
             label="Assessments"
             icon={(active) => (
               <ClipboardList
