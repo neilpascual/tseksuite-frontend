@@ -15,6 +15,7 @@ import TestBankPage from "./pages/admin/AssesmentsTab/TestBankPage";
 import ErrorMessage from "./pages/admin/ErrorMessage";
 import TestInstructions from "./pages/applicant/TestInstructions";
 import CompletedTestPage from "./pages/applicant/CompletedTestPage";
+import TestBuilderPage from "./pages/admin/AssesmentsTab/TestBuilderPage";
 
 function App() {
   return (
@@ -46,7 +47,7 @@ function App() {
 
             {/* assessments submenu routes */}
             <Route path="assessments/test-bank" element={<TestBankPage />} />
-            <Route path="assessments/test-builder" element={<ComingSoon />} />
+            <Route path="assessments/test-builder" element={<TestBuilderPage />} />
             {/* <Route path="admin/applicants/results" element={<ResultsPage />} /> */}
           </Route>
         </Route>
