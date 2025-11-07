@@ -189,8 +189,8 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-blur bg-opacity-50 flex backdrop-blur-sm items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform animate-in zoom-in-95 duration-200">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold text-gray-800">
@@ -564,7 +564,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
           </div>
           <button
             onClick={openAddModal}
-            className="flex items-center gap-2 px-5 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors shadow-sm"
+            className="flex items-center gap-2 px-5 py-3 bg-[#2E99B0] text-white rounded-lg hover:bg-cyan-700 transition-colors shadow-sm"
           >
             <Plus className="w-5 h-5" />
             Add Question
@@ -593,12 +593,12 @@ const QuestionManagement = ({ quiz, onBack }) => {
             <p className="text-gray-600 mb-4">
               Get started by adding your first question
             </p>
-            <button
+            {/* <button
               onClick={openAddModal}
               className="px-5 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
             >
               Add Question
-            </button>
+            </button> */}
           </div>
         ) : (
           <div className="grid gap-4">
