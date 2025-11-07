@@ -319,9 +319,9 @@ const TestBankPage = () => {
               <h1 className="text-[#2E99B0] text-md sm:text-md md:text-xl lg:text-2xl xl:text-3xl mb-6 font-['Poppins']">
                 Departments
               </h1>
-              <p className="text-gray-600 text-sm lg:text-base">
+              {/* <p className="text-sm lg:text-base">
                 Manage test bank departments and their status
-              </p>
+              </p> */}
             </div>
             <button
               onClick={() => setShowAddModal(true)}
@@ -333,7 +333,7 @@ const TestBankPage = () => {
           </div>
 
           {/* Search and Filter Bar */}
-          <div className="flex flex-col sm:flex-row gap-3 bg-white rounded-xl p-3 lg:p-4 shadow-sm border border-gray-100">
+          <div className="flex flex-col sm:flex-row gap-3 bg-white p-3 xl:p-1 ">
             <div className="flex-1 relative">
               <Search
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -341,10 +341,10 @@ const TestBankPage = () => {
               />
               <input
                 type="text"
-                placeholder="Search departments..."
+                placeholder="Search"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-sm lg:text-base border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 text-sm lg:text-base border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
               />
             </div>
             <div className="flex gap-2">
@@ -362,7 +362,7 @@ const TestBankPage = () => {
                 onClick={() => setFilterActive("active")}
                 className={`px-3 lg:px-4 py-2 text-sm lg:text-base rounded-lg font-medium transition-all ${
                   filterActive === "active"
-                    ? "bg-green-700 text-white shadow-md"
+                    ? "bg-green-500 text-white shadow-md"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
@@ -372,7 +372,7 @@ const TestBankPage = () => {
                 onClick={() => setFilterActive("inactive")}
                 className={`px-3 lg:px-4 py-2 text-sm lg:text-base rounded-lg font-medium transition-all ${
                   filterActive === "inactive"
-                    ? "bg-gray-500 text-white shadow-md"
+                    ? "bg-red-500 text-white shadow-md"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
@@ -419,7 +419,7 @@ const TestBankPage = () => {
                 onClick={() => setSelectedDepartment(dept)}
                 className={`bg-white rounded-2xl border-2 p-4 lg:p-6 transition-all duration-300 hover:shadow-lg lg:hover:shadow-xl hover:-translate-y-0.5 lg:hover:-translate-y-1 relative overflow-hidden cursor-pointer ${
                   dept.is_active
-                    ? "border-cyan-500"
+                    ? "border-[#EFF0F6]"
                     : "border-gray-200 opacity-75"
                 }`}
               >
@@ -443,7 +443,7 @@ const TestBankPage = () => {
                     }}
                     className="text-gray-400 hover:text-gray-600 p-1 lg:p-2 rounded-full hover:bg-gray-100 transition-colors"
                   >
-                    <MoreVertical size={18} />
+                    <MoreVertical size={28} />
                   </button>
                   {openMenuId === dept.dept_id && (
                     <div className="absolute right-0 mt-1 lg:mt-2 w-44 lg:w-48 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-20">

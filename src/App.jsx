@@ -18,6 +18,7 @@ import TestBankPage from "./pages/admin/AssesmentsTab/TestBankPage";
 import ErrorMessage from "./pages/admin/ErrorMessage";
 import TestInstructions from "./pages/applicant/TestInstructions";
 import CompletedTestPage from "./pages/applicant/CompletedTestPage";
+import TestBuilderPage from "./pages/admin/AssesmentsTab/TestBuilderPage";
 
 function App() {
   return (
@@ -37,12 +38,23 @@ function App() {
         <Route element={<AdminProtectedRoutes />}>
           <Route path="admin" element={<MainLayout />}>
             <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="examiners" element={<TestPage />} />
-            {/* added results route */}
-            <Route path="examiners/results" element={<ResultsPage />} />
+
+            {/* <Route path="examiners" element={<ComingSoon />} />
             <Route path="trainings" element={<ComingSoon />} />
-            <Route path="assessments" element={<TestBankPage />} />
-            {/*  */}
+            <Route path="assessments" element={<ComingSoon />} /> */}
+
+            {/* examiners submenu route */}
+            <Route path="examiners/tests" element={<TestPage />} />
+            <Route path="examiners/results" element={<ResultsPage />} />
+
+            {/* trainings submenu routes */}
+            <Route path="trainings/tests" element={<ComingSoon />} />
+            <Route path="trainings/modules" element={<ComingSoon />} />
+            <Route path="trainings/progress" element={<ComingSoon />} />
+
+            {/* assessments submenu routes */}
+            <Route path="assessments/test-bank" element={<TestBankPage />} />
+            <Route path="assessments/test-builder" element={<TestBuilderPage />} />
             {/* <Route path="admin/applicants/results" element={<ResultsPage />} /> */}
           </Route>
         </Route>

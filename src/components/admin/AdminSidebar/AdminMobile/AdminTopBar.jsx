@@ -57,7 +57,8 @@ const AdminTopBar = () => {
       {/* Expanded content below */}
       {expanded && (
         <div className="mt-4  flex flex-col gap-2">
-          <SidebarLink
+          <div onClick={() => setExpanded(false)}>
+            <SidebarLink
             to="/admin/dashboard"
             label="Dashboard"
             icon={(active) => (
@@ -68,10 +69,11 @@ const AdminTopBar = () => {
               />
             )}
           />
+          </div>
 
           <SidebarLink
-            to="/admin/applicants"
-            label="Applicants"
+            // to="/admin/examiners"
+            label="Examiners"
             icon={(active) => (
               <User
                 className={`h-5 w-5 ${
@@ -83,25 +85,27 @@ const AdminTopBar = () => {
             toggleOpen={() => setOpenApplicants(!openApplicants)}
           />
           {openApplicants && (
+            <div onClick={() => setExpanded(false)}>
             <SidebarSubmenu
               isOpen={openApplicants}
               items={[
                 {
                   icon: <Layers2 className="h-4 w-4" />,
                   label: "Tests",
-                  to: "/admin/applicants/",
+                  to: "/admin/examiners/tests",
                 },
                 {
                   icon: <NotepadText className="h-4 w-4" />,
                   label: "Results",
-                  to: "/admin/applicants/results",
+                  to: "/admin/examiners/results",
                 },
               ]}
             />
+            </div>
           )}
 
           <SidebarLink
-            to="/admin/trainings"
+            // to="/admin/trainings"
             label="Trainings"
             icon={(active) => (
               <Captions
@@ -114,13 +118,14 @@ const AdminTopBar = () => {
             toggleOpen={() => setOpenTrainings(!openTrainings)}
           />
           {openTrainings && (
+            <div onClick={() => setExpanded(false)}>
             <SidebarSubmenu
               isOpen={openTrainings}
               items={[
                 {
                   icon: <Package className="h-4 w-4" />,
                   label: "Modules",
-                  to: "/admin/trainings/",
+                  to: "/admin/trainings/modules",
                 },
                 {
                   icon: <NotepadText className="h-4 w-4" />,
@@ -134,10 +139,11 @@ const AdminTopBar = () => {
                 },
               ]}
             />
+            </div>
           )}
 
           <SidebarLink
-            to="/admin/assessments"
+            // to="/admin/assessments"
             label="Assessments"
             icon={(active) => (
               <ClipboardList
@@ -156,10 +162,12 @@ const AdminTopBar = () => {
                 {
                   icon: <CreditCard className="h-4 w-4" />,
                   label: "Test Bank",
+                  to: "/admin/assessments/test-bank",
                 },
                 {
                   icon: <BrickWall className="h-4 w-4" />,
                   label: "Test Builder",
+                  to: "/admin/assessments/test-builder",
                 },
               ]}
             />

@@ -14,7 +14,7 @@ const SidebarSubmenu = ({ isOpen, items }) => (
         className={({ isActive }) =>
           `flex items-center justify-center gap-2 px-3 py-1 text-sm cursor-pointer ${
             isActive
-              ? "bg-[#2E99B0] text-white"
+              ? "bg-[#2E99B0] text-white rounded-2xl"
               : "text-gray-500 hover:bg-gray-100 "
           }`
         }
