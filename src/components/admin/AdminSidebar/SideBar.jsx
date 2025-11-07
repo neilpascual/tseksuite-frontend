@@ -141,7 +141,8 @@ const AdminSidebar = () => {
           />
         )}
 
-        <SidebarLink
+{/* removed */}
+        {/* <SidebarLink
           // to="/admin/trainings"
           label="Trainings"
           icon={(active) => (
@@ -174,7 +175,7 @@ const AdminSidebar = () => {
               },
             ]}
           />
-        )}
+        )} */}
 
         <SidebarLink
           // to="/admin/assessments"
@@ -196,11 +197,11 @@ const AdminSidebar = () => {
                 label: "Test Bank",
                 to: "/admin/assessments/test-bank",
               },
-              {
-                icon: <BrickWall className="h-4 w-4 hidden sm:flex" />,
-                label: "Test Builder",
-                to: "/admin/assessments/test-builder",
-              },
+              // {
+              //   icon: <BrickWall className="h-4 w-4 hidden sm:flex" />,
+              //   label: "Test Builder",
+              //   to: "/admin/assessments/test-builder",
+              // },
             ]}
           />
         )}

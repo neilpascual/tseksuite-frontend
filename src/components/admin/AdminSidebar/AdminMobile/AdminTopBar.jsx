@@ -104,7 +104,9 @@ const AdminTopBar = () => {
             </div>
           )}
 
-          <SidebarLink
+
+          {/* removed */}
+          {/* <SidebarLink
             // to="/admin/trainings"
             label="Trainings"
             icon={(active) => (
@@ -140,7 +142,7 @@ const AdminTopBar = () => {
               ]}
             />
             </div>
-          )}
+          )} */}
 
           <SidebarLink
             // to="/admin/assessments"

@@ -47,14 +47,14 @@ function App() {
             <Route path="examiners/tests" element={<TestPage />} />
             <Route path="examiners/results" element={<ResultsPage />} />
 
-            {/* trainings submenu routes */}
+            {/* trainings submenu routes
             <Route path="trainings/tests" element={<ComingSoon />} />
             <Route path="trainings/modules" element={<ComingSoon />} />
-            <Route path="trainings/progress" element={<ComingSoon />} />
+            <Route path="trainings/progress" element={<ComingSoon />} /> */}
 
             {/* assessments submenu routes */}
             <Route path="assessments/test-bank" element={<TestBankPage />} />
-            <Route path="assessments/test-builder" element={<TestBuilderPage />} />
+            {/* <Route path="assessments/test-builder" element={<TestBuilderPage />} /> */}
             {/* <Route path="admin/applicants/results" element={<ResultsPage />} /> */}
           </Route>
         </Route>
