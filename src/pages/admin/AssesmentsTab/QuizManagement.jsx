@@ -230,7 +230,10 @@ const QuizManagement = ({ department, onBack }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredQuizzes.map((quiz) => (
               <div
-                onClick={() => setSelectedQuiz(quiz)}
+                onClick={() => {
+                  // stopPropagation();
+                  setSelectedQuiz(quiz)}
+                  }
                 key={quiz.quiz_id}
                 className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow relative"
               >
@@ -290,7 +293,9 @@ const QuizManagement = ({ department, onBack }) => {
 
                 <div className="flex items-center justify-end gap-2 pt-4 border-t border-gray-100">
                   <button 
-                    onClick={() => openInviteModal(quiz)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openInviteModal(quiz)}}
                     className="flex items-center gap-2 bg-[#2E99B0] text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-emerald-700"
                   >
                     <LinkIcon size={18} />
