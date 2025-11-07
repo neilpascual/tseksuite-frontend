@@ -429,13 +429,13 @@ const TestBankPage = () => {
                 }`}
               >
                 {/* Active Status Indicator */}
-                <div
+                {/* <div
                   className={`absolute top-0 right-0 w-16 h-16 lg:w-20 lg:h-20 ${
                     dept.is_active
                       ? "bg-cyan-500"
                       : "bg-gradient-to-br from-gray-300 to-gray-400"
                   } rounded-bl-full opacity-20`}
-                ></div>
+                ></div> */}
 
                 {/* Menu Button */}
                 <div className="absolute top-3 right-3 lg:top-4 lg:right-4 z-10">
@@ -452,23 +452,23 @@ const TestBankPage = () => {
                   </button>
                   {openMenuId === dept.dept_id && (
                     <div className="absolute right-0 mt-1 lg:mt-2 w-44 lg:w-48 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-20">
+                      {/* adjusted deactivate/activate button */}
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeactivateDept(dept);
-                          setShowDeactivateModal(true);
-                          toggleActiveStatus(dept);
-                          setOpenMenuId(null);
-                        }}
-                        className={`flex items-center gap-3 w-full px-3 lg:px-4 py-2 text-sm text-left transition-colors ${
-                          dept.is_active
-                            ? "text-orange-600 hover:bg-orange-50"
-                            : "text-green-600 hover:bg-green-50"
-                        }`}
-                      >
-                        <Power size={16} />
-                        {dept.is_active ? "Deactivate" : "Activate"}
-                      </button>
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeactivateDept(dept);
+                            setShowDeactivateModal(true);
+                            setOpenMenuId(null);
+                          }}
+                          className={`flex items-center gap-3 w-full px-3 lg:px-4 py-2 text-sm text-left transition-colors ${
+                            dept.is_active
+                              ? "text-orange-600 hover:bg-orange-50"
+                              : "text-green-600 hover:bg-green-50"
+                          }`}
+                        >
+                          <Power size={16} />
+                          {dept.is_active ? "Deactivate" : "Activate"}
+                        </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -646,7 +646,6 @@ const TestBankPage = () => {
         </div>
       )}
 
-            {/* Deactivate Confirmation Modal */}
 {/* Deactivate Confirmation Modal */}
 {showDeactivateModal && deactivateDept && (
   <div className="fixed inset-0 bg-blur bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
@@ -664,6 +663,7 @@ const TestBankPage = () => {
       <div className="flex flex-col sm:flex-row gap-3">
         <button
           onClick={() => {
+            // just close modal, no toggling
             setShowDeactivateModal(false);
             setDeactivateDept(null);
           }}
@@ -671,11 +671,20 @@ const TestBankPage = () => {
         >
           Cancel
         </button>
+
         <button
-          onClick={() => {
-            toggleActiveStatus(deactivateDept);
-            setShowDeactivateModal(false);
-            setDeactivateDept(null);
+          onClick={async (e) => {
+            e.stopPropagation();
+            // Call the toggle function only when user confirms
+            try {
+              await toggleActiveStatus(deactivateDept);
+            } catch (err) {
+              // toggleActiveStatus already sets error; you can optionally handle UI here
+              console.error("Failed to toggle status:", err);
+            } finally {
+              setShowDeactivateModal(false);
+              setDeactivateDept(null);
+            }
           }}
           className={`flex-1 px-4 py-3 text-sm lg:text-base ${
             deactivateDept.is_active
@@ -689,6 +698,7 @@ const TestBankPage = () => {
     </div>
   </div>
 )}
+
 
     </div>
   );
