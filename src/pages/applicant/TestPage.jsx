@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
 import ClockIcon from "../../assets/Clock.svg";
 import Footer from "../../components/applicant/Footer";
 
@@ -15,6 +16,7 @@ const TestPage = () => {
   const [loading, setLoading] = useState(true);
   const [userAnswers, setUserAnswers] = useState([]);
   const [quizData, setQuizData] = useState(null);
+  const [applicantData, setApplicantData] = useState(null);
 
   const API_BASE_URL = "http://localhost:3000/api";
 
@@ -23,17 +25,18 @@ const TestPage = () => {
       location.state?.quizData ||
       JSON.parse(localStorage.getItem("selectedQuiz") || "null");
 
-    const applicantData =
+    const applicant =
       location.state?.applicantData ||
       JSON.parse(localStorage.getItem("applicantData") || "{}");
 
-    if (!selectedQuiz || !applicantData.department) {
-      alert("No quiz selected. Redirecting...");
+    if (!selectedQuiz || !applicant.examiner_id) {
+      alert("No quiz selected or applicant data missing. Redirecting...");
       navigate("/quiz-selection");
       return;
     }
 
     setQuizData(selectedQuiz);
+    setApplicantData(applicant);
     setTimeRemaining(selectedQuiz.time_limit * 60);
     fetchQuestions(selectedQuiz.quiz_id);
   }, []);
@@ -59,30 +62,20 @@ const TestPage = () => {
     try {
       setLoading(true);
 
-      const questionsResponse = await fetch(
+      const questionsResponse = await axios.get(
         `${API_BASE_URL}/question/get/${quizId}`
       );
 
-      if (!questionsResponse.ok) {
-        throw new Error("Failed to fetch questions");
-      }
-
-      const questionsResult = await questionsResponse.json();
-      const questionsData = questionsResult.data || [];
+      const questionsData = questionsResponse.data.data || [];
 
       const questionsWithOptions = await Promise.all(
         questionsData.map(async (question) => {
           try {
-            const optionsResponse = await fetch(
+            const optionsResponse = await axios.get(
               `${API_BASE_URL}/answer/test/${question.question_id}`
             );
 
-            if (!optionsResponse.ok) {
-              return { ...question, options: [] };
-            }
-
-            const optionsResult = await optionsResponse.json();
-            const options = optionsResult.data || [];
+            const options = optionsResponse.data.data || [];
 
             return {
               ...question,
@@ -174,17 +167,8 @@ const TestPage = () => {
 
   const submitTest = async (answers = userAnswers) => {
     try {
-      if (!quizData) {
-        alert("Quiz data not found. Cannot submit test.");
-        return;
-      }
-
-      const applicantData =
-        location.state?.applicantData ||
-        JSON.parse(localStorage.getItem("applicantData") || "{}");
-
-      if (!applicantData?.examiner_id) {
-        alert("Applicant data missing. Cannot submit test.");
+      if (!quizData || !applicantData) {
+        alert("Quiz or applicant data not found. Cannot submit test.");
         return;
       }
 
@@ -193,89 +177,90 @@ const TestPage = () => {
         const userAnswer = answers[index];
 
         if (question.question_type === "CB") {
+          // For checkbox, send array of answer IDs
           return {
             question_id: question.question_id,
-            selected_answer: Array.isArray(userAnswer)
-              ? question.options
-                  .filter((opt) => userAnswer.includes(opt.answer_id))
-                  .map((opt) => opt.option_text)
-              : [],
+            selected_answer: Array.isArray(userAnswer) ? userAnswer : [],
           };
         } else if (question.question_type === "DESC") {
+          // For descriptive, send text
           return {
             question_id: question.question_id,
-            selected_answer: userAnswer?.trim() || "",
+            selected_answer:
+              typeof userAnswer === "string" ? userAnswer.trim() : "",
           };
         } else {
-          // MC / TF
-          const selectedOption = question.options.find(
-            (opt) => opt.answer_id === userAnswer
-          );
+          // For MC/TF, send single answer ID
           return {
             question_id: question.question_id,
-            selected_answer: selectedOption?.option_text || "",
+            selected_answer: userAnswer || null,
           };
         }
       });
 
-      // 1️⃣ Create result
-      const resultData = {
+      // Determine status based on answered questions
+      const answeredCount = formattedAnswers.filter((ans) => {
+        if (Array.isArray(ans.selected_answer)) {
+          return ans.selected_answer.length > 0;
+        }
+        return ans.selected_answer !== null && ans.selected_answer !== "";
+      }).length;
+
+      const status =
+        answeredCount < questions.length ? "ABANDONED" : "COMPLETED";
+
+      // Submit to backend
+      const payload = {
         examiner_id: applicantData.examiner_id,
         quiz_id: quizData.quiz_id,
-        status: "COMPLETED",
         answers: formattedAnswers,
+        status: status,
       };
 
-      console.log("Submitting result payload:", resultData);
+      console.log("Submitting test:", payload);
 
-      const response = await fetch(`${API_BASE_URL}/result/create`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(resultData),
-      });
-
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to submit result: ${errText}`);
-      }
-
-      const resultJson = await response.json();
-      const createdResult = resultJson.data;
-      console.log("Result created:", createdResult);
-
-      // 2️⃣ Create bridge entry after result is created
-      if (createdResult?.result_id) {
-        const bridgeData = {
-          examiner_id: applicantData.examiner_id,
-          quiz_id: quizData.quiz_id,
-          result_id: createdResult.result_id,
-        };
-
-        const bridgeResponse = await fetch(`${API_BASE_URL}/bridge/create`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(bridgeData),
-        });
-
-        if (!bridgeResponse.ok) {
-          const bridgeErrText = await bridgeResponse.text();
-          console.warn("Failed to create bridge:", bridgeErrText);
-        } else {
-          const bridgeJson = await bridgeResponse.json();
-          console.log("Bridge created successfully:", bridgeJson.data);
+      const response = await axios.post(
+        `${API_BASE_URL}/result/create`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      }
-
-      // Save test results locally
-      localStorage.setItem(
-        "testResults",
-        JSON.stringify({ quizData, questions, answers: formattedAnswers })
       );
 
-      navigate("/completed-test");
+      const resultData = response.data.data;
+
+      // Create bridge entry
+      await axios.post(
+        `${API_BASE_URL}/bridge/create`,
+        {
+          examiner_id: applicantData.examiner_id,
+          quiz_id: quizData.quiz_id,
+          result_id: resultData.result_id,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // Navigate to results page with data
+      navigate("/completed-test", {
+        state: {
+          resultData: resultData,
+          quizData: quizData,
+          questions: questions,
+          applicantData: applicantData,
+        },
+      });
     } catch (error) {
       console.error("Error submitting test:", error);
-      alert("Failed to submit test. Please try again.");
+      alert(
+        error.response?.data?.message ||
+          "Failed to submit test. Please try again."
+      );
     }
   };
 
