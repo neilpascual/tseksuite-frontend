@@ -17,7 +17,7 @@ const SidebarFooter = () => {
         onClick={handleLogout}
       >
         <div className="flex sm:hidden items-center justify-center gap-2 bg-cyan-700 px-4 py-2 rounded-lg w-[30%]">
-          <LogOut className="h-5 w-5 text-white" />
+          <LogOut className="h-5 w-5 text-white hidden sm:flex" />
           <span className="text-white text-sm">Logout</span>
         </div>
 
