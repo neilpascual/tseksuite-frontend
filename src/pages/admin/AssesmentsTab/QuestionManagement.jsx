@@ -72,50 +72,13 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
         );
 
       case "MC":
-        return (
-          <div className="space-y-2">
-            {question.options.map((opt, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  checked={opt.is_correct}
-                  onChange={() => setCorrectAnswer(i)}
-                  className="w-4 h-4 text-teal-600 flex-shrink-0"
-                />
-                <input
-                  value={opt.option_text}
-                  onChange={(e) =>
-                    updateOption(i, "option_text", e.target.value)
-                  }
-                  placeholder={`Option ${i + 1}`}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-                {question.options.length > 2 && (
-                  <button
-                    onClick={() => removeOption(i)}
-                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              onClick={addOption}
-              className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-teal-500 hover:text-teal-600 transition-colors"
-            >
-              + Add Option
-            </button>
-          </div>
-        );
-
       case "CB":
         return (
           <div className="space-y-2">
             {question.options.map((opt, i) => (
               <div key={i} className="flex items-center gap-2">
                 <input
-                  type="checkbox"
+                  type={question.question_type === "MC" ? "radio" : "checkbox"}
                   checked={opt.is_correct}
                   onChange={() => setCorrectAnswer(i)}
                   className="w-4 h-4 text-teal-600 flex-shrink-0"
@@ -148,11 +111,9 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
         );
 
       default:
-         return (
-            <p className="text-gray-500 italic">
-              Unsupported question type.
-            </p>
-          );
+        return (
+          <p className="text-gray-500 italic">Unsupported question type.</p>
+        );
     }
   };
 
@@ -167,8 +128,7 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
           { option_text: "False", is_correct: false },
         ],
       }));
-    } 
-    else if (newType === "MC" || newType === "CB") {
+    } else if (newType === "MC" || newType === "CB") {
       setQuestion((prev) => ({
         ...prev,
         options: [
@@ -176,7 +136,7 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
           { option_text: "", is_correct: false },
         ],
       }));
-    }else{
+    } else {
       setQuestion((prev) => ({
         ...prev,
         options: [],
@@ -187,21 +147,20 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
   return (
     <div className="fixed inset-0 bg-blur bg-opacity-50 flex backdrop-blur-sm items-center justify-center z-50 p-4 animate-in fade-in duration-200">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform animate-in zoom-in-95 duration-200">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold text-[#2E99B0] ">
-              {question.question_id ? "Edit Question" : "Add New Question"}
-            </h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5 text-[#2E99B0]" />
-            </button>
-          </div>
+        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+          <h2 className="text-2xl font-semibold text-[#2E99B0] ">
+            {question.question_id ? "Edit Question" : "Add New Question"}
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <X className="w-5 h-5 text-[#2E99B0]" />
+          </button>
         </div>
 
         <div className="p-6 space-y-6">
+          {/* Question Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Question Type
@@ -227,6 +186,7 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
             </div>
           </div>
 
+          {/* Question Text */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Question Text
@@ -240,6 +200,7 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
             />
           </div>
 
+          {/* Points */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Points
@@ -253,6 +214,7 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
             />
           </div>
 
+          {/* Options */}
           {question.question_type !== "DESC" && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -267,6 +229,7 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
             </div>
           )}
 
+          {/* Explanation */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Explanation (Optional)
@@ -281,6 +244,7 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
           </div>
         </div>
 
+        {/* Modal Buttons */}
         <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
           <button
             onClick={onClose}
@@ -300,12 +264,51 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
   );
 };
 
+const DeleteModal = ({ isOpen, onClose, onConfirm, questionText }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-blur bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 transform animate-in zoom-in-95 duration-200">
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">
+          Delete Question
+        </h3>
+        <p className="text-gray-600 mb-6">
+          Are you sure you want to delete this question?
+          <br />
+          <br />
+          <span className="font-medium">{questionText}</span>
+        </p>
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const QuestionManagement = ({ quiz, onBack }) => {
   const [questions, setQuestions] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteIndex, setDeleteIndex] = useState(null);
 
   const API_BASE_URL = "http://localhost:3000/api";
 
@@ -320,12 +323,8 @@ const QuestionManagement = ({ quiz, onBack }) => {
     ],
   };
 
-  const [currentQuestion, setCurrentQuestion] = useState(emptyQuestion);
-
   useEffect(() => {
-    if (quiz?.quiz_id) {
-      fetchQuestions();
-    }
+    if (quiz?.quiz_id) fetchQuestions();
   }, [quiz?.quiz_id]);
 
   const fetchQuestions = async () => {
@@ -334,10 +333,8 @@ const QuestionManagement = ({ quiz, onBack }) => {
       const response = await axios.get(
         `${API_BASE_URL}/question/get/${quiz.quiz_id}`
       );
-
       const questionsData = response.data.data || [];
 
-      // Fetch options for each question individually
       const questionsWithOptions = await Promise.all(
         questionsData.map(async (q) => {
           try {
@@ -345,7 +342,6 @@ const QuestionManagement = ({ quiz, onBack }) => {
               `${API_BASE_URL}/answer/get/${q.question_id}`
             );
             const questionOptions = optionsResponse.data.data || [];
-
             return {
               ...q,
               options: questionOptions.map((opt) => ({
@@ -368,7 +364,6 @@ const QuestionManagement = ({ quiz, onBack }) => {
       setError(null);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch questions");
-      console.error("Error fetching questions:", err);
     } finally {
       setLoading(false);
     }
@@ -386,6 +381,36 @@ const QuestionManagement = ({ quiz, onBack }) => {
     setModalOpen(true);
   };
 
+  const openDeleteModal = (index) => {
+    setDeleteIndex(index);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteIndex === null) return;
+
+    const question = questions[deleteIndex];
+
+    try {
+      for (const option of question.options) {
+        if (option.answer_id) {
+          await axios.delete(`${API_BASE_URL}/answer/${option.answer_id}/delete`);
+        }
+      }
+
+      await axios.delete(
+        `${API_BASE_URL}/question/${quiz.quiz_id}/delete/${question.question_id}`
+      );
+
+      await fetchQuestions();
+      setDeleteModalOpen(false);
+      setDeleteIndex(null);
+    } catch (err) {
+      console.error("Error deleting question:", err);
+      alert("Error deleting question. Please try again.");
+    }
+  };
+
   const saveQuestion = async () => {
     if (!currentQuestion.question_text.trim()) {
       return alert("Question text is required.");
@@ -393,16 +418,18 @@ const QuestionManagement = ({ quiz, onBack }) => {
 
     if (currentQuestion.question_type !== "DESC") {
       if (
-        currentQuestion.question_type === "MC" ||
-        currentQuestion.question_type === "TF"
+        (currentQuestion.question_type === "MC" ||
+          currentQuestion.question_type === "TF") &&
+        !currentQuestion.options.some((o) => o.is_correct)
       ) {
-        if (!currentQuestion.options.some((o) => o.is_correct)) {
-          return alert("Please select the correct answer.");
-        }
-      } else if (currentQuestion.question_type === "CB") {
-        if (!currentQuestion.options.some((o) => o.is_correct)) {
-          return alert("Please select at least one correct answer.");
-        }
+        return alert("Please select the correct answer.");
+      }
+
+      if (
+        currentQuestion.question_type === "CB" &&
+        !currentQuestion.options.some((o) => o.is_correct)
+      ) {
+        return alert("Please select at least one correct answer.");
       }
 
       if (
@@ -415,7 +442,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
 
     try {
       if (editingIndex !== null) {
-        // Update existing question
+        // Update question
         await axios.put(
           `${API_BASE_URL}/question/${quiz.quiz_id}/update/${currentQuestion.question_id}`,
           {
@@ -427,10 +454,8 @@ const QuestionManagement = ({ quiz, onBack }) => {
           }
         );
 
-        // Update or create options
         for (const option of currentQuestion.options) {
           if (option.answer_id) {
-            // Update existing option
             await axios.put(
               `${API_BASE_URL}/answer/${option.answer_id}/update`,
               {
@@ -439,7 +464,6 @@ const QuestionManagement = ({ quiz, onBack }) => {
               }
             );
           } else {
-            // Create new option
             await axios.post(
               `${API_BASE_URL}/answer/${currentQuestion.question_id}/create`,
               {
@@ -450,7 +474,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
           }
         }
 
-        // Handle deleted options (if any)
+        // Handle deleted options
         const originalQuestion = questions[editingIndex];
         const currentOptionIds = currentQuestion.options
           .map((opt) => opt.answer_id)
@@ -479,7 +503,6 @@ const QuestionManagement = ({ quiz, onBack }) => {
 
         const newQuestionId = questionResponse.data.data.question_id;
 
-        // Create options for the new question
         if (currentQuestion.question_type !== "DESC") {
           for (const option of currentQuestion.options) {
             await axios.post(`${API_BASE_URL}/answer/${newQuestionId}/create`, {
@@ -492,40 +515,9 @@ const QuestionManagement = ({ quiz, onBack }) => {
 
       await fetchQuestions();
       setModalOpen(false);
-      setError(null);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to save question");
       console.error("Error saving question:", err);
       alert("Error saving question. Please try again.");
-    }
-  };
-
-  const deleteQuestion = async (index) => {
-    if (!confirm("Are you sure you want to delete this question?")) return;
-
-    const question = questions[index];
-
-    try {
-      // Delete all answer options first
-      for (const option of question.options) {
-        if (option.answer_id) {
-          await axios.delete(
-            `${API_BASE_URL}/answer/${option.answer_id}/delete`
-          );
-        }
-      }
-
-      // Delete the question
-      await axios.delete(
-        `${API_BASE_URL}/question/${quiz.quiz_id}/delete/${question.question_id}`
-      );
-
-      await fetchQuestions();
-      setError(null);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to delete question");
-      console.error("Error deleting question:", err);
-      alert("Error deleting question. Please try again.");
     }
   };
 
@@ -534,7 +526,6 @@ const QuestionManagement = ({ quiz, onBack }) => {
       MC: "Multiple Choice",
       CB: "Checkbox",
       TF: "True/False",
-      // DESC: "Descriptive",
     };
     return labels[type] || type;
   };
@@ -565,9 +556,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
             Add Question
           </button>
         </div>
-        <div className="mb-5">
-          <p className="text-2xl">Questions</p>
-        </div>
+
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
             <p className="font-medium text-sm">Error</p>
@@ -644,7 +633,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
                       <Edit2 className="w-5 h-5" />
                     </button>
                     <button
-                      onClick={() => deleteQuestion(i)}
+                      onClick={() => openDeleteModal(i)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     >
                       <Trash2 className="w-5 h-5" />
@@ -662,6 +651,15 @@ const QuestionManagement = ({ quiz, onBack }) => {
           question={currentQuestion}
           setQuestion={setCurrentQuestion}
           onSave={saveQuestion}
+        />
+
+        <DeleteModal
+          isOpen={deleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          onConfirm={confirmDelete}
+          questionText={
+            deleteIndex !== null ? questions[deleteIndex].question_text : ""
+          }
         />
       </div>
     </div>
