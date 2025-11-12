@@ -147,17 +147,22 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
           </div>
         );
 
-      case "DESC":
-        return (
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600">
-              Descriptive question - User will provide a text answer
-            </p>
-          </div>
-        );
+      // case "DESC":
+      //   return (
+      //     <div className="p-4 bg-gray-50 rounded-lg">
+      //       <p className="text-sm text-gray-600">
+      //         Descriptive question - User will provide a text answer
+      //       </p>
+      //     </div>
+      //   );
 
       default:
-        return null;
+        // return null;
+         return (
+            <p className="text-gray-500 italic">
+              Unsupported question type.
+            </p>
+          );
     }
   };
 
@@ -172,12 +177,14 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
           { option_text: "False", is_correct: false },
         ],
       }));
-    } else if (newType === "DESC") {
-      setQuestion((prev) => ({
-        ...prev,
-        options: [],
-      }));
-    } else if (question.options.length === 0) {
+    } 
+    // else if (newType === "DESC") {
+    //   setQuestion((prev) => ({
+    //     ...prev,
+    //     options: [],
+    //   }));
+    // } 
+    else if (question.options.length === 0) {
       setQuestion((prev) => ({
         ...prev,
         options: [
@@ -193,14 +200,14 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform animate-in zoom-in-95 duration-200">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold text-gray-800">
+            <h2 className="text-2xl font-semibold text-[#2E99B0] ">
               {question.question_id ? "Edit Question" : "Add New Question"}
             </h2>
             <button
               onClick={onClose}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <X className="w-5 h-5 text-gray-500" />
+              <X className="w-5 h-5 text-[#2E99B0]" />
             </button>
           </div>
         </div>
@@ -210,19 +217,19 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Question Type
             </label>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {[
                 { value: "MC", label: "Multiple Choice" },
                 { value: "CB", label: "Checkbox" },
                 { value: "TF", label: "True/False" },
-                { value: "DESC", label: "Descriptive" },
+                // { value: "DESC", label: "Descriptive" },
               ].map((type) => (
                 <button
                   key={type.value}
                   onClick={() => handleQuestionTypeChange(type.value)}
                   className={`py-2 px-3 rounded-lg font-medium text-sm transition-colors ${
                     question.question_type === type.value
-                      ? "bg-teal-500 text-white"
+                      ? "bg-[#2E99B0] text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
@@ -539,7 +546,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
       MC: "Multiple Choice",
       CB: "Checkbox",
       TF: "True/False",
-      DESC: "Descriptive",
+      // DESC: "Descriptive",
     };
     return labels[type] || type;
   };
@@ -593,12 +600,6 @@ const QuestionManagement = ({ quiz, onBack }) => {
             <p className="text-gray-600 mb-4">
               Get started by adding your first question
             </p>
-            {/* <button
-              onClick={openAddModal}
-              className="px-5 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
-            >
-              Add Question
-            </button> */}
           </div>
         ) : (
           <div className="grid gap-4">
