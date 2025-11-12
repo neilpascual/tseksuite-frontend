@@ -181,14 +181,7 @@ const TestPage = () => {
           return {
             question_id: question.question_id,
             selected_answer: Array.isArray(userAnswer) ? userAnswer : [],
-          };
-        } else if (question.question_type === "DESC") {
-          // For descriptive, send text
-          return {
-            question_id: question.question_id,
-            selected_answer:
-              typeof userAnswer === "string" ? userAnswer.trim() : "",
-          };
+          }; 
         } else {
           // For MC/TF, send single answer ID
           return {
@@ -279,7 +272,6 @@ const TestPage = () => {
       MC: "Multiple Choice",
       CB: "Multiple Select",
       TF: "True/False",
-      DESC: "Descriptive",
     };
     return labels[type] || "Question";
   };
@@ -402,7 +394,7 @@ const TestPage = () => {
                     <div className="flex items-start gap-3">
                       {currentQuestion.question_type === "CB" ? (
                         <div
-                          className={`w-5 h-5 flex-shrink-0 mt-0.5 rounded border-2 flex items-center justify-center ${
+                          className={`w-5 h-5 shrink-0 mt-0.5 rounded border-2 flex items-center justify-center ${
                             isSelected
                               ? "bg-cyan-600 border-cyan-600"
                               : "border-gray-400"
@@ -426,8 +418,10 @@ const TestPage = () => {
                         </div>
                       ) : (
                         <div
-                          className={`w-5 h-5 flex-shrink-0 mt-0.5 rounded-full border-2 flex items-center justify-center ${
-                            isSelected ? "border-cyan-600" : "border-gray-400"
+                          className={`w-5 h-5 shrink-0 mt-0.5 rounded-full border-2 flex items-center justify-center ${
+                            isSelected
+                              ? "border-cyan-600"
+                              : "border-gray-400"
                           }`}
                         >
                           {isSelected && (
