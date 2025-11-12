@@ -232,7 +232,7 @@ const ApplicantOnboardingPage = () => {
           <div className="flex-1 w-full lg:w-auto text-center lg:text-left">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 lg:mb-8">
               <span className="text-cyan-600">Welcome,</span>{" "}
-              <span className="text-black">Candidate!</span>
+              <span className="text-black">Examinee!</span>
             </h1>
 
             <div className="space-y-4 lg:space-y-6 text-gray-800 text-sm sm:text-base">
@@ -265,7 +265,7 @@ const ApplicantOnboardingPage = () => {
               className="bg-white rounded-2xl p-6 sm:p-8 relative border border-gray-200 mb-6 sm:mb-0"
               style={{ boxShadow: "4px 4px 0px 0px rgba(0, 0, 0, 1)" }}
             >
-              <h2 className="text-xl font-bold mb-1">Candidate Form</h2>
+              <h2 className="text-xl font-bold mb-1">Examinee Form</h2>
               <p className="text-gray-500 text-xs mb-6">
                 Please provide accurate details.
               </p>

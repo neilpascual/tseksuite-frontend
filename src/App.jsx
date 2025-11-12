@@ -19,6 +19,7 @@ import ErrorMessage from "./pages/admin/ErrorMessage";
 import TestInstructions from "./pages/applicant/TestInstructions";
 import CompletedTestPage from "./pages/applicant/CompletedTestPage";
 import TestBuilderPage from "./pages/admin/AssesmentsTab/TestBuilderPage";
+import AbandonTracker from "./components/AbandonTracker";
 
 function App() {
   return (
@@ -27,11 +28,21 @@ function App() {
       <Routes>
         {/* Applicant Routes */}
         <Route path="/take-quiz/:token" element={<ApplicantOnboardingPage />} />
-        <Route path="/test-instructions" element={<TestInstructions />} />
+        <Route path="/test-instructions" element={<TestInstructions />} /> 
+
+        
         <Route path="/quiz-selection" element={<QuizSelectionPage />} />
         <Route path="/completed-test" element={<CompletedTestResults />} />
-        <Route path="/test-page" element={<ApplicantTestPage />} />
-        <Route path="/completed" element={<CompletedTestPage />} />
+        
+        {/* This is the start of monitoring */}
+        <Route path="/test-page" element={
+          <AbandonTracker>
+            <ApplicantTestPage /> 
+          </AbandonTracker>} 
+          />
+        {/* End of Monitoring */}
+        
+        <Route path="/completed" element={ <CompletedTestPage /> } />
         <Route path="/auth/login" element={<LoginPage />} />
         {/* ProtectedRoutes */}
         {/* /admin protected routes */}

@@ -28,6 +28,11 @@ const TestInstructions = () => {
 
   const handleStartTest = () => {
     console.log("Starting test...");
+
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) elem.requestFullscreen();
+    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+    else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
     // Navigate to the test page
     navigate("/test-page", {
       state: {
