@@ -25,9 +25,9 @@ const AdminSideBar = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-          logout();
-          navigate('/auth/login');
-        }
+    logout();
+    navigate("/auth/login");
+  };
 
   return (
     <div className="h-screen ">
@@ -53,7 +53,7 @@ const AdminSideBar = () => {
         </div>
         <div className="flex items-center gap-3 mt-10">
           <LayoutDashboard className="h-5 w-5" />{" "}
-          <span className="text-[#2E99B0] text-lg font-bold">Dashboard</span>
+          <span className="text-[#2E99B0] text-lg font-bold  ">Dashboard</span>
         </div>
         {/* Applicant Section */}
         <div
@@ -144,8 +144,9 @@ const AdminSideBar = () => {
           </>
         )}
 
-        <div className="w-[23%] h-[7%] rounded-xl bg-[#2E99B0] px-2 py-6 flex items-center gap-1 mt-25 fixed bottom-10"
-        onClick={ handleLogout }
+        <div
+          className="w-[23%] h-[7%] rounded-xl bg-[#2E99B0] px-2 py-6 flex items-center gap-1 mt-25 fixed bottom-10"
+          onClick={handleLogout}
         >
           <div className="ml-5">
             <img src="/assets/Logo.png" alt="Logo" />

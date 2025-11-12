@@ -3,12 +3,11 @@ import {
   X,
   LayoutDashboard,
   User,
-  Captions,
   ClipboardList,
   Layers2,
-  Package,
   NotepadText,
-  ArrowUpNarrowWide,
+  CreditCard,
+  BrickWall,
 } from "lucide-react";
 import SidebarHeader from "../SidebarHeader";
 import SidebarLink from "../SidebarLink";
@@ -18,8 +17,7 @@ import SidebarFooter from "../SidebarFooter";
 
 const AdminTopBar = () => {
   const [expanded, setExpanded] = useState(false);
-  const [openApplicants, setOpenApplicants] = useState(false);
-  const [openTrainings, setOpenTrainings] = useState(false);
+  const [openExaminers, setOpenExaminers] = useState(false);
   const [openAssessments, setOpenAssessments] = useState(false);
 
   const getExpandedHeight = () => {
@@ -27,10 +25,9 @@ const AdminTopBar = () => {
 
     if (!expanded) return baseHeight;
 
-    let extraHeight = 240;
+    let extraHeight = 200;
 
-    if (openApplicants) extraHeight += 70;
-    if (openTrainings) extraHeight += 120;
+    if (openExaminers) extraHeight += 70;
     if (openAssessments) extraHeight += 80;
 
     return baseHeight + extraHeight;
@@ -59,16 +56,16 @@ const AdminTopBar = () => {
         <div className="mt-4  flex flex-col gap-2">
           <div onClick={() => setExpanded(false)}>
             <SidebarLink
-            to="/admin/dashboard"
-            label="Dashboard"
-            icon={(active) => (
-              <LayoutDashboard
-                className={`h-5 w-5 ${
-                  active ? "text-white" : "text-[#2E99B0]"
-                }`}
-              />
-            )}
-          />
+              to="/admin/dashboard"
+              label="Dashboard"
+              icon={(active) => (
+                <LayoutDashboard
+                  className={`h-5 w-5 ${
+                    active ? "text-white" : "text-[#2E99B0]"
+                  }`}
+                />
+              )}
+            />
           </div>
 
           <SidebarLink
@@ -81,68 +78,28 @@ const AdminTopBar = () => {
                 }`}
               />
             )}
-            isOpen={openApplicants}
-            toggleOpen={() => setOpenApplicants(!openApplicants)}
+            isOpen={openExaminers}
+            toggleOpen={() => setOpenExaminers(!openExaminers)}
           />
-          {openApplicants && (
+          {openExaminers && (
             <div onClick={() => setExpanded(false)}>
-            <SidebarSubmenu
-              isOpen={openApplicants}
-              items={[
-                {
-                  icon: <Layers2 className="h-4 w-4" />,
-                  label: "Tests",
-                  to: "/admin/examiners/tests",
-                },
-                {
-                  icon: <NotepadText className="h-4 w-4" />,
-                  label: "Results",
-                  to: "/admin/examiners/results",
-                },
-              ]}
-            />
+              <SidebarSubmenu
+                isOpen={openExaminers}
+                items={[
+                  {
+                    icon: <Layers2 className="h-4 w-4" />,
+                    label: "Tests",
+                    to: "/admin/examiners/tests",
+                  },
+                  {
+                    icon: <NotepadText className="h-4 w-4" />,
+                    label: "Results",
+                    to: "/admin/examiners/results",
+                  },
+                ]}
+              />
             </div>
           )}
-
-
-          {/* removed */}
-          {/* <SidebarLink
-            // to="/admin/trainings"
-            label="Trainings"
-            icon={(active) => (
-              <Captions
-                className={`h-5 w-5 ${
-                  active ? "text-white" : "text-[#2E99B0]"
-                }`}
-              />
-            )}
-            isOpen={openTrainings}
-            toggleOpen={() => setOpenTrainings(!openTrainings)}
-          />
-          {openTrainings && (
-            <div onClick={() => setExpanded(false)}>
-            <SidebarSubmenu
-              isOpen={openTrainings}
-              items={[
-                {
-                  icon: <Package className="h-4 w-4" />,
-                  label: "Modules",
-                  to: "/admin/trainings/modules",
-                },
-                {
-                  icon: <NotepadText className="h-4 w-4" />,
-                  label: "Tests",
-                  to: "/admin/trainings/tests",
-                },
-                {
-                  icon: <ArrowUpNarrowWide className="h-4 w-4" />,
-                  label: "Progress",
-                  to: "/admin/trainings/progress",
-                },
-              ]}
-            />
-            </div>
-          )} */}
 
           <SidebarLink
             // to="/admin/assessments"

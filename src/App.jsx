@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ApplicantOnboardingPage from "./pages/applicant/ApplicantOnboardingPage";
 import ApplicantTestPage from "./pages/applicant/TestPage";
 import QuizSelectionPage from "./pages/applicant/QuizSelectionPage";
@@ -6,9 +6,12 @@ import CompletedTestResults from "./pages/applicant/CompletedTestResults";
 import { Toaster } from "react-hot-toast";
 import AdminProtectedRoutes from "../routes/AdminProtectedRoutes";
 import DashboardPage from "./pages/admin/DashboardPage";
-import LoginPage from "./pages/auth/LoginPage";
+//
+import LoginForm from "./components/auth/LoginForm";
+//
 import MainLayout from "./layouts/admin/MainLayout";
 import TestPage from "./pages/admin/ApplicantsTab/TestsPage";
+
 //added results page import
 import ResultsPage from "./pages/admin/ApplicantsTab/ResultsPage";
 import ComingSoon from "./components/ComingSoon";
@@ -25,7 +28,10 @@ function App() {
   return (
     <BrowserRouter>
       <Toaster position="top-center" reverseOrder={false} />
+
       <Routes>
+        {" "}
+        <Route path="/" element={<Navigate to="/auth/login" replace />} />
         {/* Applicant Routes */}
         <Route path="/take-quiz/:token" element={<ApplicantOnboardingPage />} />
         <Route path="/test-instructions" element={<TestInstructions />} /> 
