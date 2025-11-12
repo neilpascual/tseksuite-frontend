@@ -24,7 +24,6 @@ const QuizManagement = ({ department, onBack }) => {
   const [editingQuiz, setEditingQuiz] = useState(null);
   const [deletingQuiz, setDeletingQuiz] = useState(null);
   const [selectedQuizForInvite, setSelectedQuizForInvite] = useState(null);
-  const [inviteEmail, setInviteEmail] = useState("");
   const [inviteExpiration, setInviteExpiration] = useState("");
   const [generatedLink, setGeneratedLink] = useState("");
   const [copied, setCopied] = useState(false);
@@ -128,11 +127,11 @@ const QuizManagement = ({ department, onBack }) => {
   };
 
   const handleGenerateInvite = async () => {
-    if (!inviteEmail.trim() || !selectedQuizForInvite) return;
+    if (!inviteExpiration || !selectedQuizForInvite) return;
 
     try {
       const response = await axios.post(`${INVITE_API_BASE_URL}/generate`, {
-        email: inviteEmail,
+        email: null, // Send null since examinee will provide their own email
         expiration: inviteExpiration,
         quiz_id: selectedQuizForInvite.quiz_id,
         dept_id: department.dept_id,
@@ -145,6 +144,7 @@ const QuizManagement = ({ department, onBack }) => {
         err.response?.data?.message || "Failed to generate invitation link"
       );
       console.error("Error generating invitation:", err);
+      console.error("Error details:", err.response?.data);
     }
   };
 
@@ -157,7 +157,7 @@ const QuizManagement = ({ department, onBack }) => {
   const openInviteModal = (quiz) => {
     setSelectedQuizForInvite(quiz);
     setShowInviteModal(true);
-    setInviteEmail("");
+    setInviteExpiration("");
     setGeneratedLink("");
     setCopied(false);
   };
@@ -165,7 +165,7 @@ const QuizManagement = ({ department, onBack }) => {
   const closeInviteModal = () => {
     setShowInviteModal(false);
     setSelectedQuizForInvite(null);
-    setInviteEmail("");
+    setInviteExpiration("");
     setGeneratedLink("");
     setCopied(false);
   };
@@ -239,11 +239,10 @@ const QuizManagement = ({ department, onBack }) => {
             {filteredQuizzes.map((quiz) => (
               <div
                 onClick={() => {
-                  // stopPropagation();
                   setSelectedQuiz(quiz);
                 }}
                 key={quiz.quiz_id}
-                className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow relative"
+                className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow relative cursor-pointer"
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
@@ -265,7 +264,8 @@ const QuizManagement = ({ department, onBack }) => {
                   {openMenuId === quiz.quiz_id && (
                     <div className="absolute right-5 top-14 w-40 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-20">
                       <button
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setEditingQuiz({ ...quiz });
                           setShowEditModal(true);
                           setOpenMenuId(null);
@@ -276,7 +276,8 @@ const QuizManagement = ({ department, onBack }) => {
                         Edit
                       </button>
                       <button
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setDeletingQuiz(quiz);
                           setShowDeleteModal(true);
                           setOpenMenuId(null);
@@ -297,8 +298,6 @@ const QuizManagement = ({ department, onBack }) => {
                   </span>
                 </div>
 
-                {/* <div className="h-24 mb-4"></div> */}
-
                 <div className="flex items-center justify-end gap-2 pt-4 border-t border-gray-100">
                   <button
                     onClick={(e) => {
@@ -310,12 +309,6 @@ const QuizManagement = ({ department, onBack }) => {
                     <LinkIcon size={18} />
                     Invite
                   </button>
-                  {/* <button 
-                    onClick={() => setSelectedQuiz(quiz)}
-                    className="bg-[#2E99B0] text-white px-6 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-cyan-700"
-                  >
-                    View
-                  </button> */}
                 </div>
 
                 <div className="mt-3">
@@ -513,29 +506,14 @@ const QuizManagement = ({ department, onBack }) => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Participant Email
-                  </label>
-                  <input
-                    type="email"
-                    value={inviteEmail}
-                    onChange={(e) => setInviteEmail(e.target.value)}
-                    placeholder="Enter email address"
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    onKeyPress={(e) =>
-                      e.key === "Enter" && handleGenerateInvite()
-                    }
-                    autoFocus
-                  />
-                  {/* edit for time */}
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Expiration
+                    Expiration Time (Hours)
                   </label>
                   <input
                     type="number"
                     value={inviteExpiration}
                     onChange={(e) => setInviteExpiration(e.target.value)}
-                    placeholder="Enter Expiration Time(Hours)"
-                    min={1}
+                    placeholder="Enter expiration time in hours"
+                    min="1"
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     onKeyPress={(e) =>
                       e.key === "Enter" && handleGenerateInvite()
@@ -552,7 +530,7 @@ const QuizManagement = ({ department, onBack }) => {
                   </button>
                   <button
                     onClick={handleGenerateInvite}
-                    disabled={!inviteEmail.trim()}
+                    disabled={!inviteExpiration}
                     className="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Generate Link
@@ -591,7 +569,7 @@ const QuizManagement = ({ department, onBack }) => {
                 </div>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                   <p className="text-sm text-blue-800">
-                    This link will expire in 24 hours and can only be used once.
+                    Share this link with the examinee. They will enter their email when accessing the quiz.
                   </p>
                 </div>
                 <button

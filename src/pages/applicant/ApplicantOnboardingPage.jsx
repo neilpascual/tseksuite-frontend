@@ -40,7 +40,6 @@ const ApplicantOnboardingPage = () => {
       setDepartments(activeDepartments);
     } catch (err) {
       console.error('Error fetching departments:', err);
-      // Set fallback departments if API fails
       setDepartments([]);
     } finally {
       setIsLoadingDepts(false);
@@ -49,7 +48,7 @@ const ApplicantOnboardingPage = () => {
 
   const validateInviteToken = async () => {
     if (!token) {
-      setError("Invalid invitation link. Please use the link provided in your email.");
+      setError("Invalid invitation link. Please use the link provided to you.");
       setIsValidating(false);
       return;
     }
@@ -83,18 +82,14 @@ const ApplicantOnboardingPage = () => {
 
       setInviteData(result.data);
       
-      const email = result.data.email || result.data.invitee_email || "";
+      // Extract department ID if provided in the invitation
       const deptId = result.data.dept_id || result.data.department_id || result.data.deptId || "";
       
-      console.log("Extracted values - email:", email, "dept_id:", deptId);
+      console.log("Extracted dept_id:", deptId);
       
-      if (!email) {
-        throw new Error("Email not found in invitation data");
-      }
-      
+      // Pre-fill department if available
       setFormData(prev => ({
         ...prev,
-        email: email,
         department: deptId ? deptId.toString() : ""
       }));
 
@@ -110,8 +105,6 @@ const ApplicantOnboardingPage = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     
-    if (name === "email") return;
-    
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -124,73 +117,92 @@ const ApplicantOnboardingPage = () => {
       return;
     }
 
-    if (formData.email !== inviteData.email) {
-      alert("Email must match the invitation. Please contact your recruiter if you need to change it.");
+    // Validate all required fields
+    if (!formData.firstName.trim()) {
+      alert("Please enter your first name");
       return;
     }
 
-    if (formData.firstName && formData.lastName && formData.email && formData.department) {
-      setIsSubmitting(true);
+    if (!formData.lastName.trim()) {
+      alert("Please enter your last name");
+      return;
+    }
+
+    if (!formData.email.trim()) {
+      alert("Please enter your email address");
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      alert("Please enter a valid email address");
+      return;
+    }
+
+    if (!formData.department) {
+      alert("Please select a department");
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      const applicantData = {
+        token: token,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email
+      };
+
+      console.log("Submitting applicant data:", applicantData);
+
+      const response = await fetch('http://localhost:3000/api/invitation/complete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(applicantData)
+      });
+
+      const text = await response.text();
+      let result;
       
       try {
-        const applicantData = {
-          token: token,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          email: formData.email
-        };
-
-        console.log("Submitting applicant data:", applicantData);
-
-        const response = await fetch('http://localhost:3000/api/invitation/complete', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(applicantData)
-        });
-
-        const text = await response.text();
-        let result;
-        
-        try {
-          result = JSON.parse(text);
-        } catch (e) {
-          console.error("Response is not JSON:", text);
-          throw new Error("Server returned invalid response");
-        }
-
-        if (!response.ok) {
-          throw new Error(result?.message || 'Failed to submit form');
-        }
-
-        console.log("Form submitted successfully:", result);
-
-        const applicantDataForStorage = {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          department: formData.department,
-          examiner_id: result.data.examiner.examiner_id
-        };
-        
-        localStorage.setItem("applicantData", JSON.stringify(applicantDataForStorage));
-        localStorage.setItem("selectedQuiz", JSON.stringify(result.data.quiz));
-
-        navigate("/test-instructions", {
-          state: { 
-            applicantData: applicantDataForStorage,
-            selectedQuiz: result.data.quiz
-          }
-        });
-      } catch (error) {
-        console.error("Error submitting form:", error);
-        alert(`Error: ${error.message}. Please try again.`);
-      } finally {
-        setIsSubmitting(false);
+        result = JSON.parse(text);
+      } catch (e) {
+        console.error("Response is not JSON:", text);
+        throw new Error("Server returned invalid response");
       }
-    } else {
-      alert("Please fill in all required fields");
+
+      if (!response.ok) {
+        throw new Error(result?.message || 'Failed to submit form');
+      }
+
+      console.log("Form submitted successfully:", result);
+
+      const applicantDataForStorage = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        department: formData.department,
+        examiner_id: result.data.examiner.examiner_id
+      };
+      
+      localStorage.setItem("applicantData", JSON.stringify(applicantDataForStorage));
+      localStorage.setItem("selectedQuiz", JSON.stringify(result.data.quiz));
+
+      navigate("/test-instructions", {
+        state: { 
+          applicantData: applicantDataForStorage,
+          selectedQuiz: result.data.quiz
+        }
+      });
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert(`Error: ${error.message}. Please try again.`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -297,7 +309,7 @@ const ApplicantOnboardingPage = () => {
 
                 <div className="mb-6 sm:mb-4">
                   <label className="block text-xs font-bold mb-2 text-gray-900">
-                    Email Address
+                    Email Address <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
@@ -305,11 +317,11 @@ const ApplicantOnboardingPage = () => {
                     placeholder="example@email.com"
                     value={formData.email}
                     onChange={handleChange}
-                    disabled={true}
-                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none bg-gray-100 text-gray-600 placeholder-gray-400 cursor-not-allowed"
+                    disabled={isSubmitting}
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 placeholder-gray-400 disabled:bg-gray-100"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Email cannot be changed (from invitation)
+                    Please enter your email address
                   </p>
                 </div>
 
@@ -321,7 +333,7 @@ const ApplicantOnboardingPage = () => {
                     name="department"
                     value={formData.department}
                     onChange={handleChange}
-                    disabled={inviteData?.dept_id || isLoadingDepts}
+                    disabled={inviteData?.dept_id || isLoadingDepts || isSubmitting}
                     className="w-full px-3 py-2.5 text-sm sm:text-base border border-gray-300 rounded-md bg-white text-gray-700 pr-10 disabled:bg-gray-100 disabled:cursor-not-allowed focus:outline-none focus:ring-1 focus:ring-cyan-500"
                   >
                     <option value="">

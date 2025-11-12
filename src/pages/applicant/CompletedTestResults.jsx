@@ -332,16 +332,6 @@ const CompletedTestResults = () => {
               })}
             </div>
           </div>
-
-          {/* Action Button */}
-          <div className="text-center">
-            <button
-              onClick={handleBackToHome}
-              className="inline-flex items-center gap-2 px-8 py-3 bg-[#217486] hover:bg-[#1c6574] text-white font-semibold rounded-xl shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              Back to Home
-            </button>
-          </div>
         </div>
       </div>
 
