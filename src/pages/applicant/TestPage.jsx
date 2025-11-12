@@ -17,6 +17,7 @@ const TestPage = () => {
   const [userAnswers, setUserAnswers] = useState([]);
   const [quizData, setQuizData] = useState(null);
   const [applicantData, setApplicantData] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const API_BASE_URL = "http://localhost:3000/api";
 
@@ -42,13 +43,11 @@ const TestPage = () => {
   }, []);
 
   useEffect(() => {
-    if (timeRemaining <= 0 || loading) return;
+    if (timeRemaining <= 0 || loading || isSubmitting) return;
 
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
-          clearInterval(timer);
-          handleTimeUp();
           return 0;
         }
         return prev - 1;
@@ -56,7 +55,14 @@ const TestPage = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeRemaining, loading]);
+  }, [timeRemaining, loading, isSubmitting]);
+
+  // Separate effect to handle timeout
+  useEffect(() => {
+    if (timeRemaining === 0 && !loading && !isSubmitting) {
+      handleTimeUp();
+    }
+  }, [timeRemaining, loading, isSubmitting]);
 
   const fetchQuestions = async (quizId) => {
     try {
@@ -106,9 +112,11 @@ const TestPage = () => {
     }
   };
 
-  const handleTimeUp = () => {
+  const handleTimeUp = async () => {
+    if (isSubmitting) return; // Prevent double submission
+    setIsSubmitting(true);
     alert("Time is up! Submitting your answers...");
-    submitTest();
+    await submitTest();
   };
 
   const formatTime = (seconds) => {
@@ -134,6 +142,8 @@ const TestPage = () => {
   };
 
   const handleNext = () => {
+    if (isSubmitting) return; // Prevent actions during submission
+
     const currentQuestion = questions[currentQuestionIndex];
 
     if (currentQuestion.question_type === "CB") {
@@ -181,7 +191,14 @@ const TestPage = () => {
           return {
             question_id: question.question_id,
             selected_answer: Array.isArray(userAnswer) ? userAnswer : [],
-          }; 
+          };
+        } else if (question.question_type === "DESC") {
+          // For descriptive, send text
+          return {
+            question_id: question.question_id,
+            selected_answer:
+              typeof userAnswer === "string" ? userAnswer.trim() : "",
+          };
         } else {
           // For MC/TF, send single answer ID
           return {
@@ -272,6 +289,7 @@ const TestPage = () => {
       MC: "Multiple Choice",
       CB: "Multiple Select",
       TF: "True/False",
+      DESC: "Descriptive",
     };
     return labels[type] || "Question";
   };
@@ -394,7 +412,7 @@ const TestPage = () => {
                     <div className="flex items-start gap-3">
                       {currentQuestion.question_type === "CB" ? (
                         <div
-                          className={`w-5 h-5 shrink-0 mt-0.5 rounded border-2 flex items-center justify-center ${
+                          className={`w-5 h-5 flex-shrink-0 mt-0.5 rounded border-2 flex items-center justify-center ${
                             isSelected
                               ? "bg-cyan-600 border-cyan-600"
                               : "border-gray-400"
@@ -418,10 +436,8 @@ const TestPage = () => {
                         </div>
                       ) : (
                         <div
-                          className={`w-5 h-5 shrink-0 mt-0.5 rounded-full border-2 flex items-center justify-center ${
-                            isSelected
-                              ? "border-cyan-600"
-                              : "border-gray-400"
+                          className={`w-5 h-5 flex-shrink-0 mt-0.5 rounded-full border-2 flex items-center justify-center ${
+                            isSelected ? "border-cyan-600" : "border-gray-400"
                           }`}
                         >
                           {isSelected && (
@@ -440,23 +456,37 @@ const TestPage = () => {
           <div className="flex justify-end">
             <button
               onClick={handleNext}
-              className="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-10 sm:px-16 py-3.5 rounded-lg transition-colors duration-200 flex items-center gap-2 text-base sm:text-lg"
+              disabled={isSubmitting}
+              className={`bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-10 sm:px-16 py-3.5 rounded-lg transition-colors duration-200 flex items-center gap-2 text-base sm:text-lg ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              }`}
               style={{ boxShadow: "4px 4px 0px 0px rgba(0, 0, 0, 1)" }}
             >
-              {currentQuestionIndex < questions.length - 1 ? "Next" : "Submit"}
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.5}
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
+              {isSubmitting ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  {currentQuestionIndex < questions.length - 1
+                    ? "Next"
+                    : "Submit"}
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
+                  </svg>
+                </>
+              )}
             </button>
           </div>
         </div>
