@@ -34,22 +34,21 @@ function App() {
         <Route path="/" element={<Navigate to="/auth/login" replace />} />
         {/* Applicant Routes */}
         <Route path="/take-quiz/:token" element={<ApplicantOnboardingPage />} />
-        <Route path="/test-instructions" element={<TestInstructions />} /> 
-
-        
+        <Route path="/test-instructions" element={<TestInstructions />} />
         <Route path="/quiz-selection" element={<QuizSelectionPage />} />
         <Route path="/completed-test" element={<CompletedTestResults />} />
-        
         {/* This is the start of monitoring */}
-        <Route path="/test-page" element={
-          <AbandonTracker>
-            <ApplicantTestPage /> 
-          </AbandonTracker>} 
-          />
+        <Route
+          path="/test-page"
+          element={
+            <AbandonTracker>
+              <ApplicantTestPage />
+            </AbandonTracker>
+          }
+        />
         {/* End of Monitoring */}
-        
-        <Route path="/completed" element={ <CompletedTestPage /> } />
-        <Route path="/auth/login" element={<LoginPage />} />
+        <Route path="/completed" element={<CompletedTestPage />} />
+        <Route path="/auth/login" element={<LoginForm />} />
         {/* ProtectedRoutes */}
         {/* /admin protected routes */}
         <Route element={<AdminProtectedRoutes />}>
