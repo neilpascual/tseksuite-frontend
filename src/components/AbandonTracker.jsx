@@ -3,17 +3,21 @@ import axios from "axios";
 import { useNavigate } from "react-router";
 import { AlertTriangle, ShieldAlert } from "lucide-react";
 
-function AbandonTracker({ children, examiner_id = 1, quiz_id = 1 }) {
+function AbandonTracker({ children }) {
   const countdownRef = useRef(null);
   const warnedRef = useRef(false);
   const isLeavingRef = useRef(false); // Prevent double triggers
   const [showOverlay, setShowOverlay] = useState(false);
   const navigate = useNavigate();
 
+  const applicantData = JSON.parse(localStorage.getItem('applicantData'))
+  const selectedQuiz = JSON.parse(localStorage.getItem('selectedQuiz'))
+
   const handleAbandon = () => {
+
     const abandonData = {
-      examiner_id,
-      quiz_id,
+      examiner_id: applicantData.examiner_id,
+      quiz_id: selectedQuiz.quiz_id,
       answers: [],
       status: "ABANDONED",
       created_at: Date.now(),

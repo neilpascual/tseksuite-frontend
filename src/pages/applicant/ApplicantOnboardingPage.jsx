@@ -189,7 +189,16 @@ const ApplicantOnboardingPage = () => {
         department: formData.department,
         examiner_id: result.data.examiner.examiner_id
       };
-      
+
+      if(localStorage.getItem('applicantData')){
+        localStorage.removeItem('applicantData')
+      }
+
+      if(localStorage.getItem('selectedQuiz')){
+        localStorage.removeItem('selectedQuiz')
+      }
+
+      // Validate if there the localStorage Exists and if so then override
       localStorage.setItem("applicantData", JSON.stringify(applicantDataForStorage));
       localStorage.setItem("selectedQuiz", JSON.stringify(result.data.quiz));
 
