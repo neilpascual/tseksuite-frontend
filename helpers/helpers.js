@@ -19,13 +19,21 @@ export const transformExaminers = (examiner) => ({
     examiner_name: `${examiner.first_name} ${examiner.last_name}`,
     department: examiner.Department?.dept_name || "N/A",
     email: examiner.email,
+    // Store raw timestamp for filtering
+    created_at: examiner.created_at,
+    // Display date only
     date: new Date(examiner.created_at).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
     }),
+    // Display time only
+    time: new Date(examiner.created_at).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    }),
   });
-
   
 export const filteredDepartments = (departments, searchTerm, filterActive) => departments.filter((dept) => {
     const matchesSearch = dept.dept_name

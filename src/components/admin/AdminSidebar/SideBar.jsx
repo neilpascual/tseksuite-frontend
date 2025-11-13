@@ -113,7 +113,7 @@ const AdminSidebar = () => {
         )} */}
         <SidebarLink
           to="" // no navigation
-          label="Examiners"
+          label="Examinees"
           icon={(active) => (
             <User
               className={`h-5 w-5 ${active ? "text-white" : "text-[#2E99B0]"}`}
@@ -129,7 +129,7 @@ const AdminSidebar = () => {
             items={[
               {
                 icon: <Layers2 className="h-4 w-4 hidden sm:flex" />,
-                label: "Tests",
+                label: "Examinee List",
                 to: "/admin/examiners/tests",
               },
               {
