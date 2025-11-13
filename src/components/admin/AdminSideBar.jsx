@@ -15,6 +15,7 @@ import {
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router";
+import toast from "react-hot-toast";
 
 const AdminSideBar = () => {
   const [openApplicants, setOpenApplicants] = useState(false);
@@ -26,6 +27,10 @@ const AdminSideBar = () => {
 
   const handleLogout = () => {
     logout();
+    toast.success("You have been logged out successfully", {
+      style: { width: "300px" },
+    });
+
     navigate("/auth/login");
   };
 
@@ -136,10 +141,6 @@ const AdminSideBar = () => {
             <div className="flex items-center ml-15 text-[#2E99B0] font-medium">
               <CreditCard className="h-5 w-5 mr-2" />
               <span>Test Bank</span>
-            </div>
-            <div className="flex items-center ml-15 text-[#2E99B0] font-medium">
-              <BrickWall className="h-5 w-5 mr-2" />
-              <span>Test Builder</span>
             </div>
           </>
         )}

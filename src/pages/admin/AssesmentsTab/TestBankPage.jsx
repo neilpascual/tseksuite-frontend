@@ -144,7 +144,7 @@ const TestBankPage = () => {
   }
 
   return (
-    <div className="h-screen w-full px-3 sm:px-6 md:px-8 py-6">
+    <div className="h-screen w-full px-3 sm:px-6 md:px-8 py-6 mt-20 mb-10  sm:mb-0 sm:mt-0">
       {/* Header */}
       <div className="mb-6 lg:mb-8">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
@@ -186,17 +186,19 @@ const TestBankPage = () => {
           <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Filter size={24} className="text-gray-400" />
           </div>
-          <p className="text-gray-500 text-base lg:text-lg">
+          <div className="text-gray-500 text-base lg:text-lg ">
             {searchTerm || filterActive !== "all"
               ? "No departments match your filters"
               : "No departments found"}
-          </p>
+          </div>
           <p className="text-gray-400 text-xs lg:text-sm mt-1">
-            {!searchTerm && filterActive === "all" && "Create your first department to get started"}
+            {!searchTerm &&
+              filterActive === "all" &&
+              "Create your first department to get started"}
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5  ">
           {filtered.map((dept) => (
             <DepartmentCard
               key={dept.dept_id}
@@ -205,7 +207,9 @@ const TestBankPage = () => {
               setSelectedDepartment={() => setSelectedDepartment(dept)}
               onMenuClicked={(e) => {
                 e.stopPropagation();
-                setOpenMenuId(openMenuId === dept.dept_id ? null : dept.dept_id);
+                setOpenMenuId(
+                  openMenuId === dept.dept_id ? null : dept.dept_id
+                );
               }}
               onEditClicked={(e) => {
                 e.stopPropagation();

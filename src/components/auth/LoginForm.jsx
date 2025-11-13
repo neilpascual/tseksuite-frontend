@@ -45,35 +45,35 @@ const LoginForm = () => {
   return (
     <div className="relative min-h-screen w-screen">
       <div
-        className="min-h-screen flex items-center justify-center p-4"
+        className="min-h-screen w-full flex items-center justify-center p-4"
         style={{ backgroundColor: "#5FB3C5" }}
       >
         <div
-          className="w-full max-w-sm rounded-lg p-12"
+          className="w-full max-w-sm 2xl:max-w-xl 2xl:max-h-[500px] rounded-lg p-12"
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.2)",
             border: "1px solid rgba(255, 255, 255, 0.5)",
           }}
         >
-          <h1 className="text-white text-4xl font-normal text-center mb-12 tracking-widest">
+          <h1 className="text-white text-4xl font-normal text-center mb-12 tracking-widest 2xl:text-6xl">
             LOGIN
           </h1>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-white text-xs mb-1.5 pl-1">
+              <label className="block text-white text-xs mb-1.5 pl-1 2xl:text-xl">
                 Email
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-3 rounded-full bg-white text-gray-800 focus:outline-none"
+                className="w-full px-3 py-3 rounded-full bg-white text-gray-800 focus:outline-none "
                 style={{ backgroundColor: "#E8F4F6" }}
                 required
               />
             </div>
             <div className="mt-5">
-              <label className="block text-white text-xs mb-1.5 pl-1">
+              <label className="block text-white text-xs mb-1.5 pl-1 2xl:text-xl">
                 Password
               </label>
               <div className="relative w-full">
@@ -104,7 +104,7 @@ const LoginForm = () => {
                 </button>
               </div>
             </div>
-            <div className="pt-10 font-bold">
+            <div className="pt-10 font-bold 2xl:text-2xl">
               <button
                 type="submit"
                 className="w-full text-white font-medium py-3.5 rounded-lg transition-all duration-200 hover:opacity-90"
@@ -116,7 +116,6 @@ const LoginForm = () => {
           </form>
         </div>
       </div>
-      )
     </div>
   );
 };

@@ -8,13 +8,15 @@ import {
   NotepadText,
   CreditCard,
 } from "lucide-react";
-import SidebarHeader from "../SidebarHeader";
-import SidebarLink from "../SidebarLink";
-import SidebarSubmenu from "../SidebarSubmenu";
-import { useState } from "react";
-import SidebarFooter from "../SidebarFooter";
 
-const AdminTopBar = () => {
+import { useState } from "react";
+
+import SidebarHeader from "../AdminSidebar/SidebarHeader";
+import SidebarLink from "../AdminSidebar/SidebarLink";
+import SidebarSubmenu from "../AdminSidebar/SidebarSubmenu";
+import SidebarFooter from "../AdminSidebar/SidebarFooter";
+
+const AdminBottomBar = () => {
   const [expanded, setExpanded] = useState(false);
   const [openExaminers, setOpenExaminers] = useState(false);
   const [openAssessments, setOpenAssessments] = useState(false);
@@ -34,7 +36,7 @@ const AdminTopBar = () => {
 
   return (
     <div
-      className="absolute top-0 left-0 w-full bg-white shadow-md z-50 sm:hidden transition-all duration-300"
+      className="absolute bottom-0 right-0 left-0 w-full bg-white shadow-md z-50 sm:hidden transition-all duration-300"
       style={{ height: `${getExpandedHeight()}px` }}
     >
       <div className="w-full pt-3 pr-5 flex justify-between items-center">
@@ -132,4 +134,4 @@ const AdminTopBar = () => {
   );
 };
 
-export default AdminTopBar;
+export default AdminBottomBar;
