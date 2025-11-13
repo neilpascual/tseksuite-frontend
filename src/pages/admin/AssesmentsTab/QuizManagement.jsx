@@ -312,7 +312,9 @@ const QuizManagement = ({ department, onBack }) => {
                 </div>
 
                 <div className="mt-3">
-                  <p className="text-xs text-gray-400">12 / 20</p>
+                  <p className="text-xs text-gray-400">
+                    Items: {quiz.question_count}
+                  </p>
                 </div>
               </div>
             ))}
@@ -569,7 +571,8 @@ const QuizManagement = ({ department, onBack }) => {
                 </div>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                   <p className="text-sm text-blue-800">
-                    Share this link with the examinee. They will enter their email when accessing the quiz.
+                    Share this link with the examinee. They will enter their
+                    email when accessing the quiz.
                   </p>
                 </div>
                 <button

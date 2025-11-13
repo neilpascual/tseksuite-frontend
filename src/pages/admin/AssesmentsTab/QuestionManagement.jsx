@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Clock, Plus, Edit2, Trash2, X, ArrowLeft } from "lucide-react";
 
+const API_BASE_URL = "http://localhost:3000/api";
+
 const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
   if (!isOpen) return null;
 
@@ -46,31 +48,48 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
     }
   };
 
-  const renderOptionsForType = () => {
+  const handleTypeChange = (type) => {
+    updateField("question_type", type);
+    if (type === "TF") {
+      setQuestion((prev) => ({
+        ...prev,
+        options: [
+          { option_text: "True", is_correct: false },
+          { option_text: "False", is_correct: false },
+        ],
+      }));
+    } else {
+      setQuestion((prev) => ({
+        ...prev,
+        options: [
+          { option_text: "", is_correct: false },
+          { option_text: "", is_correct: false },
+        ],
+      }));
+    }
+  };
+
+  const renderOptions = () => {
     switch (question.question_type) {
       case "TF":
         return (
           <div className="space-y-2">
-            {[
-              { text: "True", value: true },
-              { text: "False", value: false },
-            ].map((opt, i) => (
+            {question.options.map((opt, i) => (
               <div
                 key={i}
                 className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
               >
                 <input
                   type="radio"
-                  checked={question.options[i]?.is_correct || false}
+                  checked={opt.is_correct}
                   onChange={() => setCorrectAnswer(i)}
                   className="w-4 h-4 text-teal-600"
                 />
-                <span className="flex-1 font-medium">{opt.text}</span>
+                <span className="font-medium">{opt.option_text}</span>
               </div>
             ))}
           </div>
         );
-
       case "MC":
       case "CB":
         return (
@@ -81,7 +100,7 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
                   type={question.question_type === "MC" ? "radio" : "checkbox"}
                   checked={opt.is_correct}
                   onChange={() => setCorrectAnswer(i)}
-                  className="w-4 h-4 text-teal-600 flex-shrink-0"
+                  className="w-4 h-4 text-teal-600"
                 />
                 <input
                   value={opt.option_text}
@@ -89,7 +108,7 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
                     updateOption(i, "option_text", e.target.value)
                   }
                   placeholder={`Option ${i + 1}`}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
                 />
                 {question.options.length > 2 && (
                   <button
@@ -103,102 +122,67 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
             ))}
             <button
               onClick={addOption}
-              className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-teal-500 hover:text-teal-600 transition-colors"
+              className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-teal-500 text-gray-600"
             >
               + Add Option
             </button>
           </div>
         );
-
       default:
-        return (
-          <p className="text-gray-500 italic">Unsupported question type.</p>
-        );
-    }
-  };
-
-  const handleQuestionTypeChange = (newType) => {
-    updateField("question_type", newType);
-
-    if (newType === "TF") {
-      setQuestion((prev) => ({
-        ...prev,
-        options: [
-          { option_text: "True", is_correct: false },
-          { option_text: "False", is_correct: false },
-        ],
-      }));
-    } else if (newType === "MC" || newType === "CB") {
-      setQuestion((prev) => ({
-        ...prev,
-        options: [
-          { option_text: "", is_correct: false },
-          { option_text: "", is_correct: false },
-        ],
-      }));
-    } else {
-      setQuestion((prev) => ({
-        ...prev,
-        options: [],
-      }));
+        return <p className="italic text-gray-500">Unsupported type.</p>;
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-blur bg-opacity-50 flex backdrop-blur-sm items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform animate-in zoom-in-95 duration-200">
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-[#2E99B0] ">
-            {question.question_id ? "Edit Question" : "Add New Question"}
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-50">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-y-auto max-h-[90vh]">
+        <div className="p-6 border-b flex justify-between items-center">
+          <h2 className="text-2xl font-semibold text-[#2E99B0]">
+            {question.question_id ? "Edit Question" : "Add Question"}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition"
           >
             <X className="w-5 h-5 text-[#2E99B0]" />
           </button>
         </div>
 
         <div className="p-6 space-y-6">
-          {/* Question Type */}
+          {/* Type Selector */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="text-sm font-medium text-gray-700 mb-2 block">
               Question Type
             </label>
             <div className="grid grid-cols-3 gap-2">
-              {[
-                { value: "MC", label: "Multiple Choice" },
-                { value: "CB", label: "Checkbox" },
-                { value: "TF", label: "True/False" },
-              ].map((type) => (
+              {["MC", "CB", "TF"].map((t) => (
                 <button
-                  key={type.value}
-                  onClick={() => handleQuestionTypeChange(type.value)}
-                  className={`py-2 px-3 rounded-lg font-medium text-sm transition-colors ${
-                    question.question_type === type.value
+                  key={t}
+                  onClick={() => handleTypeChange(t)}
+                  className={`py-2 rounded-lg ${
+                    question.question_type === t
                       ? "bg-[#2E99B0] text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      : "bg-gray-100 hover:bg-gray-200"
                   }`}
                 >
-                  {type.label}
+                  {t === "MC"
+                    ? "Multiple Choice"
+                    : t === "CB"
+                    ? "Checkbox"
+                    : "True/False"}
                 </button>
               ))}
             </div>
           </div>
 
           {/* Question Text */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Question Text
-            </label>
-            <textarea
-              value={question.question_text}
-              onChange={(e) => updateField("question_text", e.target.value)}
-              placeholder="Enter your question here..."
-              rows={3}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
-            />
-          </div>
+          <textarea
+            placeholder="Enter question text..."
+            value={question.question_text}
+            onChange={(e) => updateField("question_text", e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+            rows={3}
+          />
 
           {/* Points */}
           <div>
@@ -207,54 +191,36 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
             </label>
             <input
               type="number"
+              min={1}
               value={question.points}
               onChange={(e) => updateField("points", Number(e.target.value))}
-              min="1"
-              className="w-24 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="px-3 py-2 border rounded-lg w-24 focus:ring-2 focus:ring-teal-500"
             />
           </div>
 
           {/* Options */}
-          {question.question_type !== "DESC" && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {question.question_type === "TF" ? "Correct Answer" : "Options"}
-                {question.question_type === "CB" && (
-                  <span className="text-gray-500 text-xs ml-2">
-                    (Select all correct answers)
-                  </span>
-                )}
-              </label>
-              {renderOptionsForType()}
-            </div>
-          )}
+          {renderOptions()}
 
           {/* Explanation */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Explanation (Optional)
-            </label>
-            <textarea
-              value={question.explanation || ""}
-              onChange={(e) => updateField("explanation", e.target.value)}
-              placeholder="Add an explanation for this question..."
-              rows={2}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
-            />
-          </div>
+          <textarea
+            placeholder="Explanation (optional)..."
+            value={question.explanation || ""}
+            onChange={(e) => updateField("explanation", e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+            rows={2}
+          />
         </div>
 
-        {/* Modal Buttons */}
-        <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
+        <div className="p-6 border-t flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-6 py-2 border border-[#2E99B0] rounded-lg text-[#2E99B0] hover:bg-gray-50 transition-colors"
+            className="px-6 py-2 border border-[#2E99B0] text-[#2E99B0] rounded-lg hover:bg-gray-50"
           >
             Cancel
           </button>
           <button
             onClick={onSave}
-            className="px-6 py-2 bg-[#2E99B0] text-white rounded-lg hover:bg-teal-600 transition-colors"
+            className="px-6 py-2 bg-[#2E99B0] text-white rounded-lg hover:bg-teal-600"
           >
             Save Question
           </button>
@@ -266,29 +232,25 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
 
 const DeleteModal = ({ isOpen, onClose, onConfirm, questionText }) => {
   if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-blur bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 transform animate-in zoom-in-95 duration-200">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">
-          Delete Question
-        </h3>
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-50">
+      <div className="bg-white rounded-xl p-6 w-full max-w-md">
+        <h3 className="text-xl font-semibold mb-3">Delete Question</h3>
         <p className="text-gray-600 mb-6">
           Are you sure you want to delete this question?
-          <br />
           <br />
           <span className="font-medium">{questionText}</span>
         </p>
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+            className="px-4 py-2 border rounded-lg hover:bg-gray-100"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
           >
             Delete
           </button>
@@ -301,16 +263,11 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, questionText }) => {
 const QuestionManagement = ({ quiz, onBack }) => {
   const [questions, setQuestions] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editingIndex, setEditingIndex] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const [currentQuestion, setCurrentQuestion] = useState(null);
-
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [editingIndex, setEditingIndex] = useState(null);
   const [deleteIndex, setDeleteIndex] = useState(null);
-
-  const API_BASE_URL = "http://localhost:3000/api";
+  const [loading, setLoading] = useState(true);
 
   const emptyQuestion = {
     question_text: "",
@@ -328,340 +285,191 @@ const QuestionManagement = ({ quiz, onBack }) => {
   }, [quiz?.quiz_id]);
 
   const fetchQuestions = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await axios.get(
+      const res = await axios.get(
         `${API_BASE_URL}/question/get/${quiz.quiz_id}`
       );
-      const questionsData = response.data.data || [];
+      const data = res.data.data || [];
 
-      const questionsWithOptions = await Promise.all(
-        questionsData.map(async (q) => {
-          try {
-            const optionsResponse = await axios.get(
-              `${API_BASE_URL}/answer/get/${q.question_id}`
-            );
-            const questionOptions = optionsResponse.data.data || [];
-            return {
-              ...q,
-              options: questionOptions.map((opt) => ({
-                answer_id: opt.answer_id,
-                option_text: opt.option_text,
-                is_correct: opt.is_correct,
-              })),
-            };
-          } catch (err) {
-            console.error(
-              `Error fetching options for question ${q.question_id}:`,
-              err
-            );
-            return { ...q, options: [] };
-          }
+      const withOptions = await Promise.all(
+        data.map(async (q) => {
+          const optRes = await axios.get(
+            `${API_BASE_URL}/answer/get/${q.question_id}`
+          );
+          return { ...q, options: optRes.data.data || [] };
         })
       );
 
-      setQuestions(questionsWithOptions);
-      setError(null);
+      setQuestions(withOptions);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch questions");
+      console.error("Fetch error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const openAddModal = () => {
-    setCurrentQuestion(emptyQuestion);
+  const openAdd = () => {
+    setCurrentQuestion({ ...emptyQuestion });
     setEditingIndex(null);
     setModalOpen(true);
   };
 
-  const openEditModal = (index) => {
-    setCurrentQuestion({ ...questions[index] });
-    setEditingIndex(index);
+  const openEdit = (i) => {
+    setCurrentQuestion(JSON.parse(JSON.stringify(questions[i]))); // deep clone
+    setEditingIndex(i);
     setModalOpen(true);
   };
 
-  const openDeleteModal = (index) => {
-    setDeleteIndex(index);
-    setDeleteModalOpen(true);
-  };
-
-  const confirmDelete = async () => {
-    if (deleteIndex === null) return;
-
+  const handleDelete = async () => {
     const question = questions[deleteIndex];
-
     try {
-      for (const option of question.options) {
-        if (option.answer_id) {
-          await axios.delete(`${API_BASE_URL}/answer/${option.answer_id}/delete`);
-        }
-      }
-
       await axios.delete(
         `${API_BASE_URL}/question/${quiz.quiz_id}/delete/${question.question_id}`
       );
-
-      await fetchQuestions();
       setDeleteModalOpen(false);
-      setDeleteIndex(null);
+      fetchQuestions();
     } catch (err) {
-      console.error("Error deleting question:", err);
-      alert("Error deleting question. Please try again.");
+      console.error("Delete error:", err);
     }
   };
 
-  const saveQuestion = async () => {
-    if (!currentQuestion.question_text.trim()) {
-      return alert("Question text is required.");
-    }
+  const handleSave = async () => {
+    const q = currentQuestion;
+    if (!q.question_text.trim()) return alert("Question text required");
 
-    if (currentQuestion.question_type !== "DESC") {
-      if (
-        (currentQuestion.question_type === "MC" ||
-          currentQuestion.question_type === "TF") &&
-        !currentQuestion.options.some((o) => o.is_correct)
-      ) {
-        return alert("Please select the correct answer.");
-      }
+    if (editingIndex !== null) {
+      // Update existing question
+      await axios.put(
+        `${API_BASE_URL}/question/${quiz.quiz_id}/update/${q.question_id}`,
+        q
+      );
 
-      if (
-        currentQuestion.question_type === "CB" &&
-        !currentQuestion.options.some((o) => o.is_correct)
-      ) {
-        return alert("Please select at least one correct answer.");
-      }
+      const original = questions[editingIndex];
+      const originalIds = original.options
+        .map((o) => o.answer_id)
+        .filter(Boolean);
 
-      if (
-        currentQuestion.question_type !== "TF" &&
-        currentQuestion.options.some((o) => !o.option_text.trim())
-      ) {
-        return alert("All options must have text.");
-      }
-    }
-
-    try {
-      if (editingIndex !== null) {
-        // Update question
-        await axios.put(
-          `${API_BASE_URL}/question/${quiz.quiz_id}/update/${currentQuestion.question_id}`,
-          {
-            quiz_id: quiz.quiz_id,
-            question_text: currentQuestion.question_text,
-            question_type: currentQuestion.question_type,
-            points: currentQuestion.points,
-            explanation: currentQuestion.explanation,
-          }
-        );
-
-        for (const option of currentQuestion.options) {
-          if (option.answer_id) {
-            await axios.put(
-              `${API_BASE_URL}/answer/${option.answer_id}/update`,
-              {
-                option_text: option.option_text,
-                is_correct: option.is_correct,
-              }
-            );
-          } else {
-            await axios.post(
-              `${API_BASE_URL}/answer/${currentQuestion.question_id}/create`,
-              {
-                option_text: option.option_text,
-                is_correct: option.is_correct,
-              }
-            );
-          }
-        }
-
-        // Handle deleted options
-        const originalQuestion = questions[editingIndex];
-        const currentOptionIds = currentQuestion.options
-          .map((opt) => opt.answer_id)
-          .filter(Boolean);
-        const deletedOptions = originalQuestion.options.filter(
-          (opt) => opt.answer_id && !currentOptionIds.includes(opt.answer_id)
-        );
-
-        for (const deletedOpt of deletedOptions) {
-          await axios.delete(
-            `${API_BASE_URL}/answer/${deletedOpt.answer_id}/delete`
+      // Update or create options
+      for (const opt of q.options) {
+        if (opt.answer_id) {
+          await axios.put(
+            `${API_BASE_URL}/answer/${opt.answer_id}/update`,
+            opt
+          );
+        } else {
+          await axios.post(
+            `${API_BASE_URL}/answer/${q.question_id}/create`,
+            opt
           );
         }
-      } else {
-        // Create new question
-        const questionResponse = await axios.post(
-          `${API_BASE_URL}/question/${quiz.quiz_id}/create`,
-          {
-            quiz_id: quiz.quiz_id,
-            question_text: currentQuestion.question_text,
-            question_type: currentQuestion.question_type,
-            points: currentQuestion.points,
-            explanation: currentQuestion.explanation,
-          }
-        );
-
-        const newQuestionId = questionResponse.data.data.question_id;
-
-        if (currentQuestion.question_type !== "DESC") {
-          for (const option of currentQuestion.options) {
-            await axios.post(`${API_BASE_URL}/answer/${newQuestionId}/create`, {
-              option_text: option.option_text,
-              is_correct: option.is_correct,
-            });
-          }
-        }
       }
 
-      await fetchQuestions();
-      setModalOpen(false);
-    } catch (err) {
-      console.error("Error saving question:", err);
-      alert("Error saving question. Please try again.");
+      // Delete removed options
+      for (const oldId of originalIds) {
+        if (!q.options.find((o) => o.answer_id === oldId)) {
+          await axios.delete(`${API_BASE_URL}/answer/${oldId}/delete`);
+        }
+      }
+    } else {
+      // Create new question
+      const res = await axios.post(
+        `${API_BASE_URL}/question/${quiz.quiz_id}/create`,
+        q
+      );
+      const newId = res.data.data.question_id;
+      for (const opt of q.options) {
+        await axios.post(`${API_BASE_URL}/answer/${newId}/create`, opt);
+      }
     }
-  };
 
-  const getQuestionTypeLabel = (type) => {
-    const labels = {
-      MC: "Multiple Choice",
-      CB: "Checkbox",
-      TF: "True/False",
-    };
-    return labels[type] || type;
+    setModalOpen(false);
+    fetchQuestions();
   };
 
   return (
-    <div className="min-h-screen bg-white p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="p-6">
+      <div className="flex justify-between mb-6">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-6 transition-colors"
+          className="flex items-center gap-2 text-gray-600"
         >
-          <ArrowLeft size={20} />
-          <span className="font-medium">Back to Quizzes</span>
+          <ArrowLeft /> Back
         </button>
-
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl text-[#2E99B0]">
-              {quiz?.quiz_name || "Question Bank"}
-            </h1>
-            <p className="text-gray-600 mt-1">Manage your test questions</p>
-          </div>
-          <button
-            onClick={openAddModal}
-            className="flex items-center gap-2 px-5 py-3 bg-[#2E99B0] text-white rounded-lg hover:bg-cyan-700 transition-colors shadow-sm"
-          >
-            <Plus className="w-5 h-5" />
-            Add Question
-          </button>
-        </div>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-            <p className="font-medium text-sm">Error</p>
-            <p className="text-xs">{error}</p>
-          </div>
-        )}
-
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="w-12 h-12 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin"></div>
-          </div>
-        ) : questions.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Plus className="w-8 h-8 text-gray-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              No questions yet
-            </h3>
-            <p className="text-gray-600 mb-4">
-              Get started by adding your first question
-            </p>
-          </div>
-        ) : (
-          <div className="grid gap-4">
-            {questions.map((q, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="px-3 py-1 bg-teal-100 text-teal-700 text-sm font-medium rounded-full">
-                        {getQuestionTypeLabel(q.question_type)}
-                      </span>
-                      <span className="flex items-center gap-1 text-gray-600 text-sm">
-                        <Clock className="w-4 h-4" />
-                        {q.points} {q.points === 1 ? "point" : "points"}
-                      </span>
-                    </div>
-                    <p className="text-gray-900 font-medium text-lg mb-2">
-                      {q.question_text}
-                    </p>
-                    {q.question_type !== "DESC" &&
-                      q.options &&
-                      q.options.length > 0 && (
-                        <div className="mt-3 space-y-1">
-                          {q.options.map((opt, optIndex) => (
-                            <div
-                              key={optIndex}
-                              className={`flex items-center gap-2 text-sm ${
-                                opt.is_correct
-                                  ? "text-teal-700 font-medium"
-                                  : "text-gray-600"
-                              }`}
-                            >
-                              <span
-                                className={`w-1.5 h-1.5 rounded-full ${
-                                  opt.is_correct ? "bg-teal-500" : "bg-gray-300"
-                                }`}
-                              ></span>
-                              {opt.option_text}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => openEditModal(i)}
-                      className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      <Edit2 className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => openDeleteModal(i)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <QuestionModal
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          question={currentQuestion}
-          setQuestion={setCurrentQuestion}
-          onSave={saveQuestion}
-        />
-
-        <DeleteModal
-          isOpen={deleteModalOpen}
-          onClose={() => setDeleteModalOpen(false)}
-          onConfirm={confirmDelete}
-          questionText={
-            deleteIndex !== null ? questions[deleteIndex].question_text : ""
-          }
-        />
+        <button
+          onClick={openAdd}
+          className="flex items-center gap-2 px-5 py-3 bg-[#2E99B0] text-white rounded-lg"
+        >
+          <Plus /> Add Question
+        </button>
       </div>
+
+      {loading ? (
+        <div className="text-center py-10">Loading...</div>
+      ) : questions.length === 0 ? (
+        <div className="text-center text-gray-600 py-10">No questions yet.</div>
+      ) : (
+        <div className="space-y-4">
+          {questions.map((q, i) => (
+            <div
+              key={i}
+              className="border rounded-lg p-4 hover:shadow transition flex justify-between items-start"
+            >
+              <div>
+                <h3 className="font-semibold">{q.question_text}</h3>
+                <div className="text-sm text-gray-600 mb-2">
+                  {q.points} {q.points === 1 ? "point" : "points"} •{" "}
+                  {q.question_type}
+                </div>
+                {q.options.map((opt, j) => (
+                  <div
+                    key={j}
+                    className={`text-sm ${
+                      opt.is_correct
+                        ? "text-teal-700 font-medium"
+                        : "text-gray-600"
+                    }`}
+                  >
+                    {opt.option_text}
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => openEdit(i)}
+                  className="p-2 hover:bg-gray-100 rounded"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => {
+                    setDeleteIndex(i);
+                    setDeleteModalOpen(true);
+                  }}
+                  className="p-2 text-red-600 hover:bg-red-50 rounded"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <QuestionModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        question={currentQuestion}
+        setQuestion={setCurrentQuestion}
+        onSave={handleSave}
+      />
+
+      <DeleteModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        questionText={questions[deleteIndex]?.question_text}
+      />
     </div>
   );
 };
