@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { useAuth } from "../../../hooks/useAuth";
 import toast from "react-hot-toast";
 import { useState } from "react";
-import LogoutModal from "../../LogoutModal";
+import ConfirmationModal from "../../ConfimationModal";
 
 const SidebarFooter = () => {
   const navigate = useNavigate();
@@ -22,19 +22,20 @@ const SidebarFooter = () => {
   return (
     <>
       {showLogoutModal && (
-        <LogoutModal
+        <ConfirmationModal
+          title="Confirm Logout"
+          message="Are you sure you want to log out?"
+          confirmLabel="Logout"
+          cancelLabel="Cancel"
           onClose={() => setShowLogoutModal(false)}
-          onConfirm={() => {
-            setShowLogoutModal(false);
-            handleLogout();
-          }}
+          onConfirm={handleLogout}
+          confirmColor="red"
         />
       )}
 
       <div className="mt-auto w-full px-3">
         <div
           className="flex items-center justify-center sm:justify-between cursor-pointer sm:bg-[#2E99B0] rounded-xl py-3 lg:pl-3  "
-          // onClick={handleLogout}
           onClick={() => setShowLogoutModal(true)}
         >
           <div className="flex sm:hidden items-center justify-center gap-2 bg-cyan-700 px-3 py-2 rounded-lg w-[30%]">

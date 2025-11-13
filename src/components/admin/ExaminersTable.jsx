@@ -36,7 +36,12 @@ function stableSort(array, comparator) {
   return stabilized.map((el) => el[0]);
 }
 
-function CandidateTable({ candidates = [], headerCells = [], columns = [], tableName= '' }) {
+function CandidateTable({
+  candidates = [],
+  headerCells = [],
+  columns = [],
+  tableName = "",
+}) {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("id");
   const [page, setPage] = useState(0);
@@ -63,123 +68,125 @@ function CandidateTable({ candidates = [], headerCells = [], columns = [], table
     page * rowsPerPage + rowsPerPage
   );
 
-  if(!candidates || candidates.length === 0){
-    return <div className="flex justify-center items-center">
-      No Data!
-    </div>
+  if (!candidates || candidates.length === 0) {
+    return <div className="flex justify-center items-center">No Data!</div>;
   }
 
   return (
     <div className="min-w-[350px] sm:min-w-0">
-    <Paper 
-      elevation={0} 
-      sx={{ 
-        width: "100%", 
-        overflow: "hidden",
-        border: "1px solid #e5e7eb",
-        borderRadius: "8px"
-      }}
-    >
-      {/* Header */}
-      <Box sx={{ padding: "20px 24px", borderBottom: "1px solid #e5e7eb" }}>
-        <Typography
-          variant="h6"
-          sx={{
-            color: "#2E99B0",
-            fontWeight: 600,
-            fontSize: "1.125rem",
-            fontFamily: "Poppins, sans-serif",
-          }}
-        >
-          {tableName}
-        </Typography>
-      </Box>
+      <Paper
+        elevation={0}
+        sx={{
+          width: "100%",
+          overflow: "hidden",
+          border: "1px solid #e5e7eb",
+          borderRadius: "8px",
+        }}
+      >
+        {/* Header */}
+        <Box sx={{ padding: "20px 24px", borderBottom: "1px solid #e5e7eb" }}>
+          <Typography
+            variant="h6"
+            sx={{
+              color: "#2E99B0",
+              fontWeight: 600,
+              fontSize: "1.125rem",
+              fontFamily: "Poppins, sans-serif",
+            }}
+          >
+            {tableName}
+          </Typography>
+        </Box>
 
-      {/* Table */}
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow >
-              {headerCells.map((headCell) => (
-                <TableCell
-                  key={headCell.id}
-                  sortDirection={orderBy === headCell.id ? order : false}
-                  sx={{
-                    fontWeight: 600,
-                    fontSize: "0.875rem",
-                    color: "#64748b",
-                    borderBottom: "1px solid #e5e7eb",
-                    padding: "20px 16px",
-                    backgroundColor:'#f0f0f0',
-                  }}
-                >
-                  <TableSortLabel
-                    active={orderBy === headCell.id}
-                    direction={orderBy === headCell.id ? order : "asc"}
-                    onClick={() => handleRequestSort(headCell.id)}
-                    sx={{
-                      "&.Mui-active": {
-                        color: "#2E99B0",
-                      },
-                      "&.Mui-active .MuiTableSortLabel-icon": {
-                        color: "#2E99B0",
-                      },
-                    }}
-                  >
-                    {headCell.label}
-                  </TableSortLabel>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {paginatedRows.map((row, index) => (
-              <TableRow 
-                key={row.id}
-                sx={{
-                  "&:hover": {
-                    backgroundColor: "#f8fafc",
-                  },
-                  borderBottom: index === paginatedRows.length - 1 ? "none" : "1px solid #f1f5f9",
-                }}
-              >
-                {columns.map((col) => (
+        {/* Table */}
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                {headerCells.map((headCell) => (
                   <TableCell
-                    key={col.id}
+                    key={headCell.id}
+                    sortDirection={orderBy === headCell.id ? order : false}
                     sx={{
+                      fontWeight: 600,
+                      fontSize: "0.875rem",
+                      color: "#64748b",
+                      borderBottom: "1px solid #e5e7eb",
                       padding: "20px 16px",
-                      color: col.color || "#475569",
-                      fontWeight: col.bold ? 600 : 400,
+                      backgroundColor: "#f0f0f0",
                     }}
                   >
-                    {row[col.id]}
+                    <TableSortLabel
+                      active={orderBy === headCell.id}
+                      direction={orderBy === headCell.id ? order : "asc"}
+                      onClick={() => handleRequestSort(headCell.id)}
+                      sx={{
+                        "&.Mui-active": {
+                          color: "#2E99B0",
+                        },
+                        "&.Mui-active .MuiTableSortLabel-icon": {
+                          color: "#2E99B0",
+                        },
+                      }}
+                    >
+                      {headCell.label}
+                    </TableSortLabel>
                   </TableCell>
                 ))}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
 
-      {/* Pagination */}
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={candidates.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        sx={{
-          borderTop: "1px solid #e5e7eb",
-          ".MuiTablePagination-displayedRows, .MuiTablePagination-selectLabel": {
-            fontSize: "0.875rem",
-            color: "#64748b",
-          },
-        }}
-      />
-    </Paper>
+            <TableBody>
+              {paginatedRows.map((row, index) => (
+                <TableRow
+                  key={row.id}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "#f8fafc",
+                    },
+                    borderBottom:
+                      index === paginatedRows.length - 1
+                        ? "none"
+                        : "1px solid #f1f5f9",
+                  }}
+                >
+                  {columns.map((col) => (
+                    <TableCell
+                      key={col.id}
+                      sx={{
+                        padding: "20px 16px",
+                        color: col.color || "#475569",
+                        fontWeight: col.bold ? 600 : 400,
+                      }}
+                    >
+                      {row[col.id]}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        {/* Pagination */}
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={candidates.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          sx={{
+            borderTop: "1px solid #e5e7eb",
+            ".MuiTablePagination-displayedRows, .MuiTablePagination-selectLabel":
+              {
+                fontSize: "0.875rem",
+                color: "#64748b",
+              },
+          }}
+        />
+      </Paper>
     </div>
   );
 }
