@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Filter } from "lucide-react";
+import { Plus, Filter, Search, BookOpen } from "lucide-react";
 import QuizManagement from "./QuizManagement";
 import {
   addDepartment,
@@ -144,95 +144,134 @@ const TestBankPage = () => {
   }
 
   return (
-    <div className="h-screen w-full px-3 sm:px-6 md:px-8 py-6 mt-20 mb-10  sm:mb-0 sm:mt-0">
-      {/* Header */}
-      <div className="mb-6 lg:mb-8">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
-          <h1 className="text-[#2E99B0] text-md md:text-xl lg:text-2xl xl:text-3xl">
-            Departments
-          </h1>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center justify-center gap-2 bg-cyan-600 text-white px-4 lg:px-6 py-2 lg:py-3 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5"
-          >
-            <Plus size={18} strokeWidth={2.5} />
-            <span className="text-sm lg:text-base">Add Department</span>
-          </button>
-        </div>
-
-        <SearchAndFilter
-          searchTerm={searchTerm}
-          filterActive={filterActive}
-          onChangeSearchValue={(e) => setSearchTerm(e.target.value)}
-          onFilterClicked={(value) => setFilterActive(value)}
-        />
-      </div>
-
-      {/* Error message */}
-      {error && (
-        <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg mb-6 shadow-sm">
-          <p className="font-medium text-sm lg:text-base">Error</p>
-          <p className="text-xs lg:text-sm">{error}</p>
-        </div>
-      )}
-
-      {/* Content */}
-      {loading ? (
-        <div className="flex justify-center items-center h-48 lg:h-64">
-          <div className="w-12 h-12 lg:w-16 lg:h-16 border-4 border-cyan-200 border-t-cyan-500 rounded-full animate-spin" />
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="text-center py-12 lg:py-16 bg-white rounded-2xl border-2 border-dashed border-gray-200">
-          <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Filter size={24} className="text-gray-400" />
+    <div className="min-h-screen bg-white px-6 py-6 mt-20 mb-10 sm:mb-0 sm:mt-0">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div>
+                <h1 className="text-3xl font-bold text-[#217486]">Test Bank</h1>
+                <p className="text-sm text-gray-600">
+                  Manage departments and quizzes
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="flex items-center justify-center gap-2 bg-[#217486] text-white px-6 py-3 rounded-xl shadow-lg shadow-[#217486]/30 hover:shadow-xl hover:shadow-[#217486]/40 hover:bg-[#1a5d6d] transition-all transform hover:-translate-y-0.5"
+            >
+              <Plus className="w-5 h-5" strokeWidth={2.5} />
+              <span className="font-medium">Add Department</span>
+            </button>
           </div>
-          <div className="text-gray-500 text-base lg:text-lg ">
-            {searchTerm || filterActive !== "all"
-              ? "No departments match your filters"
-              : "No departments found"}
-          </div>
-          <p className="text-gray-400 text-xs lg:text-sm mt-1">
-            {!searchTerm &&
-              filterActive === "all" &&
-              "Create your first department to get started"}
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5  ">
-          {filtered.map((dept) => (
-            <DepartmentCard
-              key={dept.dept_id}
-              dept={dept}
-              openMenuId={openMenuId}
-              setSelectedDepartment={() => setSelectedDepartment(dept)}
-              onMenuClicked={(e) => {
-                e.stopPropagation();
-                setOpenMenuId(
-                  openMenuId === dept.dept_id ? null : dept.dept_id
-                );
-              }}
-              onEditClicked={(e) => {
-                e.stopPropagation();
-                setEditingDept({ ...dept });
-                setShowEditModal(true);
-                setOpenMenuId(null);
-              }}
-              onDeactivateClicked={(e) => {
-                e.stopPropagation();
-                setDeactivateDept(dept);
-                setShowDeactivateModal(true);
-                setOpenMenuId(null);
-              }}
-              onDeleteClicked={(e) => {
-                e.stopPropagation();
-                setDeletingDept(dept);
-                setShowDeleteModal(true);
-                setOpenMenuId(null);
-              }}
+
+          {/* Search and Filter */}
+          <div className="mt-6">
+            <SearchAndFilter
+              searchTerm={searchTerm}
+              filterActive={filterActive}
+              onChangeSearchValue={(e) => setSearchTerm(e.target.value)}
+              onFilterClicked={(value) => setFilterActive(value)}
             />
-          ))}
+          </div>
         </div>
-      )}
+
+        {/* Error Alert */}
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 text-red-800 px-5 py-4 rounded-xl mb-6 shadow-sm">
+            <p className="font-semibold text-sm mb-1">Error Occurred</p>
+            <p className="text-sm">{error}</p>
+          </div>
+        )}
+
+        {/* Content Section */}
+        {loading ? (
+          <div className="bg-white rounded-2xl shadow-lg p-16 text-center">
+            <div className="animate-pulse">
+              <div className="w-16 h-16 bg-[#217486]/20 rounded-full mx-auto mb-4"></div>
+              <p className="text-gray-600 font-medium">
+                Loading departments...
+              </p>
+            </div>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="bg-white rounded-2xl shadow-lg p-16 text-center">
+            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Filter className="w-10 h-10 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              {searchTerm || filterActive !== "all"
+                ? "No departments match your filters"
+                : "No departments found"}
+            </h3>
+            <p className="text-gray-500 mb-6">
+              {!searchTerm && filterActive === "all"
+                ? "Create your first department to get started"
+                : "Try adjusting your search or filter"}
+            </p>
+            {!searchTerm && filterActive === "all" && (
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[#217486] text-white rounded-xl hover:bg-[#1a5d6d] font-medium transition-all shadow-lg shadow-[#217486]/30"
+              >
+                <Plus className="w-5 h-5" />
+                Create First Department
+              </button>
+            )}
+          </div>
+        ) : (
+          <div>
+            <div className="mb-4 flex items-center justify-between">
+              <p className="text-sm text-gray-600">
+                Showing{" "}
+                <span className="font-semibold text-[#217486]">
+                  {filtered.length}
+                </span>{" "}
+                of{" "}
+                <span className="font-semibold text-[#217486]">
+                  {departments.length}
+                </span>{" "}
+                departments
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filtered.map((dept) => (
+                <DepartmentCard
+                  key={dept.dept_id}
+                  dept={dept}
+                  openMenuId={openMenuId}
+                  setSelectedDepartment={() => setSelectedDepartment(dept)}
+                  onMenuClicked={(e) => {
+                    e.stopPropagation();
+                    setOpenMenuId(
+                      openMenuId === dept.dept_id ? null : dept.dept_id
+                    );
+                  }}
+                  onEditClicked={(e) => {
+                    e.stopPropagation();
+                    setEditingDept({ ...dept });
+                    setShowEditModal(true);
+                    setOpenMenuId(null);
+                  }}
+                  onDeactivateClicked={(e) => {
+                    e.stopPropagation();
+                    setDeactivateDept(dept);
+                    setShowDeactivateModal(true);
+                    setOpenMenuId(null);
+                  }}
+                  onDeleteClicked={(e) => {
+                    e.stopPropagation();
+                    setDeletingDept(dept);
+                    setShowDeleteModal(true);
+                    setOpenMenuId(null);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Modals */}
       {showAddModal && (

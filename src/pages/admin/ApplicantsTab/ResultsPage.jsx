@@ -5,18 +5,18 @@ import {
   Download,
   X,
   Calendar,
-  User,
-  Mail,
   Building2,
   FileText,
-  Trophy,
   CheckCircle2,
   XCircle,
   Clock,
 } from "lucide-react";
 import { getAllResults } from "../../../../api/api";
+import toast from "react-hot-toast";
+import { useMediaQuery } from "@mui/material";
 
 function ResultsPage() {
+  const isMobile = useMediaQuery("(max-width:600px)");
   const [data, setData] = useState([]);
   const [allData, setAllData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +41,7 @@ function ResultsPage() {
       setAllData(res);
     } catch (error) {
       console.error(error);
-      // toast.error("Failed to fetch results");
+      toast.error("Failed to fetch results");
     } finally {
       setIsLoading(false);
     }
@@ -102,12 +102,12 @@ function ResultsPage() {
     }
 
     setData(filtered);
+    setCurrentPage(1);
   };
 
   const handleFilterChange = (key, value) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
-    setCurrentPage(1); // Reset to first page when filtering
     applyFilters(newFilters);
   };
 
@@ -121,8 +121,8 @@ function ResultsPage() {
     };
     setFilters(clearedFilters);
     setSearchQuery("");
-    setCurrentPage(1);
     setData(allData);
+    setCurrentPage(1);
   };
 
   // Export to CSV
@@ -136,6 +136,7 @@ function ResultsPage() {
       "Score",
       "Status",
       "Date",
+      "Time",
     ];
     const csvContent = [
       headers.join(","),
@@ -149,6 +150,7 @@ function ResultsPage() {
           row.score,
           row.status,
           row.date,
+          row.time || "",
         ].join(",")
       ),
     ].join("\n");
@@ -197,9 +199,9 @@ function ResultsPage() {
   };
 
   const uniqueDepartments = [
-    ...new Set(allData.map((item) => item.department)),
+    ...new Set(allData.map((item) => item.department).filter(dept => dept)),
   ];
-  const uniqueQuizzes = [...new Set(allData.map((item) => item.quiz_name))];
+  const uniqueQuizzes = [...new Set(allData.map((item) => item.quiz_name).filter(quiz => quiz))];
   const activeFilterCount = Object.values(filters).filter((v) => v).length;
 
   // Pagination calculations
@@ -217,6 +219,53 @@ function ResultsPage() {
     setCurrentPage(1);
   };
 
+  // Mobile Card Component
+  const MobileCard = ({ result }) => (
+    <div className="bg-white border border-slate-200 rounded-lg p-4 mb-3 hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-slate-800 mb-1">
+            {result.examiner_name || "N/A"}
+          </p>
+          <p className="text-xs text-slate-500">{result.email || "N/A"}</p>
+        </div>
+        <span className="text-xs font-mono text-slate-600 bg-slate-100 px-2 py-1 rounded">
+          #{result.id}
+        </span>
+      </div>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 text-xs">
+          <Building2 className="w-3 h-3 text-slate-400" />
+          <span className="text-slate-700">{result.department || "N/A"}</span>
+        </div>
+        <div className="flex items-center gap-2 text-xs">
+          <FileText className="w-3 h-3 text-slate-400" />
+          <span className="text-slate-700">{result.quiz_name || "N/A"}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs">
+            <Calendar className="w-3 h-3 text-slate-400" />
+            <span className="text-slate-700">{result.date || "N/A"}</span>
+            <span className="text-slate-500 font-mono ml-2">{result.time || "N/A"}</span>
+          </div>
+          <span className="text-sm font-semibold text-slate-800">
+            Score: {result.score || 0}
+          </span>
+        </div>
+        <div className="pt-2">
+          <span
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+              result.status
+            )}`}
+          >
+            {getStatusIcon(result.status)}
+            {result.status}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-7xl mx-auto">
@@ -225,6 +274,9 @@ function ResultsPage() {
           <h1 className="text-3xl sm:text-4xl font-bold text-[#217486] mb-2 tracking-tight">
             Test Results
           </h1>
+          <p className="text-slate-600 text-sm">
+            Total: <span className="font-semibold">{data.length}</span> results
+          </p>
         </div>
 
         {/* Controls */}
@@ -263,7 +315,8 @@ function ResultsPage() {
             {/* Export Button */}
             <button
               onClick={handleExport}
-              className="flex items-center gap-2 px-5 py-3 bg-white border border-slate-200 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-all text-sm whitespace-nowrap"
+              disabled={data.length === 0}
+              className="flex items-center gap-2 px-5 py-3 bg-white border border-slate-200 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-all text-sm whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Download className="w-4 h-4" />
               Export
@@ -300,7 +353,7 @@ function ResultsPage() {
                 ))}
               </select>
 
-              <div className="px-100"></div>
+              <div className="px-10"></div>
 
               <input
                 type="date"
@@ -331,7 +384,7 @@ function ResultsPage() {
           )}
         </div>
 
-        {/* Table */}
+        {/* Content Area */}
         {isLoading ? (
           <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-16 flex flex-col items-center justify-center">
             <div className="w-12 h-12 border-4 border-[#217486]/30 border-t-[#217486] rounded-full animate-spin mb-4"></div>
@@ -361,103 +414,121 @@ function ResultsPage() {
           </div>
         ) : (
           <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full table-fixed">
-                <thead>
-                  <tr className="bg-gradient-to-r from-[#217486] to-[#1a5d6d] text-white">
-                    <th className="w-20 px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
-                      ID
-                    </th>
-                    <th className="w-64 px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
-                      Examinee
-                    </th>
-                    <th className="w-48 px-11 py-4 text-left text-xs font-semibold uppercase tracking-wider">
-                      Department
-                    </th>
-                    <th className="w-40 px-8 py-4 text-left text-xs font-semibold uppercase tracking-wider">
-                      Quiz
-                    </th>
-                    <th className="w-24 px-2 py-4 text-left text-xs font-semibold uppercase tracking-wider">
-                      Score
-                    </th>
-                    <th className="w-32 px-10 py-4 text-left text-xs font-semibold uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="w-36 px-12 py-4 text-left text-xs font-semibold uppercase tracking-wider">
-                      Date
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {currentData.map((row, index) => (
-                    <tr
-                      key={row.id}
-                      className="hover:bg-[#217486]/5 transition-colors"
-                    >
-                      <td className="w-20 px-6 py-4">
-                        <span className="text-sm font-mono text-slate-600">
-                          {row.id}
-                        </span>
-                      </td>
-                      <td className="w-64 px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-semibold text-slate-800 truncate">
-                              {row.examiner_name || "N/A"}
-                            </p>
-                            <p className="text-xs text-slate-500 truncate">
-                              {row.email || "N/A"}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="w-48 px-6 py-4">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
-                          <Building2 className="w-3 h-3 flex-shrink-0" />
-                          <span className="truncate">
-                            {row.department || "N/A"}
-                          </span>
-                        </span>
-                      </td>
-                      <td className="w-40 px-6 py-4">
-                        <span className="text-sm text-slate-700 truncate block">
-                          {row.quiz_name || "N/A"}
-                        </span>
-                      </td>
-                      <td className="w-24 px-6 py-4">
-                        <span className="text-sm font-semibold text-slate-800">
-                          {row.score || 0}
-                        </span>
-                      </td>
-                      <td className="w-32 px-6 py-4">
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
-                            row.status
-                          )}`}
-                        >
-                          {getStatusIcon(row.status)}
-                          {row.status}
-                        </span>
-                      </td>
-                      <td className="w-36 px-6 py-4">
-                        <span className="inline-flex items-center gap-1.5 text-sm text-slate-600">
-                          <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-                          <span className="truncate">
-                            {row.date
-                              ? new Date(row.date).toLocaleDateString("en-US", {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                })
-                              : "N/A"}
-                          </span>
-                        </span>
-                      </td>
+            {isMobile ? (
+              <div className="p-4">
+                {currentData.map((result) => (
+                  <MobileCard key={result.id} result={result} />
+                ))}
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-gradient-to-r from-[#217486] to-[#1a5d6d] text-white">
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                        ID
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                        Examinee
+                      </th>
+                      <th className="px-11 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                        Department
+                      </th>
+                      <th className="px-8 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                        Quiz
+                      </th>
+                      <th className="px-2 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                        Score
+                      </th>
+                      <th className="px-10 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-12 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                        Date
+                      </th>
+                      <th className="px-9 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                        Time
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {currentData.map((row) => (
+                      <tr
+                        key={row.id}
+                        className="hover:bg-[#217486]/5 transition-colors"
+                      >
+                        <td className="px-6 py-4">
+                          <span className="text-sm font-mono text-slate-600">
+                            {row.id}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-semibold text-slate-800 truncate">
+                                {row.examiner_name || "N/A"}
+                              </p>
+                              <p className="text-xs text-slate-500 truncate">
+                                {row.email || "N/A"}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
+                            <Building2 className="w-3 h-3 flex-shrink-0" />
+                            <span className="truncate">
+                              {row.department || "N/A"}
+                            </span>
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-sm text-slate-700 truncate block">
+                            {row.quiz_name || "N/A"}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-sm font-semibold text-slate-800">
+                            {row.score || 0}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                              row.status
+                            )}`}
+                          >
+                            {getStatusIcon(row.status)}
+                            {row.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="inline-flex items-center gap-1.5 text-sm text-slate-600">
+                            <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+                            <span className="truncate">
+                              {row.date
+                                ? new Date(row.date).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })
+                                : "N/A"}
+                            </span>
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="inline-flex items-center gap-1.5 text-sm text-slate-600">
+                            <span className="truncate font-mono">
+                              {row.time || "N/A"}
+                            </span>
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
 
             {/* Pagination Footer */}
             <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -501,7 +572,6 @@ function ResultsPage() {
                 <div className="flex gap-1">
                   {[...Array(totalPages)].map((_, i) => {
                     const pageNumber = i + 1;
-                    // Show first page, last page, current page, and pages around current
                     if (
                       pageNumber === 1 ||
                       pageNumber === totalPages ||
