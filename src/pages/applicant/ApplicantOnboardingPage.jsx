@@ -1,3 +1,4 @@
+import Footer from '../../components/Footer'
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -419,9 +420,10 @@ const ApplicantOnboardingPage = () => {
         </p>
       </div>
 
-      <div className="bg-gray-100 py-4 text-center text-xs text-gray-600">
-        © 2024 Your Company. All rights reserved.
-      </div>
+      {/* <div className="bg-[#2E99B0] py-4 text-center text-xs text-white">
+        Copyright 2025 @ SuiteTest
+      </div> */}
+      <Footer />
     </div>
   );
 };
