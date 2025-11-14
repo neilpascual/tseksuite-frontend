@@ -203,16 +203,19 @@ const ApplicantOnboardingPage = () => {
         examiner_id: result.data.examiner.examiner_id,
       };
 
-      if(localStorage.getItem('applicantData')){
-        localStorage.removeItem('applicantData')
+      if (localStorage.getItem("applicantData")) {
+        localStorage.removeItem("applicantData");
       }
 
-      if(localStorage.getItem('selectedQuiz')){
-        localStorage.removeItem('selectedQuiz')
+      if (localStorage.getItem("selectedQuiz")) {
+        localStorage.removeItem("selectedQuiz");
       }
 
       // Validate if there the localStorage Exists and if so then override
-      localStorage.setItem("applicantData", JSON.stringify(applicantDataForStorage));
+      localStorage.setItem(
+        "applicantData",
+        JSON.stringify(applicantDataForStorage)
+      );
       localStorage.setItem("selectedQuiz", JSON.stringify(result.data.quiz));
 
       navigate("/test-instructions", {
@@ -285,7 +288,7 @@ const ApplicantOnboardingPage = () => {
             `Email: ${formData.email}`,
           ]}
           confirmLabel="Yes, Proceed"
-          cancelLabel="Edit Details"
+          cancelLabel="Cancel"
           onClose={() => setShowModal(false)}
           onConfirm={() => {
             setShowModal(false);

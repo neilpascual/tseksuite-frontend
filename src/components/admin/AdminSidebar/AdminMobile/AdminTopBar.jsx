@@ -34,7 +34,7 @@ const AdminTopBar = () => {
 
   return (
     <div
-      className="absolute top-0 left-0 w-full bg-white shadow-md z-50 sm:hidden transition-all duration-300"
+      className="absolute top-0 left-0 w-full bg-white shadow-md z-50 sm:hidden transition-all duration-200"
       style={{ height: `${getExpandedHeight()}px` }}
     >
       <div className="w-full pt-3 pr-5 flex justify-between items-center">

@@ -55,9 +55,10 @@ const LoginForm = () => {
             border: "1px solid rgba(255, 255, 255, 0.5)",
           }}
         >
-          <h1 className="text-white text-4xl font-normal text-center mb-12 tracking-widest 2xl:text-6xl">
+          {/* <h1 className="text-white text-4xl font-normal text-center mb-12 tracking-widest 2xl:text-6xl">
             LOGIN
-          </h1>
+          </h1> */}
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-white text-xs mb-1.5 pl-1 2xl:text-xl">
