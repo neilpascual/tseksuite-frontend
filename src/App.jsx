@@ -22,6 +22,7 @@ import TestInstructions from "./pages/applicant/TestInstructions";
 
 import AbandonTracker from "./components/AbandonTracker";
 import AbandonedTestScreen from "./pages/applicant/AbandonTestScreen";
+import ExamsDashboard from "./pages/admin/ExamsDashboard";
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
             <Route path="dashboard" element={<DashboardPage />} />
 
             {/* examiners submenu route */}
+            <Route path="examiners/exams" element={ <ExamsDashboard/> }/>
             <Route path="examiners/tests" element={<TestPage />} />
             <Route path="examiners/results" element={<ResultsPage />} />
 
