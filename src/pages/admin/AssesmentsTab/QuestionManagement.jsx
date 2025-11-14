@@ -201,6 +201,13 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
               onChange={(e) => updateField("points", Number(e.target.value))}
               className="px-3 py-2 border border-gray-300 rounded-lg w-24 focus:ring-2 focus:ring-[#217486] focus:border-transparent"
             />
+            {/* added condition for checkbox */}
+            {question.question_type === "CB" && (
+                <span className="text-xs text-gray-600 bg-cyan-50 border border-cyan-600 p-3 rounded-lg mx-2">
+                  <span className="font-semibold text-gray-800">Note: </span>  
+                  Each correct answer is equivalent to the points allocated.
+                </span>
+            )}
           </div>
 
           {/* Options */}
@@ -430,7 +437,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
               </h1>
               <div className="flex items-center gap-4 text-sm text-gray-600">
                 <span className="flex items-center gap-1">
-                  <span className="font-semibold text-[#217486]">{questions.length}</span> Questions
+                  {/* <span className="font-semibold text-[#217486]">{questions.length}</span> Questions */}
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="font-semibold text-[#217486]">{getTotalPoints()}</span> Total Points
