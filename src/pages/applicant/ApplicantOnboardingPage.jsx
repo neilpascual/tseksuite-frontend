@@ -1,4 +1,4 @@
-import Footer from "../../components/Footer";
+import Footer from "../../components/applicant/Footer";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ConfirmationModal from "@/components/ConfimationModal";
