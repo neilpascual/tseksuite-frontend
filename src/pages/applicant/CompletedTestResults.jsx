@@ -278,6 +278,7 @@ const CompletedTestResults = () => {
                             </div>
                             <div className="text-blue-800 text-sm">
                               {question.explanation}
+                              {console.log(question)}
                             </div>
                           </div>
                         )}

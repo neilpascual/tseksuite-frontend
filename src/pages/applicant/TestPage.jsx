@@ -90,13 +90,14 @@ const TestPage = () => {
                 option_text: opt.option_text,
                 is_correct: opt.is_correct,
               })),
+               explanation: question.explanation ||  "",
             };
           } catch (err) {
             console.error(
               `Error fetching options for question ${question.question_id}:`,
               err
             );
-            return { ...question, options: [] };
+            return { ...question, options: [],explanation: question.explanation || ""};
           }
         })
       );

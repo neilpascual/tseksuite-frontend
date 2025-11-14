@@ -196,7 +196,7 @@ const QuizManagement = ({ department, onBack }) => {
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto p-6">
         {/* Header Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+        <div className="mb-15">
           <button
             onClick={onBack}
             className="flex items-center gap-2 text-gray-600 hover:text-[#217486] mb-4 font-medium transition-colors"
@@ -207,7 +207,7 @@ const QuizManagement = ({ department, onBack }) => {
 
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-[#217486] mb-2">
+              <h1 className="text-3xl text-[#217486] mb-2">
                 {department.dept_name}
               </h1>
               <div className="flex items-center gap-4 text-sm text-gray-600">
@@ -220,7 +220,7 @@ const QuizManagement = ({ department, onBack }) => {
 
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 bg-[#217486] text-white px-6 py-3 rounded-xl hover:bg-[#1a5d6d] font-medium transition-all shadow-lg shadow-[#217486]/30 hover:shadow-xl hover:shadow-[#217486]/40"
+              className="flex items-center gap-2 bg-[#217486] text-white px-6 py-3 rounded-xl hover:bg-[#1a5d6d] font-medium transition-all hover:shadow-xl hover:shadow-[#217486]/40"
             >
               <Plus className="w-5 h-5" />
               Create Quiz

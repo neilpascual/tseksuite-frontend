@@ -415,7 +415,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
     <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto p-6">
         {/* Header Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+        <div className="mb-6">
           <button
             onClick={onBack}
             className="flex items-center gap-2 text-gray-600 hover:text-[#217486] mb-4 font-medium transition-colors"
@@ -423,7 +423,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
             <ArrowLeft className="w-5 h-5" /> Back to Quizzes
           </button>
 
-          <div className="flex justify-between items-start">
+          <div className="flex justify-between items-center mt-10">
             <div>
               <h1 className="text-3xl font-bold text-[#217486] mb-2">
                 {quiz.quiz_name}
@@ -440,7 +440,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
           
             <button
               onClick={openAdd}
-              className="flex items-center gap-2 px-5 py-3 bg-[#217486] text-white rounded-xl hover:bg-[#1a5d6d] font-medium transition-all shadow-lg shadow-[#217486]/30 hover:shadow-xl hover:shadow-[#217486]/40"
+              className="flex items-center gap-2 px-5 py-3 bg-[#217486] text-white rounded-xl hover:bg-[#1a5d6d] font-medium transition-all hover:shadow-xl hover:shadow-[#217486]/40"
             >
               <Plus className="w-5 h-5" /> Add Question
             </button>
@@ -542,7 +542,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
                   </div>
 
                   {q.explanation && (
-                    <div className="ml-11 mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="ml-11 mr-26 mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
                       <p className="text-sm text-blue-900">
                         <span className="font-semibold">Explanation: </span>
                         {q.explanation}
