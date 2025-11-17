@@ -271,7 +271,7 @@ const QuizManagement = ({ department, onBack }) => {
                 key={quiz.quiz_id}
                 className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all border border-gray-100 overflow-hidden group"
               >
-                <div className="bg-gradient-to-br from-[#217486] to-[#2a8fa5] p-5">
+                <div className="bg-linear-to-br from-[#217486] to-[#2a8fa5] p-5">
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="text-xl font-bold text-white flex-1 pr-2 leading-tight">
                       {quiz.quiz_name}
@@ -367,7 +367,7 @@ const QuizManagement = ({ department, onBack }) => {
       {showAddModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-            <div className="bg-gradient-to-r from-[#217486] to-[#2a8fa5] p-6">
+            <div className="bg-linear-to-r from-[#217486] to-[#2a8fa5] p-6">
               <h2 className="text-2xl font-bold text-white">Create New Quiz</h2>
               <p className="text-white/80 text-sm mt-1">Add a new quiz to your department</p>
             </div>
@@ -432,7 +432,7 @@ const QuizManagement = ({ department, onBack }) => {
       {showEditModal && editingQuiz && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-            <div className="bg-gradient-to-r from-[#217486] to-[#2a8fa5] p-6">
+            <div className="bg-linear-to-r from-[#217486] to-[#2a8fa5] p-6">
               <h2 className="text-2xl font-bold text-white">Edit Quiz</h2>
               <p className="text-white/80 text-sm mt-1">Update quiz information</p>
             </div>
@@ -543,7 +543,7 @@ const QuizManagement = ({ department, onBack }) => {
       {showInviteModal && selectedQuizForInvite && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-            <div className="bg-gradient-to-r from-[#217486] to-[#2a8fa5] p-6">
+            <div className="bg-linear-to-r from-[#217486] to-[#2a8fa5] p-6">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                   <LinkIcon className="w-6 h-6 text-white" />

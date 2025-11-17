@@ -137,7 +137,7 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col">
-        <div className="p-5 bg-gradient-to-r from-[#217486] to-[#2a8fa5] flex justify-between items-center">
+        <div className="p-5 bg-linear-to-r from-[#217486] to-[#2a8fa5] flex justify-between items-center">
           <h2 className="text-2xl font-bold text-white">
             {question.question_id ? "Edit Question" : "Add New Question"}
           </h2>
@@ -507,7 +507,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
                       <div className="flex items-start gap-3 mb-3">
-                        <span className="flex-shrink-0 w-8 h-8 bg-[#217486] text-white rounded-lg flex items-center justify-center font-bold text-sm">
+                        <span className="shrink-0 w-8 h-8 bg-[#217486] text-white rounded-lg flex items-center justify-center font-bold text-sm">
                           {i + 1}
                         </span>
                         <h3 className="font-semibold text-lg text-gray-800 leading-tight">
@@ -535,9 +535,9 @@ const QuestionManagement = ({ quiz, onBack }) => {
                             }`}
                           >
                             {opt.is_correct ? (
-                              <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                              <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
                             ) : (
-                              <Circle className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                              <Circle className="w-4 h-4 text-gray-400 shrink-0" />
                             )}
                             <span className={opt.is_correct ? "text-green-800 font-medium" : "text-gray-600"}>
                               {opt.option_text}
