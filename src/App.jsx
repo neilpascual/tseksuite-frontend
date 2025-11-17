@@ -1,28 +1,36 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+
+// Layouts
+import MainLayout from "./layouts/admin/MainLayout";
+
+// Auth
+import LoginForm from "./components/auth/LoginForm";
+
+// Protected Routes
+import AdminProtectedRoutes from "../routes/AdminProtectedRoutes";
+
+// Applicant Pages
 import ApplicantOnboardingPage from "./pages/applicant/ApplicantOnboardingPage";
 import ApplicantTestPage from "./pages/applicant/TestPage";
+import TestInstructions from "./pages/applicant/TestInstructions";
 import CompletedTestResults from "./pages/applicant/CompletedTestResults";
-import { Toaster } from "react-hot-toast";
-import AdminProtectedRoutes from "../routes/AdminProtectedRoutes";
-import DashboardPage from "./pages/admin/DashboardPage";
-//
-import LoginForm from "./components/auth/LoginForm";
-//
-import MainLayout from "./layouts/admin/MainLayout";
-import TestPage from "./pages/admin/ApplicantsTab/TestsPage";
+import AbandonedTestScreen from "./pages/applicant/AbandonTestScreen";
 
-//added results page import
-import ResultsPage from "./pages/admin/ApplicantsTab/ResultsPage";
-import ComingSoon from "./components/ComingSoon";
+// Admin Pages - Dashboard
+import DashboardPage from "./pages/admin/DashboardPage";
+
+// Admin Pages - Examiners Tab
+import ExamsDashboard from "./pages/admin/ExamsDashboard";
+import TestPage from "./pages/admin/ApplicantsTab/TestsPage";
+import ResultsPage from "./pages/admin/ApplicantsTab/ResultsPage/ResultsPage";
+
+// Admin Pages - Assessments Tab
 import TestBankPage from "./pages/admin/AssesmentsTab/TestBankPage";
 
-// import NotFound from './components/NotFound'
+// Error & Utility Components
 import ErrorMessage from "./pages/admin/ErrorMessage";
-import TestInstructions from "./pages/applicant/TestInstructions";
-
 import AbandonTracker from "./components/AbandonTracker";
-import AbandonedTestScreen from "./pages/applicant/AbandonTestScreen";
-import ExamsDashboard from "./pages/admin/ExamsDashboard";
 
 function App() {
   return (
@@ -30,14 +38,21 @@ function App() {
       <Toaster position="top-center" reverseOrder={false} />
 
       <Routes>
-        {" "}
+        {/* Root Redirect */}
         <Route path="/" element={<Navigate to="/auth/login" replace />} />
+
+        {/* ==================== PUBLIC ROUTES ==================== */}
+
+        {/* Authentication */}
+        <Route path="/auth/login" element={<LoginForm />} />
+
         {/* Applicant Routes */}
         <Route path="/take-quiz/:token" element={<ApplicantOnboardingPage />} />
         <Route path="/test-instructions" element={<TestInstructions />} />
         <Route path="/completed-test" element={<CompletedTestResults />} />
-         <Route path="/abandoned" element={<AbandonedTestScreen />} />
-        {/* This is the start of monitoring */}
+        <Route path="/abandoned" element={<AbandonedTestScreen />} />
+
+        {/* Test Page with Abandon Tracking */}
         <Route
           path="/test-page"
           element={
@@ -46,27 +61,31 @@ function App() {
             </AbandonTracker>
           }
         />
-        {/* End of Monitoring */}
-        <Route path="/auth/login" element={<LoginForm />} />
-        {/* ProtectedRoutes */}
-        {/* /admin protected routes */}
+
+        {/* ==================== PROTECTED ROUTES ==================== */}
+
         <Route element={<AdminProtectedRoutes />}>
           <Route path="admin" element={<MainLayout />}>
+            {/* Dashboard */}
             <Route path="dashboard" element={<DashboardPage />} />
 
-            {/* examiners submenu route */}
-            <Route path="examiners/exams" element={ <ExamsDashboard/> }/>
+            {/* Examiners Submenu */}
+            <Route path="examiners/exams" element={<ExamsDashboard />} />
             <Route path="examiners/tests" element={<TestPage />} />
             <Route path="examiners/results" element={<ResultsPage />} />
 
-            {/* assessments submenu routes */}
+            {/* Assessments Submenu */}
             <Route path="assessments/test-bank" element={<TestBankPage />} />
           </Route>
         </Route>
-        {/* <Route path='*' element={<NotFound/>}/> */}
+
+        {/* ==================== ERROR HANDLING ==================== */}
+
+        {/* 404 - Catch All */}
         <Route path="*" element={<ErrorMessage />} />
       </Routes>
     </BrowserRouter>
   );
 }
+
 export default App;
