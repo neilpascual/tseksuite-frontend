@@ -89,18 +89,18 @@ function TestsPage() {
     if (newFilters.dateFrom) {
       const fromDate = new Date(newFilters.dateFrom);
       fromDate.setHours(0, 0, 0, 0); // Start of day
-      
+
       filtered = filtered.filter((item) => {
         if (!item.created_at) return false;
         const itemDate = new Date(item.created_at);
         return itemDate >= fromDate;
       });
     }
-    
+
     if (newFilters.dateTo) {
       const toDate = new Date(newFilters.dateTo);
       toDate.setHours(23, 59, 59, 999); // End of day
-      
+
       filtered = filtered.filter((item) => {
         if (!item.created_at) return false;
         const itemDate = new Date(item.created_at);
@@ -159,7 +159,9 @@ function TestsPage() {
   };
 
   const uniqueDepartments = [
-    ...new Set(allData.map((item) => item.department).filter(dept => dept !== "N/A")),
+    ...new Set(
+      allData.map((item) => item.department).filter((dept) => dept !== "N/A")
+    ),
   ];
   const activeFilterCount = Object.values(filters).filter((v) => v).length;
 
@@ -198,12 +200,16 @@ function TestsPage() {
       <div className="space-y-2">
         <div className="flex items-center gap-2 text-xs">
           <Building2 className="w-3 h-3 text-slate-400 flex-shrink-0" />
-          <span className="text-slate-700 truncate">{examiner.department || "N/A"}</span>
+          <span className="text-slate-700 truncate">
+            {examiner.department || "N/A"}
+          </span>
         </div>
         <div className="flex items-center gap-2 text-xs flex-wrap">
           <Calendar className="w-3 h-3 text-slate-400 flex-shrink-0" />
           <span className="text-slate-700">{examiner.date || "N/A"}</span>
-          <span className="text-slate-500 font-mono">{examiner.time || "N/A"}</span>
+          <span className="text-slate-500 font-mono">
+            {examiner.time || "N/A"}
+          </span>
         </div>
       </div>
     </div>
@@ -231,12 +237,16 @@ function TestsPage() {
       <div className="flex items-center justify-between gap-4 text-xs">
         <div className="flex items-center gap-1.5 min-w-0 flex-1">
           <Building2 className="w-3 h-3 text-slate-400 flex-shrink-0" />
-          <span className="text-slate-700 truncate">{examiner.department || "N/A"}</span>
+          <span className="text-slate-700 truncate">
+            {examiner.department || "N/A"}
+          </span>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <Calendar className="w-3 h-3 text-slate-400" />
           <span className="text-slate-700">{examiner.date || "N/A"}</span>
-          <span className="text-slate-500 font-mono">{examiner.time || "N/A"}</span>
+          <span className="text-slate-500 font-mono">
+            {examiner.time || "N/A"}
+          </span>
         </div>
       </div>
     </div>
@@ -264,7 +274,8 @@ function TestsPage() {
             Examinees
           </h1>
           <p className="text-slate-600 text-xs sm:text-sm">
-            Total: <span className="font-semibold">{data.length}</span> examinees
+            Total: <span className="font-semibold">{data.length}</span>{" "}
+            examinees
           </p>
         </div>
 
@@ -276,7 +287,11 @@ function TestsPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-[#217486]/60" />
               <input
                 type="text"
-                placeholder={isMobile ? "Search..." : "Search by name, email, department..."}
+                placeholder={
+                  isMobile
+                    ? "Search..."
+                    : "Search by name, email, department..."
+                }
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="border border-slate-200 p-2.5 sm:p-3 pl-9 sm:pl-10 pr-4 rounded-lg w-full bg-white focus:outline-none focus:ring-2 focus:ring-[#217486]/30 focus:border-[#217486] transition-all text-xs sm:text-sm"
@@ -333,11 +348,13 @@ function TestsPage() {
                     </option>
                   ))}
                 </select>
-
+                <div className="hidden lg:block"></div>
                 <input
                   type="date"
                   value={filters.dateFrom}
-                  onChange={(e) => handleFilterChange("dateFrom", e.target.value)}
+                  onChange={(e) =>
+                    handleFilterChange("dateFrom", e.target.value)
+                  }
                   placeholder="From Date"
                   className="border border-slate-200 p-2 sm:p-2.5 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#217486]/30 focus:border-[#217486]"
                 />
@@ -368,7 +385,9 @@ function TestsPage() {
         {isDataLoading ? (
           <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-12 sm:p-16 flex flex-col items-center justify-center">
             <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-[#217486]/30 border-t-[#217486] rounded-full animate-spin mb-4"></div>
-            <p className="text-slate-600 text-sm sm:text-base">Loading examiners...</p>
+            <p className="text-slate-600 text-sm sm:text-base">
+              Loading examiners...
+            </p>
           </div>
         ) : data.length === 0 ? (
           <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-8 sm:p-12 lg:p-16 flex flex-col items-center justify-center text-center">
@@ -492,7 +511,8 @@ function TestsPage() {
                   <div className="flex items-center justify-between text-xs">
                     <p className="text-slate-600">
                       <span className="font-semibold text-slate-800">
-                        {indexOfFirstRow + 1}-{Math.min(indexOfLastRow, data.length)}
+                        {indexOfFirstRow + 1}-
+                        {Math.min(indexOfLastRow, data.length)}
                       </span>{" "}
                       of{" "}
                       <span className="font-semibold text-slate-800">
@@ -510,7 +530,7 @@ function TestsPage() {
                       <option value={50}>50</option>
                     </select>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handlePageChange(currentPage - 1)}
@@ -519,7 +539,7 @@ function TestsPage() {
                     >
                       Previous
                     </button>
-                    
+
                     <div className="px-3 py-2 bg-cyan-700 text-white rounded-lg text-xs font-medium min-w-[60px] text-center">
                       {currentPage} / {totalPages}
                     </div>

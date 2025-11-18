@@ -126,7 +126,7 @@ function AbandonTracker({ children }) {
             </div>
 
             <h2 className="text-md sm:text-lg lg:text-2xl font-bold text-gray-900 mb-3 text-center">
-              ⚠️ First Warning!
+              ⚠️ Warning!
             </h2>
             
             <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg">
@@ -154,7 +154,7 @@ function AbandonTracker({ children }) {
               onClick={handleReturn}
               className="w-full text-xs sm:text-sm bg-linear-to-r from-[#217486] to-[#2E99B0] text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
             >
-              Continue Test
+              Continue Test            
             </button>
           </div>
         </div>

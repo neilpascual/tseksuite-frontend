@@ -157,7 +157,7 @@ const TestBankPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white px-6 py-6 mt-20 mb-10 sm:mb-0 sm:mt-0">
+    <div className="min-h-screen bg-white px-6 py-6 mb-17 sm:mb-0 sm:mt-0">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-15">
