@@ -36,12 +36,12 @@ export const loginUser = async ( loginCredentials ) => {
 export const getAllResults = async() => {
       try {
 
-        const res = await axios.get(`${API_BASE_URL}/result/get`);
-        if(!res) {console.log('Error, API')}
+        const response = await axios.get(`${API_BASE_URL}/result/get`);
+        if(!response) {console.log('Error, API')}
 
-        console.log(res.data.data)
+        console.log(response.data.data)
 
-        const formatted = res.data.data.map(transformResult);
+        const formatted = response.data.data.map(transformResult);
         
         
         return formatted
@@ -55,11 +55,11 @@ export const getAllResults = async() => {
 export const getAllExaminers = async()=> {
   
   try {
-    const res = await axios.get(`${API_BASE_URL}/examiner/get`)
+    const response = await axios.get(`${API_BASE_URL}/examiner/get`)
 
-    if(!res){console.log('Failed to fetch data!')}
+    if(!response){console.log('Failed to fetch data!')}
 
-    const formattedData = res.data.data.map(transformExaminers)
+    const formattedData = response.data.data.map(transformExaminers)
 
     return formattedData
 
@@ -72,11 +72,11 @@ export const getAllExaminers = async()=> {
 export const getAllDepartments = async() => {
 
   try {
-    const res = await axios.get(`${API_BASE_URL}/department/get`)
+    const response = await axios.get(`${API_BASE_URL}/department/get`)
 
-    if(!res) { console.log("Cannot fetch departments!") }
+    if(!response) { console.log("Cannot fetch departments!") }
 
-    return res.data.data
+    return response.data.data
     
   } catch (error) {
     console.error(error)
@@ -138,12 +138,12 @@ export const deleteDepartment = async(deletingDept) => {
   }
 }
 
-export const submitResults = async({results, examiner_id}) => {
+export const submitResults = async({results, examinerId}) => {
   try {
 
     const body  = {
       quiz_id: quiz_id,
-      examiner_id: examiner_id,
+      examiner_id: examinerId,
       answers : [
         { 
           question_id : question_id,
@@ -155,7 +155,171 @@ export const submitResults = async({results, examiner_id}) => {
     }
 
     await axios.post('url', body )
-  } catch (error) {
+
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const addQuestion = async(quizId, payload) => {
+  try {
+      const res = await axios.post(
+        `${API_BASE_URL}/question/${quizId}/create`,
+        payload
+      );
+
+      return { ...res.data.data }
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const getQuestions =  async(quizId) => {
+  try {
+
+    const response =await axios.get(`${API_BASE_URL}/question/get/${quizId}`);
+    return response.data.data || []
+
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const updateQuestion = async(quizId, questionId, payload) => {
+  try {
+    await axios.put(
+        `${API_BASE_URL}/question/${quizId}/update/${questionId}`,
+        payload
+      );
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const deleteQuestion = async(quizId, questionId) => {
+  try {
+    await axios.delete( `${API_BASE_URL}/question/${quizId}/delete/${questionId}` );
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+
+export const getOptions = async(questionId) => {
+  try {
+
+    const response = await axios.get(`${API_BASE_URL}/answer/test/${questionId}`);
+    return response.data.data || []
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const getAnswer = async(questionId) => {
+  try {
+    const res = await axios.get( `${API_BASE_URL}/answer/get/${questionId}`);
+
+    return res.data.data || []
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const updateAnswer = async(answerId, options) => {
+  try {
+    await axios.put( `${API_BASE_URL}/answer/${answerId}/update`, options);
+  } catch (err) {
+    console.error(err) 
+  }
+}
+
+export const addAnswer = async(questionId, options) => {
+  try {
+    await axios.post( `${API_BASE_URL}/answer/${questionId}/create`, options );
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const deleteAnswer = async(oldId) =>{
+    try {
+      await axios.delete(`${API_BASE_URL}/answer/${oldId}/delete`);
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+export const addResult = async(payload) => {
+  try {
+
+    const headers = { headers: {"Content-Type": "application/json" } }
+    const response = await axios.post(`${API_BASE_URL}/result/create`, payload, headers );
+
+    return response.data.data || []
     
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const addBridge = async(payload) => {
+  try {
+
+    const headers =  { headers: { "Content-Type": "application/json" }}
+    await axios.post(`${API_BASE_URL}/bridge/create`, payload, headers);
+    
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const getQuizzes = async(deptId) => {
+
+  try {
+    const response = await axios.get(
+        `${API_BASE_URL}/quiz/get/${deptId}`
+      );
+
+    return response.data.data || []
+  } catch (err) {
+    console.error(err)
+  }
+
+}
+
+
+export const addQuiz = async (deptId, payload) => {
+  try {
+    await axios.post(`${API_BASE_URL}/quiz/${deptId}/create`, payload);
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const editQuiz = async (deptId, quizId, payload) => {
+  try {
+    await axios.put( `${API_BASE_URL}/quiz/${deptId}/update/${quizId}`, payload);
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const deleteQuiz = async (deptId, quizId) => { 
+  try {
+    await axios.delete(
+          `${API_BASE_URL}/quiz/${deptId}/delete/${quizId}`
+);
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const generateInviteLink = async(payload) => {
+  try {
+    const link = await axios.post(`${API_BASE_URL}/invitation/generate`,payload );
+
+    return link.data.data.link || ''
+  } catch (err) {
+    console.error(err)
   }
 }

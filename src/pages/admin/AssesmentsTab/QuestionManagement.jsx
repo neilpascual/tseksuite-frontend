@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Clock, Plus, Edit2, Trash2, X, ArrowLeft, CheckCircle, Circle } from "lucide-react";
-
-const API_BASE_URL = "http://localhost:3000/api";
+import { Plus, Edit2, Trash2, X, ArrowLeft, CheckCircle, Circle } from "lucide-react";
+import toast from "react-hot-toast";
+import { addAnswer, addQuestion, deleteAnswer, deleteQuestion, getAnswer, getQuestions, updateAnswer, updateQuestion } from "../../../../api/api";
 
 const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
   if (!isOpen) return null;
@@ -136,7 +135,7 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col">
-        <div className="p-5 bg-gradient-to-r from-[#217486] to-[#2a8fa5] flex justify-between items-center">
+        <div className="p-5 bg-linear-to-r from-[#217486] to-[#2a8fa5] flex justify-between items-center">
           <h2 className="text-2xl font-bold text-white">
             {question.question_id ? "Edit Question" : "Add New Question"}
           </h2>
@@ -309,17 +308,12 @@ const QuestionManagement = ({ quiz, onBack }) => {
   const fetchQuestions = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(
-        `${API_BASE_URL}/question/get/${quiz.quiz_id}`
-      );
-      const data = res.data.data || [];
+      const res = await getQuestions(quiz.quiz_id)
 
       const withOptions = await Promise.all(
-        data.map(async (q) => {
-          const optRes = await axios.get(
-            `${API_BASE_URL}/answer/get/${q.question_id}`
-          );
-          return { ...q, options: optRes.data.data || [] };
+        res.map(async (q) => {
+          const optRes = await getAnswer(q.question_id)
+          return { ...q, options: optRes };
         })
       );
 
@@ -346,26 +340,38 @@ const QuestionManagement = ({ quiz, onBack }) => {
   const handleDelete = async () => {
     const question = questions[deleteIndex];
     try {
-      await axios.delete(
-        `${API_BASE_URL}/question/${quiz.quiz_id}/delete/${question.question_id}`
-      );
+      await deleteQuestion(quiz.quiz_id, question.question_id)
+      //added toast
+      toast.success("Question Deleted!")
       setDeleteModalOpen(false);
       fetchQuestions();
     } catch (err) {
       console.error("Delete error:", err);
+      toast.error("Question Deletion Failed!")
     }
   };
 
   const handleSave = async () => {
     const q = currentQuestion;
-    if (!q.question_text.trim()) return alert("Question text required");
+    if (!q.question_text.trim()) return toast.error("Question text required");
+
+    //added to check if the options are empty
+    if ((q.question_type === "MC" || q.question_type === "CB")) {
+    if (!q.options || q.options.length < 2) {
+      return toast.error("At least 2 options are required");
+    }
+    // Also check that all options have text
+    for (let i = 0; i < q.options.length; i++) {
+      if (!q.options[i].option_text.trim()) {
+        return toast.error(`All options must have text!`);
+      }
+    }
+  }
 
     if (editingIndex !== null) {
-      await axios.put(
-        `${API_BASE_URL}/question/${quiz.quiz_id}/update/${q.question_id}`,
-        q
-      );
-
+      await updateQuestion(quiz.quiz_id, q.question_id, q)
+      //added updated toast
+      toast.success("Question Updated!")
       const original = questions[editingIndex];
       const originalIds = original.options
         .map((o) => o.answer_id)
@@ -373,34 +379,25 @@ const QuestionManagement = ({ quiz, onBack }) => {
 
       for (const opt of q.options) {
         if (opt.answer_id) {
-          await axios.put(
-            `${API_BASE_URL}/answer/${opt.answer_id}/update`,
-            opt
-          );
+          await updateAnswer(opt.answer_id,opt)
         } else {
-          await axios.post(
-            `${API_BASE_URL}/answer/${q.question_id}/create`,
-            opt
-          );
+          await addAnswer(q.question_id, opt)
         }
       }
 
       for (const oldId of originalIds) {
         if (!q.options.find((o) => o.answer_id === oldId)) {
-          await axios.delete(`${API_BASE_URL}/answer/${oldId}/delete`);
+          await deleteAnswer(oldId)
         }
       }
     } else {
-      const res = await axios.post(
-        `${API_BASE_URL}/question/${quiz.quiz_id}/create`,
-        q
-      );
-      const newId = res.data.data.question_id;
+      const { question_id } = await addQuestion(quiz.quiz_id, q)
+      //added toast
+      toast.success("Question Added!")
       for (const opt of q.options) {
-        await axios.post(`${API_BASE_URL}/answer/${newId}/create`, opt);
+        await addAnswer(question_id, opt)
       }
     }
-
     setModalOpen(false);
     fetchQuestions();
   };
@@ -432,15 +429,15 @@ const QuestionManagement = ({ quiz, onBack }) => {
 
           <div className="flex justify-between items-center mt-10">
             <div>
-              <h1 className="text-3xl font-bold text-[#217486] mb-2">
+              <h1 className="text-3xl text-[#217486] mb-2">
                 {quiz.quiz_name}
               </h1>
-              <div className="flex items-center gap-4 text-sm text-gray-600">
+              <div className="flex items-center text-sm text-gray-600">
                 <span className="flex items-center gap-1">
                   {/* <span className="font-semibold text-[#217486]">{questions.length}</span> Questions */}
                 </span>
                 <span className="flex items-center gap-1">
-                  <span className="font-semibold text-[#217486]">{getTotalPoints()}</span> Total Points
+                  <span className="font-semibold text-[#217486]">{getTotalPoints()}</span> Questions
                 </span>
               </div>
             </div>
@@ -487,7 +484,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
                       <div className="flex items-start gap-3 mb-3">
-                        <span className="flex-shrink-0 w-8 h-8 bg-[#217486] text-white rounded-lg flex items-center justify-center font-bold text-sm">
+                        <span className="shrink-0 w-8 h-8 bg-[#217486] text-white rounded-lg flex items-center justify-center font-bold text-sm">
                           {i + 1}
                         </span>
                         <h3 className="font-semibold text-lg text-gray-800 leading-tight">
@@ -515,9 +512,9 @@ const QuestionManagement = ({ quiz, onBack }) => {
                             }`}
                           >
                             {opt.is_correct ? (
-                              <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                              <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
                             ) : (
-                              <Circle className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                              <Circle className="w-4 h-4 text-gray-400 shrink-0" />
                             )}
                             <span className={opt.is_correct ? "text-green-800 font-medium" : "text-gray-600"}>
                               {opt.option_text}
