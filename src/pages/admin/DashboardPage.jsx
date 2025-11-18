@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { getAllExaminers, getAllResults } from "../../../api/api";
 import NoDataFound from "../../components/NoDataFound";
 import LoadingIndicator from "../../components/LoadingIndicator";
+import { User, CircleCheck, Ban } from "lucide-react";
 
 function DashboardPage() {
   const { data: user, isLoading, isError } = useAuth();
@@ -68,22 +69,24 @@ function DashboardPage() {
   if (isError || !user) return <div>Failed to load user</div>;
 
   return (
-    <div className="h-screen w-full pb-3 sm:px-6 md:px-1 py-6 sm:mt-0">
+    <div className="h-screen w-full pb-3 px-4 sm:px-6 md:px-1 py-6 sm:mt-0 md:mb-30 lg:mb-0">
       {/* Header */}
       <h1 className="text-3xl sm:text-3xl text-cyan-700 mb-2 tracking-tight mt-1 ">
         Dashboard
       </h1>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-4 lg:gap-15 sm:mb-8">
-        <DashboardCard title="Examinees" value={examiners.length} />
+      <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-4 lg:gap-15 sm:mb-8 md:mb-0">
+        <DashboardCard title="Examinees" value={examiners.length} icon={User} />
         <DashboardCard
           title="Completed"
           value={results.filter((r) => r.status === "COMPLETED").length}
+          icon={CircleCheck}
         />
         <DashboardCard
           title="Abandoned"
           value={results.filter((r) => r.status === "ABANDONED").length}
+          icon={Ban}
         />
       </div>
 
@@ -92,7 +95,7 @@ function DashboardPage() {
       {examiners.length === 0 ? (
         <NoDataFound />
       ) : (
-        <div className="rounded-lg md:shadow-md bg-white overflow-x-auto sm:mt-20 mt-10">
+        <div className="rounded-lg md:shadow-md bg-white overflow-x-auto mt-10 mb-10">
           {isMobile ? (
             <MobileScrollableCards candidates={examiners} />
           ) : (

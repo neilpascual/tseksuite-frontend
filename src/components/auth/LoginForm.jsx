@@ -9,13 +9,12 @@ const LoginForm = () => {
   const { login } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showAltLayout, setShowAltLayout] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) navigate("/admin/");
+    if (token) navigate("/admin/dashboard");
   }, [navigate]);
 
   const handleSubmit = async (e) => {

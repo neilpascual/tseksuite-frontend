@@ -1,37 +1,20 @@
-// import React from "react";
-
-// function DashboardCard({ title, value }) {
-//   return (
-//     <div className="border rounded-lg p-3 border-[#EFF0F6] shadow-md sm:py-2 sm:px-6 md:py-4 md:px-6 lg:py-5 lg:px-10 flex-1 min-w-[200px]">
-//       <div className="mb-2">
-//         <p className="text-[#2E99B0] text-sm sm:text-xl font-medium mb-2">
-//           {title}
-//         </p>
-//         <p className="text-xl sm:text-2xl font-bold text-end">{value}</p>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default DashboardCard;
-
 import React from "react";
+import { User } from "lucide-react";
 
-function DashboardCard({ title, value }) {
+function DashboardCard({ title, value, icon: Icon }) {
   return (
     <div className="group relative border rounded-2xl p-6 md:p-8 border-gray-100 bg-white shadow-sm hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 flex-1 min-w-[200px] overflow-hidden">
       {/* Decorative background gradient */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#2E99B0]/5 to-transparent rounded-full blur-2xl -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500"></div>
 
       {/* Floating icon background on hover */}
-      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-10 transition-all duration-300 group-hover:scale-110">
-        <svg
-          className="w-16 h-16 text-[#2E99B0]"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
-        </svg>
+
+      {/* <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-10 transition-all duration-300 group-hover:scale-110">
+        {Icon && <Icon className="w-15 h-15 text-[#2E99B0]" />}
+      </div> */}
+
+      <div className="absolute bottom-6 left-6 opacity-0 group-hover:opacity-60 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300">
+        {Icon && <Icon className="w-8 h-8 text-[#2E99B0]" />}
       </div>
 
       {/* Left accent bar */}

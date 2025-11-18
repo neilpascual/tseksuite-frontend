@@ -29,9 +29,8 @@ const BottomNav = () => {
   };
 
   return (
-
     <>
-    {showLogoutModal && (
+      {showLogoutModal && (
         <ConfirmationModal
           title="Confirm Logout"
           message="Are you sure you want to log out?"
@@ -63,35 +62,40 @@ const BottomNav = () => {
             }`}
           >
             <LayoutDashboardIcon className="w-5 h-5" />
-            <span className="hidden sm:inline text-sm font-medium">Dashboard</span>
+            <span className="hidden sm:inline text-sm font-medium">
+              Dashboard
+            </span>
           </button>
           {/* Examinees */}
           <button
             onClick={() => navigate("/admin/examiners/exams")}
             className={`flex items-center gap-2 px-5 py-4 rounded-full transition-all ${
-              isActive("/admin/examiners/exams") 
+              isActive("/admin/examiners/exams")
                 ? "bg-[#3A91AC] text-white"
                 : "text-[#3A91AC] hover:bg-[#3A91AC]/10"
             }`}
           >
             <User2Icon className="w-5 h-5" />
-            <span className="hidden sm:inline text-sm font-medium">Examinees</span>
+            <span className="hidden sm:inline text-sm font-medium">
+              Examinees
+            </span>
           </button>
           {/* Test Bank */}
           <button
             onClick={() => navigate("/admin/assessments/test-bank")}
-            className={`flex items-center gap-2 px-5 py-4 rounded-full transition-all ${
+            className={`flex items-center gap-1 px-5 py-4 rounded-full transition-all ${
               isActive("/admin/assessments/test-bank")
                 ? "bg-[#3A91AC] text-white"
                 : "text-[#3A91AC] hover:bg-[#3A91AC]/10"
             }`}
           >
             <LibraryBigIcon className="w-5 h-5" />
-            <span className="hidden sm:inline text-sm font-medium">Test Bank</span>
+            <span className="hidden sm:inline text-sm font-medium">Test</span>
+            <span className="hidden sm:inline text-sm font-medium">Bank</span>
           </button>
           {/* Logout */}
           <button
-            onClick={()=> setShowLogoutModal(true)}
+            onClick={() => setShowLogoutModal(true)}
             className="flex items-center gap-2 px-5 py-4 rounded-full text-[#3A91AC] hover:bg-[#3A91AC]/10 transition-all"
           >
             <LogOutIcon className="w-5 h-5" />

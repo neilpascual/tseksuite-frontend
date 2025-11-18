@@ -16,6 +16,7 @@ import {
 
 // import ExaminerTable from "@/components/applicant/ui/table";
 import ExamineesTable from "@/components/applicant/tables/ExamineesTable";
+import ConfirmationModal from "@/components/ConfimationModal";
 
 function TestsPage() {
   const isMobile = useMediaQuery("(max-width:600px)");
