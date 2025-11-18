@@ -179,7 +179,11 @@ function EnhancedTableToolbar(props) {
         </Typography>
       ) : (
         <Typography
-          sx={{ flex: '1 1 100%' }}
+          sx={{ flex: '1 1 100%', fontSize: {
+             xs: '0.95rem', 
+            sm: '1rem',     
+            md: '1.25rem',  
+          } }}
           variant="h6"
           id="tableTitle"
           component="div"
@@ -274,10 +278,13 @@ export default function EnhancedTable() {
   );
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', mb: 2 }}>
+    <Box sx={{ width: '100%'}}>
+      {/* <Paper sx={{ width: '100%', mb: 2 }}> */}
         <EnhancedTableToolbar numSelected={selected.length} />
-        <TableContainer>
+        <TableContainer sx={{
+          paddingX: 5,
+           paddingY: 2
+        }}>
           <Table
             sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
@@ -352,7 +359,7 @@ export default function EnhancedTable() {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-      </Paper>
+      {/* </Paper> */}
       <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"

@@ -1,10 +1,71 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Footer from "../../components/applicant/Footer";
+import InstructionChecklist from "../../components/applicant/InstructionChecklist";
 
 const TestInstructions = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [quizData, setQuizData] = useState(null);
+
+  useEffect(() => {
+    // Get quiz data from navigation state or localStorage
+    const selectedQuiz =
+      location.state?.selectedQuiz ||
+      JSON.parse(localStorage.getItem("selectedQuiz") || "null");
+
+    const applicantData =
+      location.state?.applicantData ||
+      JSON.parse(localStorage.getItem("applicantData") || "{}");
+
+    if (!selectedQuiz || !applicantData.department) {
+      // If no quiz selected, redirect back to quiz selection
+      navigate("/quiz-selection");
+      return;
+    }
+
+    console.log('Selected Quiz:', selectedQuiz)
+    console.log('Applicant Data', applicantData)
+
+    setQuizData(selectedQuiz);
+  }, []);
+
   const handleStartTest = () => {
     console.log("Starting test...");
-    // Add your navigation logic here
+
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) elem.requestFullscreen();
+    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+    else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+    // Navigate to the test page
+    navigate("/test-page", {
+      state: {
+        quizData,
+        applicantData: location.state?.applicantData,
+      },
+    });
+  };
+
+  const handleExit = () => {
+    if (
+      window.confirm(
+        "Are you sure you want to exit? Your progress will not be saved."
+      )
+    ) {
+      navigate("/");
+    }
+  };
+
+  const formatTimeLimit = (minutes) => {
+    if (!minutes) return "N/A";
+    if (minutes < 60) {
+      return `${minutes} minutes`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return mins > 0
+      ? `${hours} hour${hours > 1 ? "s" : ""} ${mins} minutes`
+      : `${hours} hour${hours > 1 ? "s" : ""}`;
   };
 
   return (
@@ -16,7 +77,10 @@ const TestInstructions = () => {
       <div className="flex-1 flex flex-col px-6 sm:px-8 lg:px-12 py-8 sm:py-12 lg:justify-center">
         <div className="w-full max-w-3xl lg:mx-auto">
           {/* Exit Button */}
-          <button className="flex items-center gap-2 text-gray-800 hover:text-gray-600 transition-colors mb-8 sm:mb-12 lg:mb-16">
+          <button
+            onClick={handleExit}
+            className="flex items-center gap-2 text-gray-800 hover:text-gray-600 transition-colors mb-8 sm:mb-12 lg:mb-16"
+          >
             <svg
               className="w-4 h-4 sm:w-5 sm:h-5"
               fill="none"
@@ -39,6 +103,18 @@ const TestInstructions = () => {
               Instructions
             </h1>
 
+            {/* Quiz Name */}
+            {quizData && (
+              <div className="mb-4">
+                <p className="text-gray-900 font-semibold text-lg">
+                  {quizData.quiz_name}
+                </p>
+                <p className="text-gray-600 text-sm">
+                  Time Limit: {formatTimeLimit(quizData.time_limit)}
+                </p>
+              </div>
+            )}
+
             <p className="text-gray-800 text-sm sm:text-base lg:text-lg leading-relaxed mb-6 sm:mb-8">
               Welcome! This short test will help us understand your current
               level and areas for improvement. Take a moment to review the
@@ -48,45 +124,7 @@ const TestInstructions = () => {
             </p>
 
             {/* Checklist */}
-            <div className="space-y-2 sm:space-y-3 mb-8 sm:mb-10 lg:mb-12">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-gray-800"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
-                  />
-                </svg>
-                <span className="text-gray-800 text-sm sm:text-base">
-                  Check Your Internet Connection
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2 sm:gap-3">
-                <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-gray-800"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <span className="text-gray-800 text-sm sm:text-base">
-                  Manage your time
-                </span>
-              </div>
-            </div>
+              <InstructionChecklist />
           </div>
         </div>
 

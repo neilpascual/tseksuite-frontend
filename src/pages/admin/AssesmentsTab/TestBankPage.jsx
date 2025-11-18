@@ -1,161 +1,334 @@
-import React, { useState } from 'react';
-import { Plus, MoreVertical } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Plus, Filter, Search, BookOpen } from "lucide-react";
+import QuizManagement from "./QuizManagement";
+import {
+  addDepartment,
+  deleteDepartment,
+  editDepartment,
+  getAllDepartments,
+  toggleDepartmentActiveStatus,
+} from "../../../../api/api";
+import DepartmentCard from "../../../components/admin/DepartmentCard";
+import { filteredDepartments } from "../../../../helpers/helpers";
+import SearchAndFilter from "../../../components/admin/SearchAndFilter";
+import DeactivateDepartment from "../../../components/admin/modals/DeactivateDepartment";
+import DeleteDepartment from "../../../components/admin/modals/DeleteDepartment";
+import AddDepartment from "../../../components/admin/modals/AddDepartment";
+import EditDepartment from "../../../components/admin/modals/EditDepartment";
+import toast from "react-hot-toast";
 
 const TestBankPage = () => {
-  const [departments, setDepartments] = useState([
-    { id: 1, name: 'Finance', image: 'finance' },
-    { id: 2, name: 'Engineering', image: 'engineering' },
-    { id: 3, name: 'Business Ops', image: 'business' },
-    { id: 4, name: 'Finance', image: 'finance' },
-    { id: 5, name: 'Engineering', image: 'engineering' },
-    { id: 6, name: 'Business Ops', image: 'business' },
-  ]);
+  // State
+  const [departments, setDepartments] = useState([]);
+  const [filtered, setFiltered] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterActive, setFilterActive] = useState("all");
+
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+
+  // Modals
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newDeptName, setNewDeptName] = useState('');
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDeactivateModal, setShowDeactivateModal] = useState(false);
 
-  const getImageForType = (type) => {
-    const images = {
-      finance: (
-        <svg viewBox="0 0 200 150" className="w-full h-32">
-          <rect x="20" y="20" width="160" height="110" fill="#f0f4f8" rx="8"/>
-          <circle cx="80" cy="75" r="25" fill="#e0e7ff" stroke="#6366f1" strokeWidth="3"/>
-          <text x="80" y="82" textAnchor="middle" fontSize="24" fill="#6366f1">$</text>
-          <rect x="30" y="30" width="30" height="5" fill="#cbd5e1" rx="2"/>
-          <rect x="30" y="40" width="20" height="5" fill="#cbd5e1" rx="2"/>
-          <rect x="140" y="35" width="3" height="20" fill="#cbd5e1"/>
-          <rect x="145" y="40" width="3" height="15" fill="#cbd5e1"/>
-          <rect x="150" y="30" width="3" height="25" fill="#cbd5e1"/>
-          <rect x="155" y="35" width="3" height="20" fill="#cbd5e1"/>
-          <ellipse cx="50" cy="110" rx="15" ry="8" fill="#10b981"/>
-          <path d="M 120 70 L 140 50 L 145 55" stroke="#6366f1" strokeWidth="3" fill="none"/>
-          <circle cx="35" cy="95" r="8" fill="#fbbf24"/>
-        </svg>
-      ),
-      engineering: (
-        <svg viewBox="0 0 200 150" className="w-full h-32">
-          <rect x="20" y="20" width="160" height="110" fill="#f0f4f8" rx="8"/>
-          <rect x="50" y="40" width="60" height="70" fill="#1e40af" rx="4"/>
-          <rect x="55" y="45" width="50" height="8" fill="#3b82f6"/>
-          <rect x="55" y="58" width="50" height="8" fill="#3b82f6"/>
-          <rect x="55" y="71" width="50" height="8" fill="#3b82f6"/>
-          <text x="60" y="95" fontSize="16" fill="#60a5fa">&lt;/&gt;</text>
-          <circle cx="135" cy="50" r="15" fill="#10b981"/>
-          <path d="M 128 50 L 133 55 L 142 45" stroke="white" strokeWidth="2" fill="none"/>
-          <rect x="35" y="45" width="8" height="8" fill="#3b82f6" rx="1"/>
-          <rect x="35" y="60" width="8" height="8" fill="#10b981" rx="1"/>
-          <rect x="35" y="75" width="8" height="8" fill="#6366f1" rx="1"/>
-          <circle cx="145" cy="95" r="12" fill="#06b6d4"/>
-          <path d="M 145 88 L 145 102 M 138 95 L 152 95" stroke="white" strokeWidth="2"/>
-        </svg>
-      ),
-      business: (
-        <svg viewBox="0 0 200 150" className="w-full h-32">
-          <rect x="20" y="20" width="160" height="110" fill="#f0f4f8" rx="8"/>
-          <rect x="45" y="50" width="40" height="60" fill="#dbeafe" rx="4"/>
-          <rect x="50" y="55" width="8" height="8" fill="#3b82f6"/>
-          <rect x="62" y="55" width="8" height="8" fill="#3b82f6"/>
-          <rect x="74" y="55" width="8" height="8" fill="#3b82f6"/>
-          <rect x="50" y="68" width="30" height="2" fill="#93c5fd"/>
-          <rect x="50" y="73" width="25" height="2" fill="#93c5fd"/>
-          <rect x="50" y="78" width="30" height="2" fill="#93c5fd"/>
-          <circle cx="110" cy="65" r="20" fill="white" stroke="#06b6d4" strokeWidth="3"/>
-          <circle cx="110" cy="65" r="12" fill="#06b6d4" opacity="0.3"/>
-          <path d="M 100 65 L 107 72 L 120 59" stroke="#06b6d4" strokeWidth="2" fill="none"/>
-          <circle cx="150" cy="50" r="15" fill="#fbbf24"/>
-          <path d="M 150 43 L 150 50 L 156 53" stroke="white" strokeWidth="2" fill="none"/>
-          <rect x="140" y="85" width="25" height="20" fill="#e0e7ff" rx="2"/>
-          <rect x="143" y="88" width="5" height="14" fill="#6366f1"/>
-          <rect x="151" y="92" width="5" height="10" fill="#6366f1"/>
-          <rect x="159" y="88" width="5" height="14" fill="#6366f1"/>
-        </svg>
-      )
-    };
-    return images[type] || images.finance;
-  };
+  // Form states
+  const [newDeptName, setNewDeptName] = useState("");
+  const [editingDept, setEditingDept] = useState(null);
+  const [deletingDept, setDeletingDept] = useState(null);
+  const [deactivateDept, setDeactivateDept] = useState(null);
+  // const [disabled, setDisabled] = useState(false);
 
-  const handleAddDepartment = () => {
-    if (newDeptName.trim()) {
-      const types = ['finance', 'engineering', 'business'];
-      const randomType = types[Math.floor(Math.random() * types.length)];
-      setDepartments([...departments, {
-        id: Date.now(),
-        name: newDeptName,
-        image: randomType
-      }]);
-      setNewDeptName('');
-      setShowAddModal(false);
+  // Fetch all departments
+  const fetchDepartments = async () => {
+    try {
+      setLoading(true);
+      const data = await getAllDepartments();
+      setDepartments(data);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching departments:", err);
+      setError(err.response?.data?.message || "Failed to fetch departments");
+    } finally {
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+
+  // Filtering logic
+  useEffect(() => {
+    const result = filteredDepartments(departments, searchTerm, filterActive);
+    setFiltered(result);
+  }, [departments, searchTerm, filterActive]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setOpenMenuId(null);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  // Handlers
+  const toggleActiveStatus = async (department) => {
+    try {
+      await toggleDepartmentActiveStatus(department);
+      await fetchDepartments();
+      //added toast!
+      toast.success("Department Status Updated!")
+      setError(null);
+    } catch (err) {
+      console.error("Error toggling status:", err);
+      setError(err.response?.data?.message || "Failed to update status");
+      toast.error("Department Update Status Failed")
+    }
+  };
+
+  const handleAddDepartment = async () => {
+    if (!newDeptName.trim()) return;
+    try {
+      await addDepartment(newDeptName);
+      await fetchDepartments();
+      //added toast
+      toast.success("Department Added!")
+      closeAllModals();
+    } catch (err) {
+      console.error("Error creating department:", err);
+      setError(err.response?.data?.message || "Failed to create department");
+      toast.error("Department Creation Failed!")
+    }
+  };
+
+  const handleUpdateDepartment = async () => {
+    if (!editingDept?.dept_name.trim()) return;
+    try {
+      await editDepartment(editingDept);
+      await fetchDepartments();
+      //added toast
+      toast.success("Department Updated!")
+      closeAllModals();
+    } catch (err) {
+      console.error("Error updating department:", err);
+      setError(err.response?.data?.message || "Failed to update department");
+      toast.error("De[artment Update Failed!")
+    }
+  };
+
+  const handleDeleteDepartment = async () => {
+    if (!deletingDept) return;
+    try {
+      await deleteDepartment(deletingDept);
+      await fetchDepartments();
+      toast.success("Department Deleted Successfully!")
+      closeAllModals();
+    } catch (err) {
+      console.error("Error deleting department:", err);
+      setError(err.response?.data?.message || "Failed to delete department");
+      toast.error("Department Deletion Failed!")
+    }
+  };
+
+  // Centralized modal close helper
+  const closeAllModals = () => {
+    setShowAddModal(false);
+    setShowEditModal(false);
+    setShowDeleteModal(false);
+    setShowDeactivateModal(false);
+    setNewDeptName("");
+    setEditingDept(null);
+    setDeletingDept(null);
+    setDeactivateDept(null);
+  };
+
+  // Show Quiz Management if a department is selected
+  if (selectedDepartment) {
+    return (
+      <QuizManagement
+        department={selectedDepartment}
+        onBack={() => setSelectedDepartment(null)}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-white px-6 py-6 mb-17 sm:mb-0 sm:mt-0">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-start mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Departments</h1>
-            <p className="text-gray-500">This table is for test bank</p>
+        {/* Header Section */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-15">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div className="flex items-center">
+              <div>
+                <h1 className="text-3xl text-[#217486] mb-5">Departments</h1>
+                <p className="text-sm text-gray-600">
+                  Manage departments and quizzes
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="flex items-center justify-center gap-2 bg-[#217486] text-white px-6 py-3 rounded-xl shadow-lg shadow-[#217486]/30 hover:shadow-xl hover:shadow-[#217486]/40 hover:bg-[#1a5d6d] transition-all transform hover:-translate-y-0.5"
+            >
+              <Plus className="w-5 h-5" strokeWidth={2.5} />
+              <span className="font-medium">Add Department</span>
+            </button>
           </div>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-3 rounded-lg transition-colors"
-          >
-            <Plus size={20} />
-            Add Department
-          </button>
+
+          {/* Search and Filter */}
+          <div className="mt-4">
+            <SearchAndFilter
+              searchTerm={searchTerm}
+              filterActive={filterActive}
+              onChangeSearchValue={(e) => setSearchTerm(e.target.value)}
+              onFilterClicked={(value) => setFilterActive(value)}
+            />
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {departments.map((dept) => (
-            <div
-              key={dept.id}
-              className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow"
-            >
-              <div className="flex justify-end mb-4">
-                <button className="text-gray-400 hover:text-gray-600 p-1">
-                  <MoreVertical size={20} />
-                </button>
-              </div>
-              <div className="flex justify-center mb-4">
-                {getImageForType(dept.image)}
-              </div>
-              <h3 className="text-gray-600 text-center text-lg">{dept.name}</h3>
+        {/* Error Alert */}
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 text-red-800 px-5 py-4 rounded-xl mb-6 shadow-sm">
+            <p className="font-semibold text-sm mb-1">Error Occurred</p>
+            <p className="text-sm">{error}</p>
+          </div>
+        )}
+
+        {/* Content Section */}
+        {loading ? (
+          <div className="bg-white rounded-2xl shadow-lg p-16 text-center">
+            <div className="animate-pulse">
+              <div className="w-16 h-16 bg-[#217486]/20 rounded-full mx-auto mb-4"></div>
+              <p className="text-gray-600 font-medium">
+                Loading departments...
+              </p>
             </div>
-          ))}
-        </div>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="bg-white rounded-2xl shadow-lg p-16 text-center">
+            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Filter className="w-10 h-10 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              {searchTerm || filterActive !== "all"
+                ? "No departments match your filters"
+                : "No departments found"}
+            </h3>
+            <p className="text-gray-500 mb-6">
+              {!searchTerm && filterActive === "all"
+                ? "Create your first department to get started"
+                : "Try adjusting your search or filter"}
+            </p>
+            {!searchTerm && filterActive === "all" && (
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[#217486] text-white rounded-xl hover:bg-[#1a5d6d] font-medium transition-all shadow-lg shadow-[#217486]/30"
+              >
+                <Plus className="w-5 h-5" />
+                Create First Department
+              </button>
+            )}
+          </div>
+        ) : (
+          <div>
+            <div className="mb-4 flex items-center justify-between">
+              <p className="text-sm text-gray-600">
+                Showing{" "}
+                <span className="font-semibold text-[#217486]">
+                  {filtered.length}
+                </span>{" "}
+                of{" "}
+                <span className="font-semibold text-[#217486]">
+                  {departments.length}
+                </span>{" "}
+                departments
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filtered.map((dept) => (
+                <DepartmentCard
+                  key={dept.dept_id}
+                  dept={dept}
+                  openMenuId={openMenuId}
+                  setSelectedDepartment={() => setSelectedDepartment(dept)}
+                  onMenuClicked={(e) => {
+                    e.stopPropagation();
+                    setOpenMenuId(
+                      openMenuId === dept.dept_id ? null : dept.dept_id
+                    );
+                  }}
+                  onEditClicked={(e) => {
+                    e.stopPropagation();
+                    setEditingDept({ ...dept });
+                    setShowEditModal(true);
+                    setOpenMenuId(null);
+                  }}
+                  onDeactivateClicked={(e) => {
+                    e.stopPropagation();
+                    setDeactivateDept(dept);
+                    setShowDeactivateModal(true);
+                    setOpenMenuId(null);
+                    // setDisabled(true)
+                  }}
+                  onDeleteClicked={(e) => {
+                    e.stopPropagation();
+                    setDeletingDept(dept);
+                    setShowDeleteModal(true);
+                    setOpenMenuId(null);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
+      {/* Modals */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Add Department</h2>
-            <input
-              type="text"
-              value={newDeptName}
-              onChange={(e) => setNewDeptName(e.target.value)}
-              placeholder="Department name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-              onKeyPress={(e) => e.key === 'Enter' && handleAddDepartment()}
-            />
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => {
-                  setShowAddModal(false);
-                  setNewDeptName('');
-                }}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddDepartment}
-                className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition-colors"
-              >
-                Add
-              </button>
-            </div>
-          </div>
-        </div>
+        <AddDepartment
+          newDeptName={newDeptName}
+          onChangedDeptName={(e) => setNewDeptName(e.target.value)}
+          handleAddDepartment={handleAddDepartment}
+          onModalClosed={closeAllModals}
+        />
+      )}
+
+      {showEditModal && editingDept && (
+        <EditDepartment
+          editingDept={editingDept}
+          onChangedEditingDept={(e) =>
+            setEditingDept({ ...editingDept, dept_name: e.target.value })
+          }
+          handleUpdateDepartment={handleUpdateDepartment}
+          onModalClosed={closeAllModals}
+        />
+      )}
+
+      {showDeleteModal && deletingDept && (
+        <DeleteDepartment
+          deletingDept={deletingDept}
+          handleDeleteDepartment={handleDeleteDepartment}
+          onModalClosed={closeAllModals}
+        />
+      )}
+
+      {showDeactivateModal && deactivateDept && (
+        <DeactivateDepartment
+          deactivateDept={deactivateDept}
+          handleDeactivateClicked={async (e) => {
+            e.stopPropagation();
+            try {
+              await toggleActiveStatus(deactivateDept);
+            } finally {
+              closeAllModals();
+            }
+          }}
+          onModalClosed={closeAllModals}
+        />
       )}
     </div>
   );

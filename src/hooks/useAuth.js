@@ -1,5 +1,5 @@
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { fetchCurrentUser, loginUser } from '../../api/api'
+import { fetchCurrentUser, loginUser } from "../../api/api";
 
 export function useAuth() {
   const queryClient = useQueryClient();
@@ -9,8 +9,6 @@ export function useAuth() {
     queryFn: fetchCurrentUser,
     retry: false,
   });
-
-  console.log('AuthQuery', authQuery)
 
   const login = async (loginCredentials) => {
     try {
@@ -26,8 +24,14 @@ export function useAuth() {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    queryClient.removeQueries(["authUser"]);
+    try {
+      localStorage.removeItem("token");
+      queryClient.removeQueries(["authUser"]);
+
+      return { isSuccess: true, message: "Successfully logged out" };
+    } catch (error) {
+      return { isSuccess: false, message: error.message || "Logout failed" };
+    }
   };
 
   return { ...authQuery, login, logout };
