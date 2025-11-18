@@ -15,7 +15,7 @@ function MobileResultCard({ result, isTablet = false }) {
           {/* Left Section - User Info */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
-              <User className="w-4 h-4 text-slate-400 flex-shrink-0" />
+              <User className="w-4 h-4 text-slate-400 shrink-0" />
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-slate-800 truncate">
                   {result.examiner_name || "N/A"}
@@ -40,7 +40,7 @@ function MobileResultCard({ result, isTablet = false }) {
           </div>
 
           {/* Right Section - Quiz & Status */}
-          <div className="flex flex-col items-end gap-2 flex-shrink-0">
+          <div className="flex flex-col items-end gap-2 shrink-0">
             <div className="text-right">
               <div className="flex items-center gap-1.5 mb-1">
                 <FileText className="w-3.5 h-3.5 text-slate-400" />
@@ -96,7 +96,7 @@ function MobileResultCard({ result, isTablet = false }) {
             <span className="truncate">{result.email || "N/A"}</span>
           </div>
         </div>
-        <span className="text-xs font-mono text-slate-600 bg-slate-100 px-2 py-1 rounded flex-shrink-0">
+        <span className="text-xs font-mono text-slate-600 bg-slate-100 px-2 py-1 rounded shrink-0">
           #{result.id}
         </span>
       </div>
@@ -105,19 +105,19 @@ function MobileResultCard({ result, isTablet = false }) {
       <div className="space-y-2.5">
         {/* Department */}
         <div className="flex items-center gap-2 text-xs">
-          <Building2 className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+          <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           <span className="text-slate-700 truncate">{result.department || "N/A"}</span>
         </div>
 
         {/* Quiz Name */}
         <div className="flex items-center gap-2 text-xs">
-          <FileText className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+          <FileText className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           <span className="text-slate-700 truncate">{result.quiz_name || "N/A"}</span>
         </div>
 
         {/* Date & Time */}
         <div className="flex items-center gap-2 text-xs">
-          <Calendar className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+          <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           <div className="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">
             <span className="text-slate-700 truncate">{result.date || "N/A"}</span>
             <span className="text-slate-400">•</span>
