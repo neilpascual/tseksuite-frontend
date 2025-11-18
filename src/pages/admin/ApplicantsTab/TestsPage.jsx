@@ -1,16 +1,8 @@
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { getAllExaminers } from "../../../../api/api";
-import {
-  Search,
-  Filter,
-  Download,
-  X,
-  FileText,
-  Calendar,
-  Building2,
-  Mail,
-} from "lucide-react";
+import { Search, Filter, Download, X, FileText, Calendar, Building2, Mail } from "lucide-react";
+import ConfirmationModal from "@/components/ConfimationModal";
 
 // Custom hook for media queries
 function useMediaQuery(query) {
@@ -39,6 +31,8 @@ function TestsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  //modal for csv
+  const [showModal, setShowModal] = useState(false);
   const [filters, setFilters] = useState({
     department: "",
     dateFrom: "",
@@ -259,6 +253,19 @@ function TestsPage() {
   );
 
   return (
+    <>
+         {showModal && (
+            <ConfirmationModal
+              title="Proceed to Next Step?"
+              message="Do you want to export this as csv?"
+              confirmLabel="Yes, Proceed"
+              cancelLabel="Cancel"
+              onClose={() => setShowModal(false)}
+              onConfirm={handleExport}
+              confirmColor="green"
+            />
+          )}
+
     <div className="min-h-screen bg-white px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -313,7 +320,7 @@ function TestsPage() {
 
               {/* Export Button */}
               <button
-                onClick={handleExport}
+                onClick={() => setShowModal(true)}
                 disabled={data.length === 0}
                 className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 bg-white border border-slate-200 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-all text-xs sm:text-sm whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-initial justify-center"
               >
@@ -639,6 +646,7 @@ function TestsPage() {
         )}
       </div>
     </div>
+    </>
   );
 }
 
