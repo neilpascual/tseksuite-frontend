@@ -4,6 +4,7 @@ import axios from "axios";
 import ClockIcon from "../../assets/Clock.svg";
 import Footer from "../../components/applicant/Footer";
 import { Breadcrumbs, Stack, Link, Typography } from '@mui/material'
+import toast from "react-hot-toast";
 
 const ApplicantTestPage = () => {
   const navigate = useNavigate();
@@ -126,7 +127,7 @@ const ApplicantTestPage = () => {
   const handleTimeUp = async () => {
     if (isSubmitting) return; // Prevent double submission
     setIsSubmitting(true);
-    alert("Time is up! Submitting your answers...");
+    toast.success("Time is up! Submitting your answers...");
     await submitTest();
   };
 

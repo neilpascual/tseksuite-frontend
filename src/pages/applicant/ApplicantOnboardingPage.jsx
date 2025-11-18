@@ -2,6 +2,7 @@ import Footer from "../../components/applicant/Footer";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ConfirmationModal from "@/components/ConfimationModal";
+import toast from "react-hot-toast";
 
 const ApplicantOnboardingPage = () => {
   const [formData, setFormData] = useState({
@@ -130,24 +131,24 @@ const ApplicantOnboardingPage = () => {
 
     // Validate all required fields
     if (!formData.firstName.trim()) {
-      alert("Please enter your first name");
+      toast.error("Please enter your First name");
       return;
     }
 
     if (!formData.lastName.trim()) {
-      alert("Please enter your last name");
+      toast.error("Please enter your Last name");
       return;
     }
 
     if (!formData.email.trim()) {
-      alert("Please enter your email address");
+      toast.error("Email Address required!");
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      alert("Please enter a valid email address");
+      toast.error("Please enter a valid email address");
       return;
     }
 
@@ -343,7 +344,7 @@ const ApplicantOnboardingPage = () => {
                 <div>
                   <div className="mb-5">
                     <label className="block text-xs font-bold mb-2 text-gray-900">
-                      Full Name
+                      Full Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
