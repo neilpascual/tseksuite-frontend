@@ -3,7 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import ClockIcon from "../../assets/Clock.svg";
 import Footer from "../../components/applicant/Footer";
-import { Breadcrumbs, Stack, Link, Typography } from '@mui/material'
+import { Breadcrumbs, Stack, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material'
+import { getQuestions, getOptions, addResult, addBridge } from "../../../api/api";
 
 const ApplicantTestPage = () => {
   const navigate = useNavigate();
@@ -19,9 +20,41 @@ const ApplicantTestPage = () => {
   const [quizData, setQuizData] = useState(null);
   const [applicantData, setApplicantData] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [percentage, setPercentage] = useState(50)
+  const [percentage, setPercentage] = useState(50);
 
-  const API_BASE_URL = "http://localhost:3000/api";
+  // Modal states
+  const [modalState, setModalState] = useState({
+    open: false,
+    type: '', 
+    title: '',
+    message: '',
+    onConfirm: null,
+    showCancel: false
+  });
+
+  // Helper function to open modal
+  const openModal = (type, title, message, onConfirm, showCancel = false) => {
+    setModalState({
+      open: true,
+      type,
+      title,
+      message,
+      onConfirm,
+      showCancel
+    });
+  };
+
+  // Helper function to close modal
+  const closeModal = () => {
+    setModalState({
+      open: false,
+      type: '',
+      title: '',
+      message: '',
+      onConfirm: null,
+      showCancel: false
+    });
+  };
 
   useEffect(() => {
     const selectedQuiz =
@@ -33,8 +66,15 @@ const ApplicantTestPage = () => {
       JSON.parse(localStorage.getItem("applicantData") || "{}");
 
     if (!selectedQuiz || !applicant.examiner_id) {
-      alert("No quiz selected or applicant data missing. Redirecting...");
-      navigate("/quiz-selection");
+      openModal(
+        'error',
+        '⚠️ Error',
+        'No quiz selected or applicant data missing. Redirecting...',
+        () => {
+          closeModal();
+          navigate("/quiz-selection");
+        }
+      );
       return;
     }
 
@@ -67,31 +107,22 @@ const ApplicantTestPage = () => {
   }, [timeRemaining, loading, isSubmitting]);
 
   useEffect(() => {
-  if (questions.length > 0) {
-    const percent = ((currentQuestionIndex + 1) / questions.length) * 100;
-    setPercentage(percent);
-  }
-}, [currentQuestionIndex, questions]);
-
+    if (questions.length > 0) {
+      const percent = ((currentQuestionIndex + 1) / questions.length) * 100;
+      setPercentage(percent);
+    }
+  }, [currentQuestionIndex, questions]);
 
   const fetchQuestions = async (quizId) => {
     try {
       setLoading(true);
 
-      const questionsResponse = await axios.get(
-        `${API_BASE_URL}/question/get/${quizId}`
-      );
-
-      const questionsData = questionsResponse.data.data || [];
+      const questionsData = await getQuestions(quizId);
 
       const questionsWithOptions = await Promise.all(
         questionsData.map(async (question) => {
           try {
-            const optionsResponse = await axios.get(
-              `${API_BASE_URL}/answer/test/${question.question_id}`
-            );
-
-            const options = optionsResponse.data.data || [];
+            const options = await getOptions(question.question_id)
 
             return {
               ...question,
@@ -100,14 +131,14 @@ const ApplicantTestPage = () => {
                 option_text: opt.option_text,
                 is_correct: opt.is_correct,
               })),
-               explanation: question.explanation ||  "",
+              explanation: question.explanation || "",
             };
           } catch (err) {
             console.error(
               `Error fetching options for question ${question.question_id}:`,
               err
             );
-            return { ...question, options: [],explanation: question.explanation || ""};
+            return { ...question, options: [], explanation: question.explanation || "" };
           }
         })
       );
@@ -116,18 +147,33 @@ const ApplicantTestPage = () => {
       setUserAnswers(new Array(questionsWithOptions.length).fill(null));
     } catch (error) {
       console.error("Error fetching questions:", error);
-      alert("Failed to load questions. Please try again.");
-      navigate("/quiz-selection");
+      openModal(
+        'error',
+        '⚠️ Error',
+        'Failed to load questions. Please try again.',
+        () => {
+          closeModal();
+          navigate("/quiz-selection");
+        }
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleTimeUp = async () => {
-    if (isSubmitting) return; // Prevent double submission
+    if (isSubmitting) return;
     setIsSubmitting(true);
-    alert("Time is up! Submitting your answers...");
-    await submitTest();
+    
+    openModal(
+      'timeup',
+      '⏰ Time\'s Up',
+      'Time is up! Your answers will be submitted automatically.',
+      async () => {
+        closeModal();
+        await submitTest();
+      }
+    );
   };
 
   const formatTime = (seconds) => {
@@ -153,18 +199,28 @@ const ApplicantTestPage = () => {
   };
 
   const handleNext = () => {
-    if (isSubmitting) return; // Prevent actions during submission
+    if (isSubmitting) return;
 
     const currentQuestion = questions[currentQuestionIndex];
 
     if (currentQuestion.question_type === "CB") {
       if (selectedAnswers.length === 0) {
-        alert("Please select at least one answer");
+        openModal(
+          'validation',
+          '⚠️ Validation',
+          'Please select at least one answer before proceeding.',
+          closeModal
+        );
         return;
       }
     } else if (currentQuestion.question_type !== "DESC") {
       if (selectedAnswer === null) {
-        alert("Please select an answer");
+        openModal(
+          'validation',
+          '⚠️ Validation',
+          'Please select an answer before proceeding.',
+          closeModal
+        );
         return;
       }
     }
@@ -189,29 +245,30 @@ const ApplicantTestPage = () => {
   const submitTest = async (answers = userAnswers) => {
     try {
       if (!quizData || !applicantData) {
-        alert("Quiz or applicant data not found. Cannot submit test.");
+        openModal(
+          'error',
+          '⚠️ Error',
+          'Quiz or applicant data not found. Cannot submit test.',
+          closeModal
+        );
         return;
       }
 
-      // Format answers for backend
       const formattedAnswers = questions.map((question, index) => {
         const userAnswer = answers[index];
 
         if (question.question_type === "CB") {
-          // For checkbox, send array of answer IDs
           return {
             question_id: question.question_id,
             selected_answer: Array.isArray(userAnswer) ? userAnswer : [],
           };
         } else if (question.question_type === "DESC") {
-          // For descriptive, send text
           return {
             question_id: question.question_id,
             selected_answer:
               typeof userAnswer === "string" ? userAnswer.trim() : "",
           };
         } else {
-          // For MC/TF, send single answer ID
           return {
             question_id: question.question_id,
             selected_answer: userAnswer || null,
@@ -219,7 +276,6 @@ const ApplicantTestPage = () => {
         }
       });
 
-      // Determine status based on answered questions
       const answeredCount = formattedAnswers.filter((ans) => {
         if (Array.isArray(ans.selected_answer)) {
           return ans.selected_answer.length > 0;
@@ -230,7 +286,6 @@ const ApplicantTestPage = () => {
       const status =
         answeredCount < questions.length ? "ABANDONED" : "COMPLETED";
 
-      // Submit to backend
       const payload = {
         examiner_id: applicantData.examiner_id,
         quiz_id: quizData.quiz_id,
@@ -240,34 +295,12 @@ const ApplicantTestPage = () => {
 
       console.log("Submitting test:", payload);
 
-      const response = await axios.post(
-        `${API_BASE_URL}/result/create`,
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const resultData = await addResult(payload)
 
-      const resultData = response.data.data;
+      await addBridge({ examiner_id: applicantData.examiner_id,
+                        quiz_id: quizData.quiz_id,
+                        result_id: resultData.result_id })
 
-      // Create bridge entry
-      await axios.post(
-        `${API_BASE_URL}/bridge/create`,
-        {
-          examiner_id: applicantData.examiner_id,
-          quiz_id: quizData.quiz_id,
-          result_id: resultData.result_id,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      // Navigate to results page with data
       navigate("/completed-test", {
         state: {
           resultData: resultData,
@@ -278,21 +311,26 @@ const ApplicantTestPage = () => {
       });
     } catch (error) {
       console.error("Error submitting test:", error);
-      alert(
-        error.response?.data?.message ||
-          "Failed to submit test. Please try again."
+      openModal(
+        'error',
+        '⚠️ Submission Error',
+        error.response?.data?.message || 'Failed to submit test. Please try again.',
+        closeModal
       );
     }
   };
 
   const handleBackToHome = () => {
-    if (
-      window.confirm(
-        "Are you sure you want to exit? Your progress will be lost."
-      )
-    ) {
-      navigate("/");
-    }
+    openModal(
+      'exit',
+      '⚠️ Exit Test',
+      'Are you sure you want to exit? Your progress will be lost.',
+      () => {
+        closeModal();
+        navigate("/test-instructions");
+      },
+      true // Show cancel button
+    );
   };
 
   const getQuestionTypeLabel = (type) => {
@@ -300,7 +338,6 @@ const ApplicantTestPage = () => {
       MC: "Multiple Choice",
       CB: "Multiple Select",
       TF: "True/False",
-      DESC: "Descriptive",
     };
     return labels[type] || "Question";
   };
@@ -340,96 +377,121 @@ const ApplicantTestPage = () => {
   const currentQuestion = questions[currentQuestionIndex];
 
   const breadcrumbs = [
-    <Typography underline="hover" key="1" color="inherit" sx={{ fontSize:{
-       xs:15,
-      sm:20,
-      md:25
-    }}} fontSize={25}>
-      { getQuestionTypeLabel(currentQuestion.question_type) }
+    <Typography 
+      underline="hover" 
+      key="1" 
+      color="inherit" 
+      sx={{ 
+        fontSize: {
+          xs: 14,
+          sm: 16,
+          md: 18
+        }
+      }}
+    >
+      {getQuestionTypeLabel(currentQuestion.question_type)}
     </Typography>,
-    <Typography key="2" sx={{ color: '#2E99B0', fontSize:{
-      xs:15,
-      sm:20,
-      md:25
-    } }} >
+    <Typography 
+      key="2" 
+      sx={{ 
+        color: '#2E99B0', 
+        fontSize: {
+          xs: 14,
+          sm: 16,
+          md: 18
+        } 
+      }}
+    >
       Question {currentQuestionIndex + 1} / {questions.length}
     </Typography>
   ];
 
   return (
     <div
-      className="min-h-screen bg-white flex flex-col justify-between"
+      className="min-h-screen bg-white flex flex-col"
       style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
     >
-      <div className="sticky top-0 h-1 bg-[#2E99B0] transition-all duration-300 ease-out"style={{ width: `${percentage}%` }}/>
+      {/* Progress Bar */}
+      <div 
+        className="sticky top-0 h-1.5 bg-[#2E99B0] transition-all duration-300 ease-out z-50"
+        style={{ width: `${percentage}%` }}
+      />
         
-          <div className="flex items-center justify-between mt-10 md:mt-10 mb-10 sm:mb-12 mx-5 sm:mx-18 lg:mx-45 xl:mx-115">
-                <button
-                  onClick={handleBackToHome}
-                  className="flex items-center gap-2 text-gray-900 hover:text-gray-600 transition-colors"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                    />
-                  </svg>
-                  <span className="font-normal text-base">Exit Test</span>
-                </button>
+      {/* Header Section with consistent padding */}
+      <div className="px-6 sm:px-12 lg:px-24 xl:px-32 pt-8 pb-6">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-2 text-gray-900 hover:text-gray-600 transition-colors"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            <span className="font-normal text-base">Exit Test</span>
+          </button>
 
-                <div
-                  className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-black rounded-lg transition-colors duration-200"
-                  style={{ boxShadow: "2px 2px 0px 0px rgba(0, 0, 0, 1)" }}
-                >
-                  <img src={ClockIcon} className="w-5 h-5" alt="clock" />
-                  <span className="font-semibold text-gray-900 text-lg">
-                    {formatTime(timeRemaining)}
-                  </span>
-            </div>
+          <div
+            className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-black rounded-lg transition-colors duration-200"
+            style={{ boxShadow: "2px 2px 0px 0px rgba(0, 0, 0, 1)" }}
+          >
+            <img src={ClockIcon} className="w-5 h-5" alt="clock" />
+            <span className="font-semibold text-gray-900 text-lg">
+              {formatTime(timeRemaining)}
+            </span>
+          </div>
+        </div>
       </div>
 
-      
-
-      {/* Main Content */}
-      
-      <div className="flex flex-col justify-center mx-5 sm:mx-10 lg:mx-30 xl:mx-100 sm:px-8 lg:px-16 py-8 sm:py-12">
-
-         {/* Header */}
-          
-          <div className="flex flex-col mb-5 gap-10"> 
-
-
-         <Stack spacing={2} className="mb-10 sm:mb-10">
-           <Breadcrumbs separator=">">
-           { breadcrumbs }
-          </Breadcrumbs>
-          <Typography key="2" sx={{ color: 'text-base' }}fontSize={25} fontWeight={'bold'}>
-            {currentQuestion.question_text}
-          </Typography>
-         </Stack>
+      {/* Main Content with consistent padding and spacing */}
+      <div className="flex-1 px-6 sm:px-12 lg:px-24 xl:px-32 pb-12">
+        <div className="max-w-7xl mx-auto">
+          {/* Breadcrumbs and Question Section */}
+          <div className="mb-8">
+            <Stack spacing={3}>
+              <Breadcrumbs separator="›" sx={{ mb: 2 }}>
+                {breadcrumbs}
+              </Breadcrumbs>
+              <Typography 
+                sx={{ 
+                  color: '#1a1a1a',
+                  fontSize: {
+                    xs: 20,
+                    sm: 24,
+                    md: 28,
+                    lg: 32
+                  },
+                  fontWeight: 'bold',
+                  lineHeight: 1.3
+                }}
+              >
+                {currentQuestion.question_text}
+              </Typography>
+            </Stack>
           </div>
 
-      
-            <div className="flex flex-col gap-10">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16 sm:mb-20">
+          {/* Options Grid with consistent spacing */}
+          <div className="mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {currentQuestion.options.map((option) => {
                 const isSelected =
                   currentQuestion.question_type === "CB"
                     ? selectedAnswers.includes(option.answer_id)
                     : selectedAnswer === option.answer_id;
-
                 return (
                   <button
                     key={option.answer_id}
                     onClick={() => handleAnswerSelect(option.answer_id)}
-                    className={`p-5 sm:p-6 rounded-lg text-left text-base sm:text-lg font-normal transition-all duration-200 border-2 ${
+                    className={`p-5 rounded-lg text-left text-base font-normal transition-all duration-200 border-2 ${
                       isSelected
                         ? "bg-cyan-50 text-black border-cyan-500"
                         : "bg-gray-50 text-black hover:bg-gray-100 border-gray-300"
@@ -471,18 +533,20 @@ const ApplicantTestPage = () => {
                           )}
                         </div>
                       )}
-                      <span>{option.option_text}</span>
+                      <span className="leading-relaxed">{option.option_text}</span>
                     </div>
                   </button>
                 );
               })}
             </div>
+          </div>
 
-          <div className="flex justify-end">
+          {/* Submit Button with consistent spacing */}
+          <div className="flex justify-end pt-4">
             <button
               onClick={handleNext}
               disabled={isSubmitting}
-              className={`bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-10 sm:px-16 py-3.5 rounded-lg transition-colors duration-200 flex items-center gap-2 text-base sm:text-lg ${
+              className={`bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-12 py-3.5 rounded-lg transition-colors duration-200 flex items-center gap-2 text-base ${
                 isSubmitting ? "opacity-50 cursor-not-allowed" : ""
               }`}
               style={{ boxShadow: "4px 4px 0px 0px rgba(0, 0, 0, 1)" }}
@@ -514,10 +578,80 @@ const ApplicantTestPage = () => {
               )}
             </button>
           </div>
-            </div>
+        </div>
       </div>
 
       <Footer />
+
+      {/* Custom Modal Component */}
+      <Dialog
+        open={modalState.open}
+        onClose={() => {
+          // Only allow closing for validation and error modals
+          if (modalState.type === 'validation' || modalState.type === 'error') {
+            closeModal();
+          }
+        }}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: '12px',
+            padding: '8px'
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          fontSize: '20px', 
+          fontWeight: 'bold',
+          color: '#1a1a1a',
+          pb: 1
+        }}>
+          {modalState.title}
+        </DialogTitle>
+        
+        <DialogContent>
+          <Typography sx={{ fontSize: '16px', color: '#4a5568', lineHeight: 1.6 }}>
+            {modalState.message}
+          </Typography>
+        </DialogContent>
+        
+        <DialogActions sx={{ padding: '16px 24px' }}>
+          {modalState.showCancel && (
+            <Button 
+              onClick={closeModal}
+              sx={{ 
+                color: '#6b7280',
+                textTransform: 'none',
+                fontSize: '15px',
+                fontWeight: 500,
+                '&:hover': {
+                  backgroundColor: '#f3f4f6'
+                }
+              }}
+            >
+              Cancel 
+            </Button>
+          )}
+          
+          <Button 
+            onClick={modalState.onConfirm}
+            variant="contained"
+            sx={{ 
+              bgcolor: modalState.type === 'exit' ? '#dc2626' : '#2E99B0',
+              '&:hover': { 
+                bgcolor: modalState.type === 'exit' ? '#b91c1c' : '#267a8d' 
+              },
+              textTransform: 'none',
+              fontSize: '15px',
+              fontWeight: 600,
+              boxShadow: '2px 2px 0px 0px rgba(0, 0, 0, 0.1)'
+            }}
+          >
+            {modalState.type === 'exit' ? 'Exit Test' : 'OK'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

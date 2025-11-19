@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import {
   Plus,
   MoreVertical,
@@ -11,11 +10,10 @@ import {
   Copy,
   Check,
   FileText,
-  Calendar,
-  Users,
 } from "lucide-react";
 import QuestionManagement from "./QuestionManagement";
 import toast from "react-hot-toast";
+import { getQuizzes, addQuiz, deleteQuiz, generateInviteLink } from "../../../../api/api";
 
 const QuizManagement = ({ department, onBack }) => {
   const [quizzes, setQuizzes] = useState([]);
@@ -36,8 +34,6 @@ const QuizManagement = ({ department, onBack }) => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
 
-  const API_BASE_URL = `http://localhost:3000/api/quiz`;
-  const INVITE_API_BASE_URL = `http://localhost:3000/api/invitation`;
 
   useEffect(() => {
     fetchQuizzes();
@@ -52,13 +48,12 @@ const QuizManagement = ({ department, onBack }) => {
   const fetchQuizzes = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        `${API_BASE_URL}/get/${department.dept_id}`
-      );
-      setQuizzes(response.data.data || []);
+      
+      const response = await getQuizzes(department.dept_id)
+
+      setQuizzes(response);
       setError(null);
     } catch (err) {
-      // If 400 error, likely means no quizzes found - treat as empty array
       if (err.response?.status === 400) {
         setQuizzes([]);
         setError(null);
@@ -75,11 +70,13 @@ const QuizManagement = ({ department, onBack }) => {
     if (!newQuiz.quiz_name.trim() || !newQuiz.time_limit) return;
 
     try {
-      await axios.post(`${API_BASE_URL}/${department.dept_id}/create`, {
+      const payload = {
         dept_id: department.dept_id,
         quiz_name: newQuiz.quiz_name,
         time_limit: parseInt(newQuiz.time_limit),
-      });
+      }
+      
+      await addQuiz(department.dept_id, payload);
 
       await fetchQuizzes();
       setNewQuiz({ quiz_name: "", time_limit: "" });
@@ -102,13 +99,13 @@ const QuizManagement = ({ department, onBack }) => {
       return;
 
     try {
-      await axios.put(
-        `${API_BASE_URL}/${department.dept_id}/update/${editingQuiz.quiz_id}`,
-        {
+
+      const payload = {
           quiz_name: editingQuiz.quiz_name,
           time_limit: parseInt(editingQuiz.time_limit),
         }
-      );
+      
+      await editingQuiz(department.dept_id, quiz.quiz_id, payload)
 
       await fetchQuizzes();
       toast.success("Quiz Updated!");
@@ -125,9 +122,7 @@ const QuizManagement = ({ department, onBack }) => {
   const handleDeleteQuiz = async () => {
     if (!deletingQuiz) return;
     try {
-      await axios.delete(
-        `${API_BASE_URL}/${department.dept_id}/delete/${deletingQuiz.quiz_id}`
-      );
+      await deleteQuiz(department.dept_id, deleteQuiz.quiz_id)
       await fetchQuizzes();
       toast.success("Quiz Deleted!");
       setShowDeleteModal(false);
@@ -144,14 +139,15 @@ const QuizManagement = ({ department, onBack }) => {
     if (!inviteExpiration || !selectedQuizForInvite) return;
 
     try {
-      const response = await axios.post(`${INVITE_API_BASE_URL}/generate`, {
+      const payload = {
         email: null,
         expiration: inviteExpiration,
         quiz_id: selectedQuizForInvite.quiz_id,
         dept_id: department.dept_id,
-      });
+      }
+      const link = await generateInviteLink(payload)
 
-      setGeneratedLink(response.data.data.link);
+      setGeneratedLink(link);
       setError(null);
     } catch (err) {
       setError(
@@ -198,21 +194,22 @@ const QuizManagement = ({ department, onBack }) => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto p-6">
+    <div className="min-h-screen bg-white mb-20">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         {/* Header Card */}
-        <div className="mb-15">
+        <div className="mb-8 sm:mb-12 lg:mb-15">
           <button
             onClick={onBack}
             className="flex items-center gap-2 text-gray-600 hover:text-[#217486] mb-4 font-medium transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
-            Back to Departments
+            <span className="hidden sm:inline">Back to Departments</span>
+            <span className="sm:hidden">Back</span>
           </button>
 
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div>
-              <h1 className="text-3xl text-[#217486] mb-2">
+              <h1 className="text-2xl sm:text-3xl text-[#217486] mb-2">
                 {department.dept_name}
               </h1>
               <div className="flex items-center gap-4 text-sm text-gray-600">
@@ -228,7 +225,7 @@ const QuizManagement = ({ department, onBack }) => {
 
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 bg-[#217486] text-white px-6 py-3 rounded-xl hover:bg-[#1a5d6d] font-medium transition-all hover:shadow-xl hover:shadow-[#217486]/40"
+              className="flex items-center justify-center gap-2 bg-[#217486] text-white px-6 py-3 rounded-xl hover:bg-[#1a5d6d] font-medium transition-all hover:shadow-xl hover:shadow-[#217486]/40 w-full sm:w-auto"
             >
               <Plus className="w-5 h-5 hidden sm:inline" />
               Create Quiz
@@ -238,7 +235,7 @@ const QuizManagement = ({ department, onBack }) => {
 
         {/* Error Alert */}
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 text-red-800 px-5 py-4 rounded-xl mb-6 shadow-sm">
+          <div className="bg-red-50 border-l-4 border-red-500 text-red-800 px-4 sm:px-5 py-4 rounded-xl mb-6 shadow-sm">
             <p className="font-semibold text-sm mb-1">Error Occurred</p>
             <p className="text-sm">{error}</p>
           </div>
@@ -246,14 +243,14 @@ const QuizManagement = ({ department, onBack }) => {
 
         {/* Loading State */}
         {loading ? (
-          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
+          <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12 text-center">
             <div className="animate-pulse">
               <div className="w-12 h-12 bg-[#217486]/20 rounded-full mx-auto mb-4"></div>
               <p className="text-gray-600">Loading quizzes...</p>
             </div>
           </div>
         ) : filteredQuizzes.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
+          <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12 text-center">
             <div className="w-20 h-20 bg-[#217486]/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <FileText className="w-10 h-10 text-[#217486]" />
             </div>
@@ -272,18 +269,18 @@ const QuizManagement = ({ department, onBack }) => {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {filteredQuizzes.map((quiz) => (
               <div
                 key={quiz.quiz_id}
                 className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all border border-gray-100 overflow-hidden group"
               >
-                <div className="bg-linear-to-br from-[#217486] to-[#2a8fa5] p-5">
+                <div className="bg-linear-to-br from-[#217486] to-[#2a8fa5] p-4 sm:p-5">
                   <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-xl font-bold text-white flex-1 pr-2 leading-tight">
+                    <h3 className="text-lg sm:text-xl font-bold text-white flex-1 pr-2 leading-tight wrap-break-word">
                       {quiz.quiz_name}
                     </h3>
-                    <div className="relative">
+                    <div className="relative shrink-0">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -334,7 +331,7 @@ const QuizManagement = ({ department, onBack }) => {
                   </div>
                 </div>
 
-                <div className="p-5">
+                <div className="p-4 sm:p-5">
                   <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
                     <div className="flex items-center gap-2 text-gray-600">
                       <FileText className="w-4 h-4 text-[#217486]" />
@@ -347,7 +344,7 @@ const QuizManagement = ({ department, onBack }) => {
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <button
                       onClick={() => setSelectedQuiz(quiz)}
                       className="flex-1 flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors"
@@ -360,9 +357,9 @@ const QuizManagement = ({ department, onBack }) => {
                         e.stopPropagation();
                         openInviteModal(quiz);
                       }}
-                      //added disabled if there is no existing question
-                      // disabled={}
-                      className="flex-1 flex items-center justify-center gap-2 bg-[#217486] hover:bg-[#1a5d6d] text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-all shadow-md shadow-[#217486]/30"
+                      disabled={!quiz.question_count || quiz.question_count === 0}
+                      className="flex-1 flex items-center justify-center gap-2 bg-[#217486] hover:bg-[#1a5d6d] text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-all shadow-md shadow-[#217486]/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#217486]"
+                      title={!quiz.question_count || quiz.question_count === 0 ? "Add questions before generating invites" : "Generate invite link"}
                     >
                       <LinkIcon className="w-4 h-4" />
                       Invite
@@ -398,7 +395,7 @@ const QuizManagement = ({ department, onBack }) => {
                     setNewQuiz({ ...newQuiz, quiz_name: e.target.value })
                   }
                   placeholder="Enter quiz name"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#217486] focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#217486] focus:border-transparent text-sm sm:text-base"
                   onKeyPress={(e) => e.key === "Enter" && handleAddQuiz()}
                   autoFocus
                 />
@@ -415,25 +412,25 @@ const QuizManagement = ({ department, onBack }) => {
                   }
                   placeholder="Enter time limit"
                   min="1"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#217486] focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#217486] focus:border-transparent text-sm sm:text-base"
                 />
               </div>
             </div>
 
-            <div className="p-6 bg-gray-50 border-t flex gap-3">
+            <div className="p-4 sm:p-6 bg-gray-50 border-t flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => {
                   setShowAddModal(false);
                   setNewQuiz({ quiz_name: "", time_limit: "" });
                 }}
-                className="flex-1 px-4 py-3 text-gray-700 bg-white hover:bg-gray-100 border border-gray-300 rounded-xl transition-colors font-medium"
+                className="flex-1 px-4 py-3 text-gray-700 bg-white hover:bg-gray-100 border border-gray-300 rounded-xl transition-colors font-medium text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddQuiz}
                 disabled={!newQuiz.quiz_name.trim() || !newQuiz.time_limit}
-                className="flex-1 px-4 py-3 bg-[#217486] hover:bg-[#1a5d6d] text-white rounded-xl transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#217486]/30"
+                className="flex-1 px-4 py-3 bg-[#217486] hover:bg-[#1a5d6d] text-white rounded-xl transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#217486]/30 text-sm sm:text-base"
               >
                 Proceed
               </button>
@@ -468,7 +465,7 @@ const QuizManagement = ({ department, onBack }) => {
                     })
                   }
                   placeholder="Quiz name"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#217486] focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#217486] focus:border-transparent text-sm sm:text-base"
                   onKeyPress={(e) => e.key === "Enter" && handleUpdateQuiz()}
                   autoFocus
                 />
@@ -488,18 +485,18 @@ const QuizManagement = ({ department, onBack }) => {
                   }
                   placeholder="Time limit"
                   min="1"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#217486] focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#217486] focus:border-transparent text-sm sm:text-base"
                 />
               </div>
             </div>
 
-            <div className="p-6 bg-gray-50 border-t flex gap-3">
+            <div className="p-4 sm:p-6 bg-gray-50 border-t flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => {
                   setShowEditModal(false);
                   setEditingQuiz(null);
                 }}
-                className="flex-1 px-4 py-3 text-gray-700 bg-white hover:bg-gray-100 border border-gray-300 rounded-xl transition-colors font-medium"
+                className="flex-1 px-4 py-3 text-gray-700 bg-white hover:bg-gray-100 border border-gray-300 rounded-xl transition-colors font-medium text-sm sm:text-base"
               >
                 Cancel
               </button>
@@ -508,7 +505,7 @@ const QuizManagement = ({ department, onBack }) => {
                 disabled={
                   !editingQuiz.quiz_name.trim() || !editingQuiz.time_limit
                 }
-                className="flex-1 px-4 py-3 bg-[#217486] hover:bg-[#1a5d6d] text-white rounded-xl transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#217486]/30"
+                className="flex-1 px-4 py-3 bg-[#217486] hover:bg-[#1a5d6d] text-white rounded-xl transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#217486]/30 text-sm sm:text-base"
               >
                 Update Quiz
               </button>
@@ -520,14 +517,14 @@ const QuizManagement = ({ department, onBack }) => {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && deletingQuiz && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Trash2 className="w-8 h-8 text-red-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 text-center">
               Delete Quiz
             </h2>
-            <p className="text-gray-600 text-center mb-6">
+            <p className="text-sm sm:text-base text-gray-600 text-center mb-6">
               Are you sure you want to delete{" "}
               <strong className="text-gray-900">
                 {deletingQuiz.quiz_name}
@@ -535,19 +532,19 @@ const QuizManagement = ({ department, onBack }) => {
               ? This action cannot be undone and will remove all associated
               questions.
             </p>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => {
                   setShowDeleteModal(false);
                   setDeletingQuiz(null);
                 }}
-                className="flex-1 px-4 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors font-medium"
+                className="flex-1 px-4 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors font-medium text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteQuiz}
-                className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors font-medium shadow-lg shadow-red-600/30"
+                className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors font-medium shadow-lg shadow-red-600/30 text-sm sm:text-base"
               >
                 Delete Quiz
               </button>
@@ -562,8 +559,8 @@ const QuizManagement = ({ department, onBack }) => {
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
             <div className="bg-linear-to-r from-[#217486] to-[#2a8fa5] p-6">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                  <LinkIcon className="w-6 h-6 text-white" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <LinkIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-white">
@@ -576,7 +573,7 @@ const QuizManagement = ({ department, onBack }) => {
               </div>
             </div>
 
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {!generatedLink ? (
                 <div className="space-y-5">
                   <div>
@@ -589,7 +586,7 @@ const QuizManagement = ({ department, onBack }) => {
                       onChange={(e) => setInviteExpiration(e.target.value)}
                       placeholder="Enter hours until expiration"
                       min="1"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#217486] focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#217486] focus:border-transparent text-sm sm:text-base"
                       onKeyPress={(e) =>
                         e.key === "Enter" && handleGenerateInvite()
                       }
@@ -599,17 +596,17 @@ const QuizManagement = ({ department, onBack }) => {
                       The invitation link will expire after the specified time
                     </p>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex flex-col sm:flex-row gap-3">
                     <button
                       onClick={closeInviteModal}
-                      className="flex-1 px-4 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors font-medium"
+                      className="flex-1 px-4 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors font-medium text-sm sm:text-base"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleGenerateInvite}
                       disabled={!inviteExpiration}
-                      className="flex-1 px-4 py-3 bg-[#217486] hover:bg-[#1a5d6d] text-white rounded-xl transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#217486]/30"
+                      className="flex-1 px-4 py-3 bg-[#217486] hover:bg-[#1a5d6d] text-white rounded-xl transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#217486]/30 text-sm sm:text-base"
                     >
                       Generate Link
                     </button>
@@ -626,11 +623,11 @@ const QuizManagement = ({ department, onBack }) => {
                         type="text"
                         value={generatedLink}
                         readOnly
-                        className="flex-1 px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-sm"
+                        className="flex-1 px-3 sm:px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-xs sm:text-sm truncate"
                       />
                       <button
                         onClick={handleCopyLink}
-                        className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                        className="px-3 sm:px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors flex-shrink-0"
                       >
                         {copied ? (
                           <Check className="w-5 h-5 text-green-600" />
@@ -655,7 +652,7 @@ const QuizManagement = ({ department, onBack }) => {
                   </div>
                   <button
                     onClick={closeInviteModal}
-                    className="w-full px-4 py-3 bg-[#217486] hover:bg-[#1a5d6d] text-white rounded-xl transition-colors font-medium shadow-lg shadow-[#217486]/30"
+                    className="w-full px-4 py-3 bg-[#217486] hover:bg-[#1a5d6d] text-white rounded-xl transition-colors font-medium shadow-lg shadow-[#217486]/30 text-sm sm:text-base"
                   >
                     Done
                   </button>

@@ -72,7 +72,7 @@ function ResultsTable({ data }) {
               </td>
               <td className="px-6 py-4">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
-                  <Building2 className="w-3 h-3 flex-shrink-0" />
+                  <Building2 className="w-3 h-3 shrink-0" />
                   <span className="truncate">{row.department || "N/A"}</span>
                 </span>
               </td>
@@ -98,7 +98,7 @@ function ResultsTable({ data }) {
               </td>
               <td className="px-6 py-4">
                 <span className="inline-flex items-center gap-1.5 text-sm text-slate-600">
-                  <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+                  <Calendar className="w-3.5 h-3.5 shrink-0" />
                   <span className="truncate">{formatDate(row.date)}</span>
                 </span>
               </td>

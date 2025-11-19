@@ -2,6 +2,8 @@ import Footer from "../../components/applicant/Footer";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ConfirmationModal from "@/components/ConfimationModal";
+import toast from "react-hot-toast";
+import OnboardingMessage from "../../components/applicant/OnboardingMessage";
 
 const ApplicantOnboardingPage = () => {
   const [formData, setFormData] = useState({
@@ -130,24 +132,24 @@ const ApplicantOnboardingPage = () => {
 
     // Validate all required fields
     if (!formData.firstName.trim()) {
-      alert("Please enter your first name");
+      toast.error("Please enter your First name");
       return;
     }
 
     if (!formData.lastName.trim()) {
-      alert("Please enter your last name");
+      toast.error("Please enter your Last name");
       return;
     }
 
     if (!formData.email.trim()) {
-      alert("Please enter your email address");
+      toast.error("Email Address required!");
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      alert("Please enter a valid email address");
+      toast.error("Please enter a valid email address");
       return;
     }
 
@@ -304,33 +306,7 @@ const ApplicantOnboardingPage = () => {
       >
         <div className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
           <div className="w-full max-w-5xl flex flex-col lg:flex-row gap-8 lg:gap-12 items-center">
-            <div className="flex-1 w-full lg:w-auto text-center lg:text-left">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 lg:mb-8">
-                <span className="text-cyan-600">Welcome,</span>{" "}
-                <span className="text-black">Examinee!</span>
-              </h1>
-              <div className="space-y-4 lg:space-y-6 text-gray-800 text-sm sm:text-base">
-                <p className="leading-relaxed">
-                  Thank you for your interest in joining our program. Please
-                  complete the form with accurate information
-                  <span className="font-semibold">
-                    {" "}
-                    — especially your email address, as it will be used to link
-                    your account and test results.
-                  </span>
-                </p>
-                <p className="leading-relaxed">
-                  Once you've submitted your details, you'll receive access to
-                  your assessment. Make sure to take the test only once per
-                  applicant.
-                </p>
-                <p className="leading-relaxed">
-                  <span className="text-cyan-600 font-bold">Good luck</span>{" "}
-                  <span className="font-semibold">—</span> we're excited to see
-                  how you perform!
-                </p>
-              </div>
-            </div>
+          <OnboardingMessage />
             <div className="w-full sm:w-96">
               <div
                 className="bg-white rounded-2xl p-6 sm:p-8 relative border border-gray-200 mb-6 sm:mb-0"
@@ -343,7 +319,7 @@ const ApplicantOnboardingPage = () => {
                 <div>
                   <div className="mb-5">
                     <label className="block text-xs font-bold mb-2 text-gray-900">
-                      Full Name
+                      Full Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -480,9 +456,6 @@ const ApplicantOnboardingPage = () => {
             communication of results.
           </p>
         </div>
-        {/* <div className="bg-[#2E99B0] py-4 text-center text-xs text-white">
-          Copyright 2025 @ SuiteTest
-        </div> */}
         <Footer />
       </div>
     </>

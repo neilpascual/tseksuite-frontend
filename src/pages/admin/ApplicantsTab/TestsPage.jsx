@@ -1,16 +1,8 @@
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { getAllExaminers } from "../../../../api/api";
-import {
-  Search,
-  Filter,
-  Download,
-  X,
-  FileText,
-  Calendar,
-  Building2,
-  Mail,
-} from "lucide-react";
+import { Search, Filter, Download, X, FileText, Calendar, Building2, Mail } from "lucide-react";
+import ConfirmationModal from "@/components/ConfimationModal";
 
 // Custom hook for media queries
 function useMediaQuery(query) {
@@ -39,6 +31,8 @@ function TestsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  //modal for csv
+  const [showModal, setShowModal] = useState(false);
   const [filters, setFilters] = useState({
     department: "",
     dateFrom: "",
@@ -195,23 +189,23 @@ function TestsPage() {
             {examiner.examiner_name || "N/A"}
           </p>
           <p className="text-xs text-slate-500 flex items-center gap-1 truncate">
-            <Mail className="w-3 h-3 flex-shrink-0" />
+            <Mail className="w-3 h-3 shrink-0" />
             <span className="truncate">{examiner.email || "N/A"}</span>
           </p>
         </div>
-        <span className="text-xs font-mono text-slate-600 bg-slate-100 px-2 py-1 rounded ml-2 flex-shrink-0">
+        <span className="text-xs font-mono text-slate-600 bg-slate-100 px-2 py-1 rounded ml-2 shrink-0">
           #{examiner.id}
         </span>
       </div>
       <div className="space-y-2">
         <div className="flex items-center gap-2 text-xs">
-          <Building2 className="w-3 h-3 text-slate-400 flex-shrink-0" />
+          <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
           <span className="text-slate-700 truncate">
             {examiner.department || "N/A"}
           </span>
         </div>
         <div className="flex items-center gap-2 text-xs flex-wrap">
-          <Calendar className="w-3 h-3 text-slate-400 flex-shrink-0" />
+          <Calendar className="w-3 h-3 text-slate-400 shrink-0" />
           <span className="text-slate-700">{examiner.date || "N/A"}</span>
           <span className="text-slate-500 font-mono">
             {examiner.time || "N/A"}
@@ -235,19 +229,19 @@ function TestsPage() {
             </p>
           </div>
           <p className="text-xs text-slate-500 flex items-center gap-1 truncate mb-2">
-            <Mail className="w-3 h-3 flex-shrink-0" />
+            <Mail className="w-3 h-3 shrink-0" />
             <span className="truncate">{examiner.email || "N/A"}</span>
           </p>
         </div>
       </div>
       <div className="flex items-center justify-between gap-4 text-xs">
         <div className="flex items-center gap-1.5 min-w-0 flex-1">
-          <Building2 className="w-3 h-3 text-slate-400 flex-shrink-0" />
+          <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
           <span className="text-slate-700 truncate">
             {examiner.department || "N/A"}
           </span>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <Calendar className="w-3 h-3 text-slate-400" />
           <span className="text-slate-700">{examiner.date || "N/A"}</span>
           <span className="text-slate-500 font-mono">
@@ -259,6 +253,19 @@ function TestsPage() {
   );
 
   return (
+    <>
+         {showModal && (
+            <ConfirmationModal
+              title="Proceed to Next Step?"
+              message="Do you want to export this as csv?"
+              confirmLabel="Yes, Proceed"
+              cancelLabel="Cancel"
+              onClose={() => setShowModal(false)}
+              onConfirm={handleExport}
+              confirmColor="green"
+            />
+          )}
+
     <div className="min-h-screen bg-white px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -305,7 +312,7 @@ function TestsPage() {
                 <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span className="hidden xs:inline">Filters</span>
                 {activeFilterCount > 0 && (
-                  <span className="bg-white text-[#217486] text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded-full min-w-[20px] text-center">
+                  <span className="bg-white text-[#217486] text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded-full min-w-5ß text-center">
                     {activeFilterCount}
                   </span>
                 )}
@@ -313,7 +320,7 @@ function TestsPage() {
 
               {/* Export Button */}
               <button
-                onClick={handleExport}
+                onClick={() => setShowModal(true)}
                 disabled={data.length === 0}
                 className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 bg-white border border-slate-200 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-all text-xs sm:text-sm whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-initial justify-center"
               >
@@ -341,7 +348,7 @@ function TestsPage() {
                     </option>
                   ))}
                 </select>
-
+                <div className="hidden lg:block"></div>
                 <input
                   type="date"
                   value={filters.dateFrom}
@@ -468,7 +475,7 @@ function TestsPage() {
                         </td>
                         <td className="px-4 lg:px-6 py-3 lg:py-4">
                           <span className="inline-flex items-center gap-1.5 px-2 lg:px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium max-w-full">
-                            <Building2 className="w-3 h-3 flex-shrink-0" />
+                            <Building2 className="w-3 h-3 shrink-0" />
                             <span className="truncate">
                               {row.department || "N/A"}
                             </span>
@@ -476,7 +483,7 @@ function TestsPage() {
                         </td>
                         <td className="px-4 lg:px-6 py-3 lg:py-4">
                           <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-slate-600">
-                            <Calendar className="w-3 lg:w-3.5 lg:h-3.5 h-3 flex-shrink-0" />
+                            <Calendar className="w-3 lg:w-3.5 lg:h-3.5 h-3 shrink-0" />
                             <span className="truncate">
                               {row.date || "N/A"}
                             </span>
@@ -639,6 +646,7 @@ function TestsPage() {
         )}
       </div>
     </div>
+    </>
   );
 }
 

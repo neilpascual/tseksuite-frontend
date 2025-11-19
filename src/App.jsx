@@ -56,9 +56,9 @@ function App() {
         <Route
           path="/test-page"
           element={
-            // <AbandonTracker>
+            <AbandonTracker>
               <ApplicantTestPage />
-            // </AbandonTracker>
+            </AbandonTracker>
           }
         />
 

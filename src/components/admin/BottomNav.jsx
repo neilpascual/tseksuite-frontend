@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import BottomNavLink from "./BottomNavLink";
 import { useAuth } from "../../hooks/useAuth";
 import toast from "react-hot-toast";
@@ -15,7 +16,12 @@ const BottomNav = () => {
     toast.success("You have been logged out successfully", {
       style: { width: "300px" },
     });
+
     navigate("/auth/login");
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
 
   return (

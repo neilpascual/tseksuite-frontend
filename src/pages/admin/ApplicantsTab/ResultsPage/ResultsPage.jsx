@@ -253,7 +253,7 @@ function ResultsPage() {
                   <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <span className="hidden xs:inline">Filters</span>
                   {activeFilterCount > 0 && (
-                    <span className="bg-white text-[#217486] text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded-full min-w-[20px] text-center">
+                    <span className="bg-white text-[#217486] text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded-full min-w-5 text-center">
                       {activeFilterCount}
                     </span>
                   )}
