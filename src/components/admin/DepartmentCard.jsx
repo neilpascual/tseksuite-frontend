@@ -212,7 +212,7 @@ function DepartmentCard({
   return (
     <div
       onClick={dept.is_active ? setSelectedDepartment : undefined}
-      className={`bg-white rounded-4xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden ${
+      className={`bg-white rounded-4xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 relative overflow-hidden ${
         dept.is_active ? "cursor-pointer" : "cursor-default"
       } group ${
         dept.is_active
@@ -227,7 +227,7 @@ function DepartmentCard({
         {/* Header with Status and Menu */}
         <div className="flex justify-between items-start mb-4">
           <span
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 ${
               dept.is_active
                 ? "bg-green-100 text-green-700"
                 : "bg-gray-100 text-gray-600"
@@ -259,7 +259,7 @@ function DepartmentCard({
                   }`}
                 >
                   <Power className="w-4 h-4" />
-                  <span className="font-medium">
+                  <span>
                     {dept.is_active ? "Deactivate" : "Activate"}
                   </span>
                 </button>
@@ -268,7 +268,7 @@ function DepartmentCard({
                   className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-left text-[#217486] hover:bg-[#217486]/5 transition-colors"
                 >
                   <Edit2 className="w-4 h-4" />
-                  <span className="font-medium">Edit</span>
+                  <span>Edit</span>
                 </button>
                 <div className="border-t border-gray-100 my-1"></div>
                 <button
@@ -276,7 +276,7 @@ function DepartmentCard({
                   className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-left text-red-600 hover:bg-red-50 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
-                  <span className="font-medium">Delete</span>
+                  <span>Delete</span>
                 </button>
               </div>
             )}

@@ -160,13 +160,13 @@ const TestBankPage = () => {
     <div className="min-h-screen bg-white px-6 py-6 mb-17 sm:mb-0 sm:mt-0">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-15">
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-15">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div className="flex items-center">
               <div>
                 <h1 className="text-3xl text-[#217486] mb-5">Departments</h1>
                 <p className="text-sm text-gray-600">
-                  Manage departments and quizzes
+                  Manage departments
                 </p>
               </div>
             </div>

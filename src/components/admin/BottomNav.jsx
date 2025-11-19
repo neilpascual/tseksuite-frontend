@@ -4,7 +4,6 @@ import BottomNavLink from "./BottomNavLink";
 import { useAuth } from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 import ConfirmationModal from "../ConfimationModal";
-import { useNavigate } from "react-router-dom";
 
 const BottomNav = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);

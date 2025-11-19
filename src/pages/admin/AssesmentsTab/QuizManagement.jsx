@@ -13,7 +13,13 @@ import {
 } from "lucide-react";
 import QuestionManagement from "./QuestionManagement";
 import toast from "react-hot-toast";
-import { getQuizzes, addQuiz, deleteQuiz, generateInviteLink } from "../../../../api/api";
+import {
+  getQuizzes,
+  addQuiz,
+  editQuiz,
+  deleteQuiz,
+  generateInviteLink,
+} from "../../../../api/api";
 
 const QuizManagement = ({ department, onBack }) => {
   const [quizzes, setQuizzes] = useState([]);
@@ -34,7 +40,6 @@ const QuizManagement = ({ department, onBack }) => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
 
-
   useEffect(() => {
     fetchQuizzes();
   }, [department.dept_id]);
@@ -48,8 +53,8 @@ const QuizManagement = ({ department, onBack }) => {
   const fetchQuizzes = async () => {
     try {
       setLoading(true);
-      
-      const response = await getQuizzes(department.dept_id)
+
+      const response = await getQuizzes(department.dept_id);
 
       setQuizzes(response);
       setError(null);
@@ -74,8 +79,8 @@ const QuizManagement = ({ department, onBack }) => {
         dept_id: department.dept_id,
         quiz_name: newQuiz.quiz_name,
         time_limit: parseInt(newQuiz.time_limit),
-      }
-      
+      };
+
       await addQuiz(department.dept_id, payload);
 
       await fetchQuizzes();
@@ -99,13 +104,12 @@ const QuizManagement = ({ department, onBack }) => {
       return;
 
     try {
-
       const payload = {
-          quiz_name: editingQuiz.quiz_name,
-          time_limit: parseInt(editingQuiz.time_limit),
-        }
-      
-      await editingQuiz(department.dept_id, quiz.quiz_id, payload)
+        quiz_name: editingQuiz.quiz_name,
+        time_limit: parseInt(editingQuiz.time_limit),
+      };
+
+      await editQuiz(department.dept_id, editingQuiz.quiz_id, payload);
 
       await fetchQuizzes();
       toast.success("Quiz Updated!");
@@ -122,7 +126,7 @@ const QuizManagement = ({ department, onBack }) => {
   const handleDeleteQuiz = async () => {
     if (!deletingQuiz) return;
     try {
-      await deleteQuiz(department.dept_id, deleteQuiz.quiz_id)
+      await deleteQuiz(department.dept_id, deletingQuiz.quiz_id);
       await fetchQuizzes();
       toast.success("Quiz Deleted!");
       setShowDeleteModal(false);
@@ -144,8 +148,8 @@ const QuizManagement = ({ department, onBack }) => {
         expiration: inviteExpiration,
         quiz_id: selectedQuizForInvite.quiz_id,
         dept_id: department.dept_id,
-      }
-      const link = await generateInviteLink(payload)
+      };
+      const link = await generateInviteLink(payload);
 
       setGeneratedLink(link);
       setError(null);
@@ -218,7 +222,7 @@ const QuizManagement = ({ department, onBack }) => {
                   <span className="font-semibold text-[#217486]">
                     {quizzes.length}
                   </span>{" "}
-                  Quizzes
+                  {quizzes.length === 1 ? "Quiz" : "Quizzes"}
                 </span>
               </div>
             </div>
@@ -326,7 +330,8 @@ const QuizManagement = ({ department, onBack }) => {
                   <div className="flex items-center gap-2 text-white/90">
                     <Clock className="w-4 h-4" />
                     <span className="text-sm font-medium">
-                      {quiz.time_limit} minutes
+                      {quiz.time_limit}{" "}
+                      {quiz.time_limit === 1 ? "minute" : "minutes"}
                     </span>
                   </div>
                 </div>
@@ -339,7 +344,7 @@ const QuizManagement = ({ department, onBack }) => {
                         <span className="text-[#217486] font-bold">
                           {quiz.question_count || 0}
                         </span>{" "}
-                        Questions
+                        {quiz.question_count === 1 ? "Question" : "Questions"}
                       </span>
                     </div>
                   </div>
@@ -357,9 +362,15 @@ const QuizManagement = ({ department, onBack }) => {
                         e.stopPropagation();
                         openInviteModal(quiz);
                       }}
-                      disabled={!quiz.question_count || quiz.question_count === 0}
+                      disabled={
+                        !quiz.question_count || quiz.question_count === 0
+                      }
                       className="flex-1 flex items-center justify-center gap-2 bg-[#217486] hover:bg-[#1a5d6d] text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-all shadow-md shadow-[#217486]/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#217486]"
-                      title={!quiz.question_count || quiz.question_count === 0 ? "Add questions before generating invites" : "Generate invite link"}
+                      title={
+                        !quiz.question_count || quiz.question_count === 0
+                          ? "Add questions before generating invites"
+                          : "Generate invite link"
+                      }
                     >
                       <LinkIcon className="w-4 h-4" />
                       Invite
@@ -376,14 +387,16 @@ const QuizManagement = ({ department, onBack }) => {
       {showAddModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-            <div className="bg-linear-to-r from-[#217486] to-[#2a8fa5] p-6">
-              <h2 className="text-2xl font-bold text-white">Create New Quiz</h2>
+            <div className="bg-gradient-to-r from-[#217486] to-[#2a8fa5] p-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-white">
+                Create New Quiz
+              </h2>
               <p className="text-white/80 text-sm mt-1">
                 Add a new quiz to your department
               </p>
             </div>
 
-            <div className="p-6 space-y-5">
+            <div className="p-4 sm:p-6 space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Quiz Name
@@ -444,13 +457,15 @@ const QuizManagement = ({ department, onBack }) => {
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
             <div className="bg-linear-to-r from-[#217486] to-[#2a8fa5] p-6">
-              <h2 className="text-2xl font-bold text-white">Edit Quiz</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-white">
+                Edit Quiz
+              </h2>
               <p className="text-white/80 text-sm mt-1">
                 Update quiz information
               </p>
             </div>
 
-            <div className="p-6 space-y-5">
+            <div className="p-4 sm:p-6 space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Quiz Name
@@ -562,11 +577,11 @@ const QuizManagement = ({ department, onBack }) => {
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
                   <LinkIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-white">
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white">
                     Generate Invite
                   </h2>
-                  <p className="text-white/80 text-sm">
+                  <p className="text-white/80 text-sm truncate">
                     {selectedQuizForInvite.quiz_name}
                   </p>
                 </div>
@@ -644,7 +659,7 @@ const QuizManagement = ({ department, onBack }) => {
                     )}
                   </div>
                   <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                    <p className="text-sm text-blue-900">
+                    <p className="text-xs sm:text-sm text-blue-900">
                       <strong className="font-semibold">Note:</strong> Share
                       this link with examinees. They will be prompted to enter
                       their email when accessing the quiz.
