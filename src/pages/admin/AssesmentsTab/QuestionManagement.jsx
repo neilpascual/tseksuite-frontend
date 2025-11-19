@@ -441,7 +441,15 @@ const QuestionManagement = ({ quiz, onBack }) => {
   };
 
   const getTotalPoints = () => {
-    return questions.reduce((sum, q) => sum + (q.points || 0), 0);
+    return questions.reduce((sum, q) => {
+      if (q.question_type === "CB") {
+        const correctAnswersCount =
+          q.options?.filter((opt) => opt.is_correct === true).length || 0;
+        return sum + q.points * correctAnswersCount;
+      }
+
+      return sum + (q.points || 0);
+    }, 0);
   };
 
   return (
