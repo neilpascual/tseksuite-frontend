@@ -49,10 +49,7 @@ function ResultsTable({ data }) {
         </thead>
         <tbody className="divide-y divide-slate-100">
           {data.map((row) => (
-            <tr
-              key={row.id}
-              className="hover:bg-[#217486]/5 transition-colors"
-            >
+            <tr key={row.id} className="hover:bg-[#217486]/5 transition-colors">
               <td className="px-6 py-4">
                 <span className="text-sm font-mono text-slate-600">
                   {row.id}
@@ -83,7 +80,7 @@ function ResultsTable({ data }) {
               </td>
               <td className="px-6 py-4">
                 <span className="text-sm font-semibold text-slate-800">
-                  {row.score || 0}
+                  {row.score || 0}/{row.total_points || 0}
                 </span>
               </td>
               <td className="px-6 py-4">

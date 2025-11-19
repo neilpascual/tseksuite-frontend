@@ -75,7 +75,7 @@ export const getAllDepartments = async() => {
     const response = await axios.get(`${API_BASE_URL}/department/get`)
 
     if(!response) { console.log("Cannot fetch departments!") }
-
+    console.log(response.data.data)
     return response.data.data
     
   } catch (error) {
@@ -319,6 +319,31 @@ export const generateInviteLink = async(payload) => {
     const link = await axios.post(`${API_BASE_URL}/invitation/generate`,payload );
 
     return link.data.data.link || ''
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const validateInvitationLink = async(token) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/invitation/validate/${token}`)
+
+    const status = response.status
+    
+    return { ...response.data.data, status }
+
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const submitExaminerData = async(payload) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/invitation/complete`, payload, { headers: { "Content-Type":"application/json" } })
+
+    console.log(response)
+    return response.data.data
+
   } catch (err) {
     console.error(err)
   }

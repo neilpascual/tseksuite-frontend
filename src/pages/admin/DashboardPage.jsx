@@ -69,7 +69,7 @@ function DashboardPage() {
   if (isError || !user) return <div>Failed to load user</div>;
 
   return (
-    <div className="h-screen w-full pb-3 px-4 sm:px-6 md:px-1 py-6 sm:mt-0 md:mb-30 lg:mb-0">
+    <div className="h-screen w-full pb-3 px-4 lg:px-43 sm:px-6 md:px-1 py-6 sm:mt-0 md:mb-30 lg:mb-0">
       {/* Header */}
       <h1 className="text-3xl sm:text-3xl text-cyan-700 mb-2 tracking-tight mt-1 ">
         Dashboard

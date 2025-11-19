@@ -140,7 +140,8 @@ const AdminSideBar = () => {
           <>
             <div className="flex items-center ml-15 text-[#2E99B0] font-medium">
               <CreditCard className="h-5 w-5 mr-2" />
-              <span>Test Bank</span>
+              <span>Test</span>
+              <span>Bank</span>
             </div>
           </>
         )}

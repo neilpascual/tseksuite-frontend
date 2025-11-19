@@ -1,7 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, X, ArrowLeft, CheckCircle, Circle } from "lucide-react";
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  X,
+  ArrowLeft,
+  CheckCircle,
+  Circle,
+  FileText,
+} from "lucide-react";
 import toast from "react-hot-toast";
-import { addAnswer, addQuestion, deleteAnswer, deleteQuestion, getAnswer, getQuestions, updateAnswer, updateQuestion } from "../../../../api/api";
+import {
+  addAnswer,
+  addQuestion,
+  deleteAnswer,
+  deleteQuestion,
+  getAnswer,
+  getQuestions,
+  updateAnswer,
+  updateQuestion,
+} from "../../../../api/api";
 
 const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
   if (!isOpen) return null;
@@ -84,7 +102,9 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
                   onChange={() => setCorrectAnswer(i)}
                   className="w-4 h-4 text-[#217486] focus:ring-[#217486] shrink-0"
                 />
-                <span className="font-medium text-gray-700 text-sm sm:text-base">{opt.option_text}</span>
+                <span className="font-medium text-gray-700 text-sm sm:text-base">
+                  {opt.option_text}
+                </span>
               </div>
             ))}
           </div>
@@ -128,7 +148,9 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
           </div>
         );
       default:
-        return <p className="italic text-gray-500 text-sm">Unsupported type.</p>;
+        return (
+          <p className="italic text-gray-500 text-sm">Unsupported type.</p>
+        );
     }
   };
 
@@ -203,7 +225,7 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
               />
               {question.question_type === "CB" && (
                 <span className="text-xs text-gray-600 bg-cyan-50 border border-cyan-600 p-2 sm:p-3 rounded-lg">
-                  <span className="font-semibold text-gray-800">Note: </span>  
+                  <span className="font-semibold text-gray-800">Note: </span>
                   Each correct answer is equivalent to the points allocated.
                 </span>
               )}
@@ -257,11 +279,15 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, questionText }) => {
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4">
       <div className="bg-white rounded-xl sm:rounded-2xl p-5 sm:p-6 w-full max-w-md shadow-2xl mx-4">
-        <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-3">Delete Question</h3>
+        <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-3">
+          Delete Question
+        </h3>
         <p className="text-sm sm:text-base text-gray-600 mb-6">
           Are you sure you want to delete this question?
           <br />
-          <span className="font-semibold text-gray-800 mt-2 block break-words">"{questionText}"</span>
+          <span className="font-semibold text-gray-800 mt-2 block break-words">
+            "{questionText}"
+          </span>
         </p>
         <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
           <button
@@ -309,11 +335,11 @@ const QuestionManagement = ({ quiz, onBack }) => {
   const fetchQuestions = async () => {
     setLoading(true);
     try {
-      const res = await getQuestions(quiz.quiz_id)
+      const res = await getQuestions(quiz.quiz_id);
 
       const withOptions = await Promise.all(
         res.map(async (q) => {
-          const optRes = await getAnswer(q.question_id)
+          const optRes = await getAnswer(q.question_id);
           return { ...q, options: optRes };
         })
       );
@@ -341,14 +367,14 @@ const QuestionManagement = ({ quiz, onBack }) => {
   const handleDelete = async () => {
     const question = questions[deleteIndex];
     try {
-      await deleteQuestion(quiz.quiz_id, question.question_id)
+      await deleteQuestion(quiz.quiz_id, question.question_id);
       //added toast
-      toast.success("Question Deleted!")
+      toast.success("Question Deleted!");
       setDeleteModalOpen(false);
       fetchQuestions();
     } catch (err) {
       console.error("Delete error:", err);
-      toast.error("Question Deletion Failed!")
+      toast.error("Question Deletion Failed!");
     }
   };
 
@@ -356,7 +382,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
     const q = currentQuestion;
     if (!q.question_text.trim()) return toast.error("Question text required");
 
-    if ((q.question_type === "MC" || q.question_type === "CB")) {
+    if (q.question_type === "MC" || q.question_type === "CB") {
       if (!q.options || q.options.length < 2) {
         return toast.error("At least 2 options are required");
       }
@@ -368,9 +394,9 @@ const QuestionManagement = ({ quiz, onBack }) => {
     }
 
     if (editingIndex !== null) {
-      await updateQuestion(quiz.quiz_id, q.question_id, q)
+      await updateQuestion(quiz.quiz_id, q.question_id, q);
       //added updated toast
-      toast.success("Question Updated!")
+      toast.success("Question Updated!");
       const original = questions[editingIndex];
       const originalIds = original.options
         .map((o) => o.answer_id)
@@ -378,23 +404,23 @@ const QuestionManagement = ({ quiz, onBack }) => {
 
       for (const opt of q.options) {
         if (opt.answer_id) {
-          await updateAnswer(opt.answer_id,opt)
+          await updateAnswer(opt.answer_id, opt);
         } else {
-          await addAnswer(q.question_id, opt)
+          await addAnswer(q.question_id, opt);
         }
       }
 
       for (const oldId of originalIds) {
         if (!q.options.find((o) => o.answer_id === oldId)) {
-          await deleteAnswer(oldId)
+          await deleteAnswer(oldId);
         }
       }
     } else {
-      const { question_id } = await addQuestion(quiz.quiz_id, q)
+      const { question_id } = await addQuestion(quiz.quiz_id, q);
       //added toast
-      toast.success("Question Added!")
+      toast.success("Question Added!");
       for (const opt of q.options) {
-        await addAnswer(question_id, opt)
+        await addAnswer(question_id, opt);
       }
     }
     setModalOpen(false);
@@ -402,16 +428,28 @@ const QuestionManagement = ({ quiz, onBack }) => {
   };
 
   const getTypeLabel = (type) => {
-    switch(type) {
-      case "MC": return "Multiple Choice";
-      case "CB": return "Checkbox";
-      case "TF": return "True/False";
-      default: return type;
+    switch (type) {
+      case "MC":
+        return "Multiple Choice";
+      case "CB":
+        return "Checkbox";
+      case "TF":
+        return "True/False";
+      default:
+        return type;
     }
   };
 
   const getTotalPoints = () => {
-    return questions.reduce((sum, q) => sum + (q.points || 0), 0);
+    return questions.reduce((sum, q) => {
+      if (q.question_type === "CB") {
+        const correctAnswersCount =
+          q.options?.filter((opt) => opt.is_correct === true).length || 0;
+        return sum + q.points * correctAnswersCount;
+      }
+
+      return sum + (q.points || 0);
+    }, 0);
   };
 
   return (
@@ -423,7 +461,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
             onClick={onBack}
             className="flex items-center gap-2 text-gray-600 hover:text-[#217486] mb-4 font-medium transition-colors text-sm sm:text-base"
           >
-            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" /> 
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             <span className="hidden sm:inline">Back to Quizzes</span>
             <span className="sm:hidden">Back</span>
           </button>
@@ -435,19 +473,25 @@ const QuestionManagement = ({ quiz, onBack }) => {
               </h1>
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
                 <span className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-lg">
-                  <span className="font-semibold text-[#217486]">{getTotalPoints()}</span> Total Points
+                  <span className="font-semibold text-[#217486]">
+                    {getTotalPoints()}
+                  </span>
+                  {getTotalPoints() === 1 ? "Point" : "Points"}
                 </span>
                 <span className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-lg">
-                  <span className="font-semibold text-[#217486]">{questions.length}</span> Questions
+                  <span className="font-semibold text-[#217486]">
+                    {questions.length}
+                  </span>
+                  {questions.length === 1 ? "Question" : "Questions"}
                 </span>
               </div>
             </div>
-          
+
             <button
               onClick={openAdd}
               className="flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-[#217486] text-white rounded-xl hover:bg-[#1a5d6d] font-medium transition-all hover:shadow-xl hover:shadow-[#217486]/40 text-sm sm:text-base whitespace-nowrap"
             >
-              <Plus className="w-4 h-4 sm:w-5 sm:h-5" /> 
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="hidden sm:inline">Add Question</span>
               <span className="sm:hidden">Add</span>
             </button>
@@ -459,16 +503,25 @@ const QuestionManagement = ({ quiz, onBack }) => {
           <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-8 sm:p-12 text-center">
             <div className="animate-pulse">
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#217486]/20 rounded-full mx-auto mb-4"></div>
-              <p className="text-gray-600 text-sm sm:text-base">Loading questions...</p>
+              <p className="text-gray-600 text-sm sm:text-base">
+                Loading questions...
+              </p>
             </div>
           </div>
         ) : questions.length === 0 ? (
           <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-8 sm:p-12 text-center">
-            <div className="text-gray-400 mb-4">
+            {/* <div className="text-gray-400 mb-4">
               <Circle className="w-12 h-12 sm:w-16 sm:h-16 mx-auto" />
+            </div> */}
+            <div className="w-20 h-20 bg-[#217486]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FileText className="w-10 h-10 text-[#217486]" />
             </div>
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-2">No Questions Yet</h3>
-            <p className="text-sm sm:text-base text-gray-500 mb-6">Start building your quiz by adding your first question.</p>
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-2">
+              No Questions Yet
+            </h3>
+            <p className="text-sm sm:text-base text-gray-500 mb-6">
+              Start building your quiz by adding your first question.
+            </p>
             <button
               onClick={openAdd}
               className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[#217486] text-white rounded-xl hover:bg-[#1a5d6d] font-medium transition-all shadow-lg shadow-[#217486]/30 text-sm sm:text-base"
@@ -494,7 +547,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
                           {q.question_text}
                         </h3>
                       </div>
-                      
+
                       <div className="flex flex-wrap items-center gap-2 sm:gap-3 ml-9 sm:ml-11 mb-3">
                         <span className="px-2.5 sm:px-3 py-1 bg-[#217486]/10 text-[#217486] rounded-lg text-xs font-semibold">
                           {getTypeLabel(q.question_type)}
@@ -519,7 +572,13 @@ const QuestionManagement = ({ quiz, onBack }) => {
                             ) : (
                               <Circle className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
                             )}
-                            <span className={`break-words ${opt.is_correct ? "text-green-800 font-medium" : "text-gray-600"}`}>
+                            <span
+                              className={`break-words ${
+                                opt.is_correct
+                                  ? "text-green-800 font-medium"
+                                  : "text-gray-600"
+                              }`}
+                            >
                               {opt.option_text}
                             </span>
                           </div>

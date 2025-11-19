@@ -1,16 +1,15 @@
-import { Edit2, MoreVertical, Power, Trash2, Building2 } from 'lucide-react';
-import React from 'react'
+import { Edit2, MoreVertical, Power, Trash2, Building2 } from "lucide-react";
+import React from "react";
 
 function DepartmentCard({
   dept,
   openMenuId,
-  onMenuClicked, 
-  onEditClicked, 
-  onDeactivateClicked, 
+  onMenuClicked,
+  onEditClicked,
+  onDeactivateClicked,
   onDeleteClicked,
   setSelectedDepartment,
 }) {
-
   const getImageForType = (name) => {
     const lowerName = name.toLowerCase();
     let type = "business";
@@ -151,9 +150,33 @@ function DepartmentCard({
           <rect x="46" y="38" width="10" height="10" fill="#217486" rx="2" />
           <rect x="60" y="38" width="10" height="10" fill="#217486" rx="2" />
           <rect x="74" y="38" width="10" height="10" fill="#217486" rx="2" />
-          <rect x="46" y="52" width="10" height="10" fill="#217486" rx="2" opacity="0.7" />
-          <rect x="60" y="52" width="10" height="10" fill="#217486" rx="2" opacity="0.7" />
-          <rect x="74" y="52" width="10" height="10" fill="#217486" rx="2" opacity="0.7" />
+          <rect
+            x="46"
+            y="52"
+            width="10"
+            height="10"
+            fill="#217486"
+            rx="2"
+            opacity="0.7"
+          />
+          <rect
+            x="60"
+            y="52"
+            width="10"
+            height="10"
+            fill="#217486"
+            rx="2"
+            opacity="0.7"
+          />
+          <rect
+            x="74"
+            y="52"
+            width="10"
+            height="10"
+            fill="#217486"
+            rx="2"
+            opacity="0.7"
+          />
           <circle cx="120" cy="55" r="24" fill="url(#bizGrad)" opacity="0.2" />
           <circle
             cx="120"
@@ -187,17 +210,16 @@ function DepartmentCard({
   };
 
   return (
-        <div
-          onClick={dept.is_active ? setSelectedDepartment : undefined}
-          className={`bg-white rounded-4xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden ${
-            dept.is_active ? "cursor-pointer" : "cursor-default"
-          } group ${
-            dept.is_active
-              ? "border-2 border-gray-100"
-              : "border-2 border-gray-200 opacity-50"
-          }`}
-        >
-
+    <div
+      onClick={dept.is_active ? setSelectedDepartment : undefined}
+      className={`bg-white rounded-4xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 relative overflow-hidden ${
+        dept.is_active ? "cursor-pointer" : "cursor-default"
+      } group ${
+        dept.is_active
+          ? "border-2 border-gray-100"
+          : "border-2 border-gray-200 opacity-50"
+      }`}
+    >
       {/* Gradient Accent Bar */}
       {/* <div className={`h-1.5 w-full bg-gradient-to-r from-[#217486] to-[#2a8fa5] ${!dept.is_active && 'opacity-50'}`}></div> */}
 
@@ -205,13 +227,17 @@ function DepartmentCard({
         {/* Header with Status and Menu */}
         <div className="flex justify-between items-start mb-4">
           <span
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 ${
               dept.is_active
                 ? "bg-green-100 text-green-700"
                 : "bg-gray-100 text-gray-600"
             }`}
           >
-            <span className={`w-2 h-2 rounded-full ${dept.is_active ? 'bg-green-500' : 'bg-gray-400'}`}></span>
+            <span
+              className={`w-2 h-2 rounded-full ${
+                dept.is_active ? "bg-green-500" : "bg-gray-400"
+              }`}
+            ></span>
             {dept.is_active ? "Active" : "Inactive"}
           </span>
 
@@ -228,19 +254,21 @@ function DepartmentCard({
                   onClick={onDeactivateClicked}
                   className={`flex items-center gap-3 w-full px-4 py-2.5 text-sm text-left transition-colors ${
                     dept.is_active
-                      ? "text-orange-600 hover:bg-orange-50" 
+                      ? "text-orange-600 hover:bg-orange-50"
                       : "text-green-600 hover:bg-green-50"
                   }`}
                 >
                   <Power className="w-4 h-4" />
-                  <span className="font-medium">{dept.is_active ? "Deactivate" : "Activate"}</span>
+                  <span>
+                    {dept.is_active ? "Deactivate" : "Activate"}
+                  </span>
                 </button>
                 <button
                   onClick={onEditClicked}
                   className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-left text-[#217486] hover:bg-[#217486]/5 transition-colors"
                 >
                   <Edit2 className="w-4 h-4" />
-                  <span className="font-medium">Edit</span>
+                  <span>Edit</span>
                 </button>
                 <div className="border-t border-gray-100 my-1"></div>
                 <button
@@ -248,7 +276,7 @@ function DepartmentCard({
                   className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-left text-red-600 hover:bg-red-50 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
-                  <span className="font-medium">Delete</span>
+                  <span>Delete</span>
                 </button>
               </div>
             )}
@@ -269,19 +297,21 @@ function DepartmentCard({
           >
             {dept.dept_name}
           </h3>
-          <p className="text-xs text-gray-500">Click to manage quizzes</p>
+          <p className="text-xs text-gray-300">Click to manage quizzes</p>
         </div>
 
         {/* Hover Indicator */}
-        <div className={`mt-4 pt-4 border-t border-gray-100 flex items-center justify-center gap-2 text-sm opacity-0 group-hover:opacity-100 transition-opacity ${
-          dept.is_active ? "text-[#217486]" : "text-gray-400"
-        }`}>
+        <div
+          className={`mt-4 pt-4 border-t border-gray-100 flex items-center justify-center gap-2 text-sm opacity-0 group-hover:opacity-100 transition-opacity ${
+            dept.is_active ? "text-[#217486]" : "text-gray-400"
+          }`}
+        >
           <Building2 className="w-4 h-4" />
           <span className="font-medium">View Department</span>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default DepartmentCard
+export default DepartmentCard;
