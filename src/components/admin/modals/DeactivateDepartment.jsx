@@ -30,7 +30,7 @@ function DeactivateDepartment({
           onClick={ handleDeactivateClicked }
           className={`flex-1 px-4 py-3 text-sm lg:text-base ${
             deactivateDept.is_active
-              ? "bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
+              ? "bg-red-600 hover:from-orange-600 hover:to-orange-700"
               : "bg-linear-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
           } text-white rounded-xl transition-all font-medium shadow-lg hover:shadow-xl`}
         >

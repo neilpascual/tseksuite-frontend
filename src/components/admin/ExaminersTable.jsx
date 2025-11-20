@@ -29,10 +29,10 @@ function CandidateTable({
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
       {/* Header */}
-      <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100">
+      <div className="flex justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100">
         <h2 className="text-base sm:text-lg font-semibold text-cyan-700">{tableName}</h2>
         <p className="text-slate-600 text-xs sm:text-sm mt-1">
-          Showing <span className="font-semibold">5</span> latest examiners
+          Showing <span className="font-semibold">5</span> latest examinees
         </p>
       </div>
 
