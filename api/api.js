@@ -330,7 +330,7 @@ export const validateInvitationLink = async(token) => {
 
     const status = response.status
     
-    return { ...response.data.data, status }
+    return { ...response.data.data , status }
 
   } catch (err) {
     console.error(err)
@@ -344,6 +344,15 @@ export const submitExaminerData = async(payload) => {
     console.log(response)
     return response.data.data
 
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+
+export const submitAbandonTest = async(payload) => {
+  try {
+     await axios.post(`${API_BASE_URL}/result/create`, payload );
   } catch (err) {
     console.error(err)
   }
