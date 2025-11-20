@@ -207,7 +207,7 @@ const ApplicantTestPage = () => {
       if (selectedAnswers.length === 0) {
         openModal(
           'validation',
-          '⚠️ Validation',
+          '⚠️ Selection Needed',
           'Please select at least one answer before proceeding.',
           closeModal
         );
@@ -217,7 +217,7 @@ const ApplicantTestPage = () => {
       if (selectedAnswer === null) {
         openModal(
           'validation',
-          '⚠️ Validation',
+          '⚠️ Answer Required',
           'Please select an answer before proceeding.',
           closeModal
         );

@@ -381,7 +381,7 @@ const QuizManagement = ({ department, onBack }) => {
       {showAddModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-            <div className="bg-gradient-to-r from-[#217486] to-[#2a8fa5] p-6">
+            <div className="bg-linear-to-r from-[#217486] to-[#2a8fa5] p-6">
               <h2 className="text-xl sm:text-2xl font-bold text-white">
                 Create New Quiz
               </h2>
@@ -568,7 +568,7 @@ const QuizManagement = ({ department, onBack }) => {
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
             <div className="bg-linear-to-r from-[#217486] to-[#2a8fa5] p-6">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
                   <LinkIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -636,7 +636,7 @@ const QuizManagement = ({ department, onBack }) => {
                       />
                       <button
                         onClick={handleCopyLink}
-                        className="px-3 sm:px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors flex-shrink-0"
+                        className="px-3 sm:px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors shrink-0"
                       >
                         {copied ? (
                           <Check className="w-5 h-5 text-green-600" />

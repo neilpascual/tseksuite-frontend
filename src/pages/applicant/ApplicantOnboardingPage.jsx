@@ -108,7 +108,7 @@ const ApplicantOnboardingPage = () => {
     if (!inviteData) {
       //TODO
       // wag alert dito ayusin UI
-      alert("Invalid invitation. Please use a valid invite link.");
+      toast.error("Invalid invitation. Please use a valid invite link.");
       return;
     }
 
@@ -137,7 +137,7 @@ const ApplicantOnboardingPage = () => {
     if (!formData.department) {
       // TODO
       // pati dito
-      alert("Please select a department");
+      toast.error("Please select a department");
       return;
     }
 

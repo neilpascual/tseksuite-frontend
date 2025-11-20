@@ -33,7 +33,7 @@ function EditDepartment({
               <button
                 onClick={handleUpdateDepartment}
                 disabled={!editingDept.dept_name.trim()}
-                className="flex-1 px-4 py-3 text-sm lg:text-base bg-linear-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-xl transition-all font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-3 text-sm lg:text-base bg-cyan-700 hover:from-cyan-600 hover:to-blue-600 text-white rounded-xl transition-all font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Update
               </button>
