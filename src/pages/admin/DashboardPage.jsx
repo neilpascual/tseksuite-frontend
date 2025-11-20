@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { getAllExaminers, getAllResults } from "../../../api/api";
 import NoDataFound from "../../components/NoDataFound";
 import LoadingIndicator from "../../components/LoadingIndicator";
-import { User, CircleCheck, Ban } from "lucide-react";
+import { User, CircleCheck, Ban, X, Check } from "lucide-react";
 
 // Recharts imports
 import {
@@ -190,7 +190,37 @@ function DashboardPage() {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip
+                    cursor={false}
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const deptName = payload[0].name;
+                          const totalAbandoned = results.filter(
+                            (r) => r.department === deptName && r.status === "ABANDONED"
+                          ).length;
+                          const totalCompleted = results.filter(
+                            (r) => r.department === deptName && r.status === "COMPLETED"
+                          ).length;
+
+                          return (
+                            <div className="rounded-xl bg-white/30 backdrop-blur-md border border-white/20 px-6 py-4 shadow-lg">
+                              <p className="text-sm font-semibold text-gray-800 mb-3">{deptName}</p>
+                              <div className="flex items-center gap-2">
+                                <Check className="h-6 w-6 text-green-500" />
+                                <p className="text-sm text-gray-600">Completed: {totalCompleted}</p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <X className="h-6 w-6 text-red-500" />
+                                <p className="text-sm text-gray-600">Abandoned: {totalAbandoned}</p>
+                              </div>
+                              
+                              
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
                     <Legend verticalAlign="bottom" height={36} />
                   </PieChart>
                 </ResponsiveContainer>
