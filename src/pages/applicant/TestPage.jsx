@@ -13,6 +13,7 @@ const ApplicantTestPage = () => {
 
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
+  const [descriptiveAnswer, setDescriptiveAnswer] = useState(""); // For DESC type
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [questions, setQuestions] = useState([]);
@@ -114,6 +115,22 @@ const ApplicantTestPage = () => {
     }
   }, [currentQuestionIndex, questions]);
 
+  // Load saved answer when question changes
+  useEffect(() => {
+    const currentQuestion = questions[currentQuestionIndex];
+    if (!currentQuestion) return;
+
+    const savedAnswer = userAnswers[currentQuestionIndex];
+    
+    if (currentQuestion.question_type === "DESC") {
+      setDescriptiveAnswer(savedAnswer || "");
+    } else if (currentQuestion.question_type === "CB") {
+      setSelectedAnswers(savedAnswer || []);
+    } else {
+      setSelectedAnswer(savedAnswer || null);
+    }
+  }, [currentQuestionIndex, questions]);
+
   const fetchQuestions = async (quizId) => {
     try {
       setLoading(true);
@@ -204,7 +221,18 @@ const ApplicantTestPage = () => {
 
     const currentQuestion = questions[currentQuestionIndex];
 
-    if (currentQuestion.question_type === "CB") {
+    // Validation based on question type
+    if (currentQuestion.question_type === "DESC") {
+      if (!descriptiveAnswer.trim()) {
+        openModal(
+          'validation',
+          '⚠️ Answer Required',
+          'Please provide an answer before proceeding.',
+          closeModal
+        );
+        return;
+      }
+    } else if (currentQuestion.question_type === "CB") {
       if (selectedAnswers.length === 0) {
         openModal(
           'validation',
@@ -214,7 +242,7 @@ const ApplicantTestPage = () => {
         );
         return;
       }
-    } else if (currentQuestion.question_type !== "DESC") {
+    } else {
       if (selectedAnswer === null) {
         openModal(
           'validation',
@@ -226,20 +254,25 @@ const ApplicantTestPage = () => {
       }
     }
 
+    // Save answer
     const newUserAnswers = [...userAnswers];
-    if (currentQuestion.question_type === "CB") {
+    if (currentQuestion.question_type === "DESC") {
+      newUserAnswers[currentQuestionIndex] = descriptiveAnswer.trim();
+    } else if (currentQuestion.question_type === "CB") {
       newUserAnswers[currentQuestionIndex] = selectedAnswers;
     } else {
       newUserAnswers[currentQuestionIndex] = selectedAnswer;
     }
     setUserAnswers(newUserAnswers);
 
-    localStorage.setItem('userAnswers', JSON.stringify(userAnswers));
+    localStorage.setItem('userAnswers', JSON.stringify(newUserAnswers));
 
+    // Move to next question or submit
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer(null);
       setSelectedAnswers([]);
+      setDescriptiveAnswer("");
     } else {
       submitTest(newUserAnswers);
     }
@@ -301,7 +334,7 @@ const ApplicantTestPage = () => {
         closeModal();
         navigate("/test-instructions");
       },
-      true // Show cancel button
+      true
     );
   };
 
@@ -374,13 +407,11 @@ const ApplicantTestPage = () => {
       className="min-h-screen bg-white flex flex-col"
       style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
     >
-      {/* Progress Bar */}
       <div 
         className="sticky top-0 h-1.5 bg-[#2E99B0] transition-all duration-300 ease-out z-50"
         style={{ width: `${percentage}%` }}
       />
         
-      {/* Header Section with consistent padding */}
       <div className="px-6 sm:px-12 lg:px-24 xl:px-32 pt-8 pb-6">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <button
@@ -415,10 +446,8 @@ const ApplicantTestPage = () => {
         </div>
       </div>
 
-      {/* Main Content with consistent padding and spacing */}
       <div className="flex-1 px-6 sm:px-12 lg:px-24 xl:px-32 pb-12">
         <div className="max-w-7xl mx-auto">
-          {/* Breadcrumbs and Question Section */}
           <div className="mb-8">
             <Stack spacing={3}>
               <Breadcrumbs separator="›" sx={{ mb: 2 }}>
@@ -442,69 +471,83 @@ const ApplicantTestPage = () => {
             </Stack>
           </div>
 
-          {/* Options Grid with consistent spacing */}
           <div className="mb-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {currentQuestion.options.map((option) => {
-                const isSelected =
-                  currentQuestion.question_type === "CB"
-                    ? selectedAnswers.includes(option.answer_id)
-                    : selectedAnswer === option.answer_id;
-                return (
-                  <button
-                    key={option.answer_id}
-                    onClick={() => handleAnswerSelect(option.answer_id)}
-                    className={`p-5 rounded-lg text-left text-base font-normal transition-all duration-200 border-2 ${
-                      isSelected
-                        ? "bg-cyan-50 text-black border-cyan-500"
-                        : "bg-gray-50 text-black hover:bg-gray-100 border-gray-300"
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      {currentQuestion.question_type === "CB" ? (
-                        <div
-                          className={`w-5 h-5 shrink-0 mt-0.5 rounded border-2 flex items-center justify-center ${
-                            isSelected
-                              ? "bg-cyan-600 border-cyan-600"
-                              : "border-gray-400"
-                          }`}
-                        >
-                          {isSelected && (
-                            <svg
-                              className="w-3 h-3 text-white"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={3}
-                                d="M5 13l4 4L19 7"
-                              />
-                            </svg>
-                          )}
-                        </div>
-                      ) : (
-                        <div
-                          className={`w-5 h-5 shrink-0 mt-0.5 rounded-full border-2 flex items-center justify-center ${
-                            isSelected ? "border-cyan-600" : "border-gray-400"
-                          }`}
-                        >
-                          {isSelected && (
-                            <div className="w-3 h-3 bg-cyan-600 rounded-full"></div>
-                          )}
-                        </div>
-                      )}
-                      <span className="leading-relaxed">{option.option_text}</span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+            {currentQuestion.question_type === "DESC" ? (
+              <div>
+                <textarea
+                  value={descriptiveAnswer}
+                  onChange={(e) => setDescriptiveAnswer(e.target.value)}
+                  placeholder="Type your answer here..."
+                  className="w-full p-5 rounded-lg text-base font-normal border-2 border-gray-300 focus:border-cyan-500 focus:outline-none resize-none"
+                  rows={8}
+                  style={{ minHeight: '200px' }}
+                />
+                <p className="text-sm text-gray-500 mt-2">
+                  Characters: {descriptiveAnswer.length}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {currentQuestion.options.map((option) => {
+                  const isSelected =
+                    currentQuestion.question_type === "CB"
+                      ? selectedAnswers.includes(option.answer_id)
+                      : selectedAnswer === option.answer_id;
+                  return (
+                    <button
+                      key={option.answer_id}
+                      onClick={() => handleAnswerSelect(option.answer_id)}
+                      className={`p-5 rounded-lg text-left text-base font-normal transition-all duration-200 border-2 ${
+                        isSelected
+                          ? "bg-cyan-50 text-black border-cyan-500"
+                          : "bg-gray-50 text-black hover:bg-gray-100 border-gray-300"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        {currentQuestion.question_type === "CB" ? (
+                          <div
+                            className={`w-5 h-5 shrink-0 mt-0.5 rounded border-2 flex items-center justify-center ${
+                              isSelected
+                                ? "bg-cyan-600 border-cyan-600"
+                                : "border-gray-400"
+                            }`}
+                          >
+                            {isSelected && (
+                              <svg
+                                className="w-3 h-3 text-white"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={3}
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                            )}
+                          </div>
+                        ) : (
+                          <div
+                            className={`w-5 h-5 shrink-0 mt-0.5 rounded-full border-2 flex items-center justify-center ${
+                              isSelected ? "border-cyan-600" : "border-gray-400"
+                            }`}
+                          >
+                            {isSelected && (
+                              <div className="w-3 h-3 bg-cyan-600 rounded-full"></div>
+                            )}
+                          </div>
+                        )}
+                        <span className="leading-relaxed">{option.option_text}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
-          {/* Submit Button with consistent spacing */}
           <div className="flex justify-end pt-4">
             <button
               onClick={handleNext}
@@ -546,11 +589,9 @@ const ApplicantTestPage = () => {
 
       <Footer />
 
-      {/* Custom Modal Component */}
       <Dialog
         open={modalState.open}
         onClose={() => {
-          // Only allow closing for validation and error modals
           if (modalState.type === 'validation' || modalState.type === 'error') {
             closeModal();
           }

@@ -21,7 +21,7 @@ import {
   updateQuestion,
 } from "../../../../api/api";
 
-const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
+const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave, isPdfTest }) => {
   if (!isOpen) return null;
 
   const updateField = (field, value) => {
@@ -75,6 +75,11 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
           { option_text: "False", is_correct: false },
         ],
       }));
+    } else if (type === "DESC") {
+      setQuestion((prev) => ({
+        ...prev,
+        options: [{ option_text: "", is_correct: true }],
+      }));
     } else {
       setQuestion((prev) => ({
         ...prev,
@@ -88,6 +93,28 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
 
   const renderOptions = () => {
     switch (question.question_type) {
+      case "DESC":
+        return (
+          <div className="space-y-3">
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-900 mb-2">
+                <span className="font-semibold">Note:</span> This is a descriptive question. Enter the correct/expected answer below.
+              </p>
+            </div>
+            <div>
+              <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                Correct Answer
+              </label>
+              <textarea
+                value={question.options[0]?.option_text || ""}
+                onChange={(e) => updateOption(0, "option_text", e.target.value)}
+                placeholder="Enter the correct/expected answer..."
+                className="w-full px-3 py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#217486] focus:border-transparent resize-none"
+                rows={4}
+              />
+            </div>
+          </div>
+        );
       case "TF":
         return (
           <div className="space-y-2">
@@ -154,6 +181,20 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
     }
   };
 
+  const questionTypes = isPdfTest 
+    ? ["MC", "CB", "TF", "DESC"]
+    : ["MC", "CB", "TF"];
+
+  const getTypeLabel = (type) => {
+    switch (type) {
+      case "MC": return "Multiple Choice";
+      case "CB": return "Checkbox";
+      case "TF": return "True/False";
+      case "DESC": return "Descriptive";
+      default: return type;
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-3 sm:p-4">
       <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden max-h-[95vh] sm:max-h-[90vh] flex flex-col">
@@ -175,8 +216,8 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
             <label className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 block">
               Question Type
             </label>
-            <div className="grid grid-cols-3 gap-2">
-              {["MC", "CB", "TF"].map((t) => (
+            <div className={`grid ${isPdfTest ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'} gap-2`}>
+              {questionTypes.map((t) => (
                 <button
                   key={t}
                   onClick={() => handleTypeChange(t)}
@@ -186,11 +227,7 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
                       : "bg-gray-100 hover:bg-gray-200 text-gray-700"
                   }`}
                 >
-                  {t === "MC"
-                    ? "Multiple Choice"
-                    : t === "CB"
-                    ? "Checkbox"
-                    : "True/False"}
+                  {getTypeLabel(t)}
                 </button>
               ))}
             </div>
@@ -235,7 +272,7 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave }) => {
           {/* Options */}
           <div>
             <label className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 block">
-              Answer Options
+              {question.question_type === "DESC" ? "Expected Answer" : "Answer Options"}
             </label>
             {renderOptions()}
           </div>
@@ -317,6 +354,8 @@ const QuestionManagement = ({ quiz, onBack }) => {
   const [deleteIndex, setDeleteIndex] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const isPdfTest = quiz?.pdf_link ? true : false;
+
   const emptyQuestion = {
     question_text: "",
     question_type: "MC",
@@ -339,8 +378,19 @@ const QuestionManagement = ({ quiz, onBack }) => {
 
       const withOptions = await Promise.all(
         res.map(async (q) => {
-          const optRes = await getAnswer(q.question_id);
-          return { ...q, options: optRes };
+          if (q.question_type === "DESC") {
+            // For descriptive questions, try to get the answer
+            try {
+              const optRes = await getAnswer(q.question_id);
+              return { ...q, options: optRes };
+            } catch (err) {
+              // If no answer exists, create empty option
+              return { ...q, options: [{ option_text: "", is_correct: true }] };
+            }
+          } else {
+            const optRes = await getAnswer(q.question_id);
+            return { ...q, options: optRes };
+          }
         })
       );
 
@@ -368,7 +418,6 @@ const QuestionManagement = ({ quiz, onBack }) => {
     const question = questions[deleteIndex];
     try {
       await deleteQuestion(quiz.quiz_id, question.question_id);
-      //added toast
       toast.success("Question Deleted!");
       setDeleteModalOpen(false);
       fetchQuestions();
@@ -382,7 +431,11 @@ const QuestionManagement = ({ quiz, onBack }) => {
     const q = currentQuestion;
     if (!q.question_text.trim()) return toast.error("Question text required");
 
-    if (q.question_type === "MC" || q.question_type === "CB") {
+    if (q.question_type === "DESC") {
+      if (!q.options[0]?.option_text.trim()) {
+        return toast.error("Correct answer is required for descriptive questions");
+      }
+    } else if (q.question_type === "MC" || q.question_type === "CB") {
       if (!q.options || q.options.length < 2) {
         return toast.error("At least 2 options are required");
       }
@@ -393,38 +446,42 @@ const QuestionManagement = ({ quiz, onBack }) => {
       }
     }
 
-    if (editingIndex !== null) {
-      await updateQuestion(quiz.quiz_id, q.question_id, q);
-      //added updated toast
-      toast.success("Question Updated!");
-      const original = questions[editingIndex];
-      const originalIds = original.options
-        .map((o) => o.answer_id)
-        .filter(Boolean);
+    try {
+      if (editingIndex !== null) {
+        await updateQuestion(quiz.quiz_id, q.question_id, q);
+        toast.success("Question Updated!");
+        
+        const original = questions[editingIndex];
+        const originalIds = original.options
+          .map((o) => o.answer_id)
+          .filter(Boolean);
 
-      for (const opt of q.options) {
-        if (opt.answer_id) {
-          await updateAnswer(opt.answer_id, opt);
-        } else {
-          await addAnswer(q.question_id, opt);
+        for (const opt of q.options) {
+          if (opt.answer_id) {
+            await updateAnswer(opt.answer_id, opt);
+          } else {
+            await addAnswer(q.question_id, opt);
+          }
+        }
+
+        for (const oldId of originalIds) {
+          if (!q.options.find((o) => o.answer_id === oldId)) {
+            await deleteAnswer(oldId);
+          }
+        }
+      } else {
+        const { question_id } = await addQuestion(quiz.quiz_id, q);
+        toast.success("Question Added!");
+        for (const opt of q.options) {
+          await addAnswer(question_id, opt);
         }
       }
-
-      for (const oldId of originalIds) {
-        if (!q.options.find((o) => o.answer_id === oldId)) {
-          await deleteAnswer(oldId);
-        }
-      }
-    } else {
-      const { question_id } = await addQuestion(quiz.quiz_id, q);
-      //added toast
-      toast.success("Question Added!");
-      for (const opt of q.options) {
-        await addAnswer(question_id, opt);
-      }
+      setModalOpen(false);
+      fetchQuestions();
+    } catch (err) {
+      console.error("Save error:", err);
+      toast.error("Failed to save question");
     }
-    setModalOpen(false);
-    fetchQuestions();
   };
 
   const getTypeLabel = (type) => {
@@ -435,6 +492,8 @@ const QuestionManagement = ({ quiz, onBack }) => {
         return "Checkbox";
       case "TF":
         return "True/False";
+      case "DESC":
+        return "Descriptive";
       default:
         return type;
     }
@@ -472,6 +531,11 @@ const QuestionManagement = ({ quiz, onBack }) => {
                 {quiz.quiz_name}
               </h1>
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
+                {isPdfTest && (
+                  <span className="flex items-center gap-1 bg-[#2a8fa5]/10 px-2 py-1 rounded-lg">
+                    <span className="font-semibold text-[#2a8fa5]">PDF Test</span>
+                  </span>
+                )}
                 <span className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-lg">
                   <span className="font-semibold text-[#217486]">
                     {getTotalPoints()}
@@ -510,9 +574,6 @@ const QuestionManagement = ({ quiz, onBack }) => {
           </div>
         ) : questions.length === 0 ? (
           <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-8 sm:p-12 text-center">
-            {/* <div className="text-gray-400 mb-4">
-              <Circle className="w-12 h-12 sm:w-16 sm:h-16 mx-auto" />
-            </div> */}
             <div className="w-20 h-20 bg-[#217486]/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <FileText className="w-10 h-10 text-[#217486]" />
             </div>
@@ -520,7 +581,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
               No Questions Yet
             </h3>
             <p className="text-sm sm:text-base text-gray-500 mb-6">
-              Start building your quiz by adding your first question.
+              Start building your {isPdfTest ? "test" : "quiz"} by adding your first question.
             </p>
             <button
               onClick={openAdd}
@@ -558,31 +619,40 @@ const QuestionManagement = ({ quiz, onBack }) => {
                       </div>
 
                       <div className="ml-9 sm:ml-11 space-y-2">
-                        {q.options.map((opt, j) => (
-                          <div
-                            key={j}
-                            className={`flex items-start gap-2 text-xs sm:text-sm p-2 rounded-lg ${
-                              opt.is_correct
-                                ? "bg-green-50 border border-green-200"
-                                : "bg-gray-50"
-                            }`}
-                          >
-                            {opt.is_correct ? (
-                              <CheckCircle className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
-                            ) : (
-                              <Circle className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
-                            )}
-                            <span
-                              className={`wrap-break-word ${
+                        {q.question_type === "DESC" ? (
+                          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p className="text-xs font-semibold text-blue-900 mb-1">Expected Answer:</p>
+                            <p className="text-sm text-blue-800 break-words">
+                              {q.options[0]?.option_text || "No answer provided"}
+                            </p>
+                          </div>
+                        ) : (
+                          q.options.map((opt, j) => (
+                            <div
+                              key={j}
+                              className={`flex items-start gap-2 text-xs sm:text-sm p-2 rounded-lg ${
                                 opt.is_correct
-                                  ? "text-green-800 font-medium"
-                                  : "text-gray-600"
+                                  ? "bg-green-50 border border-green-200"
+                                  : "bg-gray-50"
                               }`}
                             >
-                              {opt.option_text}
-                            </span>
-                          </div>
-                        ))}
+                              {opt.is_correct ? (
+                                <CheckCircle className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
+                              ) : (
+                                <Circle className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                              )}
+                              <span
+                                className={`break-words ${
+                                  opt.is_correct
+                                    ? "text-green-800 font-medium"
+                                    : "text-gray-600"
+                                }`}
+                              >
+                                {opt.option_text}
+                              </span>
+                            </div>
+                          ))
+                        )}
                       </div>
 
                       {q.explanation && (
@@ -627,6 +697,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
           question={currentQuestion}
           setQuestion={setCurrentQuestion}
           onSave={handleSave}
+          isPdfTest={isPdfTest}
         />
 
         <DeleteModal
