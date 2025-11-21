@@ -31,12 +31,12 @@ function MobileScrollableCards({candidates}) {
           className="w-full max-w-sm sm:max-w-md md:max-w-lg bg-white border border-gray-200 shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200"
         >
           {/* Header with Score Badge */}
-          <div className="bg-gradient-to-r from-[#2E99B0] to-[#3BAAC4] p-3 sm:p-4 flex items-center justify-between">
+          <div className="bg-linear-to-r from-[#2E99B0] to-[#3BAAC4] p-3 sm:p-4 flex items-center justify-between">
             <div className="text-white flex-1 min-w-0">
               <p className="text-xs font-medium opacity-90">Candidate ID</p>
               <p className="text-sm sm:text-base font-semibold truncate">{row.id}</p>
             </div>
-            <div className="bg-white rounded-full px-3 sm:px-4 py-1.5 sm:py-2 shadow-md flex-shrink-0">
+            <div className="bg-white rounded-full px-3 sm:px-4 py-1.5 sm:py-2 shadow-md shrink-0">
               <p className="text-[#2E99B0] text-lg sm:text-xl font-bold">{row.score}</p>
             </div>
           </div>
@@ -49,7 +49,7 @@ function MobileScrollableCards({candidates}) {
                 <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
                   Candidate
                 </p>
-                <p className="text-sm sm:text-base font-semibold text-gray-800 break-words">
+                <p className="text-sm sm:text-base font-semibold text-gray-800 wrap-break-word">
                   {row.examiner_name || row.applicant_name || row.candidate_name || row.name || "N/A"}
                 </p>
               </div>
@@ -59,7 +59,7 @@ function MobileScrollableCards({candidates}) {
 
             {/* Department */}
             <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-2">
-              <p className="text-xs text-gray-500 uppercase tracking-wide flex-shrink-0">
+              <p className="text-xs text-gray-500 uppercase tracking-wide shrink-0">
                 Department
               </p>
               <span className="bg-[#2E99B0]/10 text-[#2E99B0] text-xs font-medium px-2.5 sm:px-3 py-1 rounded-full w-fit">
@@ -71,7 +71,7 @@ function MobileScrollableCards({candidates}) {
 
             {/* Date */}
             <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-2">
-              <p className="text-xs text-gray-500 uppercase tracking-wide flex-shrink-0">
+              <p className="text-xs text-gray-500 uppercase tracking-wide shrink-0">
                 Date
               </p>
               <p className="text-xs sm:text-sm text-gray-700 font-medium">

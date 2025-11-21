@@ -134,7 +134,7 @@ function DashboardPage() {
           <div className="w-full md:w-1/2">
             <Card className="h-100">
               <CardHeader>
-                <CardTitle>Monthly Test Status</CardTitle>
+                <CardTitle className="text-cyan-700">Monthly Test Status</CardTitle>
                 <CardDescription>Track Completed vs Abandoned tests by month</CardDescription>
               </CardHeader>
               <CardContent className="h-64">
@@ -169,7 +169,7 @@ function DashboardPage() {
           <div className="w-full md:w-1/2">
             <Card className="h-100">
               <CardHeader>
-                <CardTitle>Most Examined Departments</CardTitle>
+                <CardTitle className="text-cyan-700">Most Examined Departments</CardTitle>
                 <CardDescription>Distribution of examinees by department</CardDescription>
               </CardHeader>
               <CardContent className="h-64 flex items-center justify-center">
@@ -181,8 +181,8 @@ function DashboardPage() {
                       nameKey="name"
                       cx="50%"
                       cy="50%"
-                      innerRadius={40}
-                      outerRadius={80}
+                      innerRadius={35}
+                      outerRadius={75}
                       fill="#8884d8"
                       label
                     >
