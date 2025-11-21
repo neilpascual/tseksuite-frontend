@@ -198,7 +198,7 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave, isPdfTe
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-3 sm:p-4">
       <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden max-h-[95vh] sm:max-h-[90vh] flex flex-col">
-        <div className="p-4 sm:p-5 bg-gradient-to-r from-[#217486] to-[#2a8fa5] flex justify-between items-center">
+        <div className="p-4 sm:p-5 bg-linear-to-r from-[#217486] to-[#2a8fa5] flex justify-between items-center">
           <h2 className="text-lg sm:text-2xl font-bold text-white">
             {question.question_id ? "Edit Question" : "Add New Question"}
           </h2>
@@ -322,7 +322,7 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, questionText }) => {
         <p className="text-sm sm:text-base text-gray-600 mb-6">
           Are you sure you want to delete this question?
           <br />
-          <span className="font-semibold text-gray-800 mt-2 block break-words">
+          <span className="font-semibold text-gray-800 mt-2 block wrap-break-word">
             "{questionText}"
           </span>
         </p>
@@ -527,7 +527,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
 
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-6 sm:mt-10">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#217486] mb-2 break-words">
+              <h1 className="text-2xl sm:text-3xl text-[#217486] mb-2 wrap-break-word">
                 {quiz.quiz_name}
               </h1>
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
@@ -604,7 +604,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
                         <span className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-[#217486] text-white rounded-lg flex items-center justify-center font-bold text-xs sm:text-sm">
                           {i + 1}
                         </span>
-                        <h3 className="font-semibold text-base sm:text-lg text-gray-800 leading-tight break-words">
+                        <h3 className="font-semibold text-base sm:text-lg text-gray-800 leading-tight wrap-break-word">
                           {q.question_text}
                         </h3>
                       </div>
@@ -657,7 +657,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
 
                       {q.explanation && (
                         <div className="ml-9 sm:ml-11 mt-3 p-2.5 sm:p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                          <p className="text-xs sm:text-sm text-blue-900 break-words">
+                          <p className="text-xs sm:text-sm text-blue-900 wrap-break-word">
                             <span className="font-semibold">Explanation: </span>
                             {q.explanation}
                           </p>
