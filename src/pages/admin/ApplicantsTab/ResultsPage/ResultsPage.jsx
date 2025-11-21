@@ -202,9 +202,9 @@ function ResultsPage() {
     <>
       {showModal && (
         <ConfirmationModal
-          title="Proceed to Next Step?"
+          title="Export to CSV?"
           message="Do you want to export this as csv?"
-          confirmLabel="Yes, Proceed"
+          confirmLabel="Export"
           cancelLabel="Cancel"
           onClose={() => setShowModal(false)}
           onConfirm={handleExport}

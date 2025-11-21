@@ -54,3 +54,53 @@ export const filteredDepartments = (departments, searchTerm, filterActive) =>
       (filterActive === "inactive" && !dept.is_active);
     return matchesSearch && matchesFilter;
   });
+
+
+  export const formatAnswers = (questions = [], answers = []) => {
+  return questions.map((question, index) => {
+    const userAnswer = answers[index];
+
+    switch (question.question_type) {
+      case "CB": // Checkbox
+        return {
+          question_id: question.question_id,
+          selected_answer: Array.isArray(userAnswer) ? userAnswer : [],
+        };
+
+      case "DESC": // Descriptive / Essay
+        return {
+          question_id: question.question_id,
+          selected_answer:
+            typeof userAnswer === "string" ? userAnswer.trim() : "",
+        };
+
+      default:
+        return {
+          question_id: question.question_id,
+          selected_answer: userAnswer ?? null,
+        };
+    }
+  });
+};
+
+
+export const getQuestionTypeLabel = (type) => {
+    const labels = {
+      MC: "Multiple Choice",
+      CB: "Multiple Select",
+      TF: "True/False",
+    };
+    return labels[type] || "Question";
+  };
+
+  export const countAnswer = (formattedAnswers = []) => {
+  return formattedAnswers.filter((ans) => {
+    const value = ans.selected_answer;
+
+    if (Array.isArray(value)) {
+      return value.length > 0;
+    }
+    
+    return value !== null && value !== "";
+  }).length;
+};

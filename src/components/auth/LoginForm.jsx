@@ -85,7 +85,7 @@ const LoginForm = () => {
             </div>
           </div>
 
-          <div className="text-center mb-8 2xl:mb-10">
+          <div className="text-center mb-8 2xl:mb-10 mt-10">
             <div className="text-white text-xl 2xl:text-3xl font-light tracking-wide">
               Welcome, Admin!
             </div>

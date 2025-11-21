@@ -5,6 +5,7 @@ import ClockIcon from "../../assets/Clock.svg";
 import Footer from "../../components/applicant/Footer";
 import { Breadcrumbs, Stack, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material'
 import { getQuestions, getOptions, addResult, addBridge } from "../../../api/api";
+import { countAnswer, formatAnswers, getQuestionTypeLabel } from "../../../helpers/helpers";
 
 const ApplicantTestPage = () => {
   const navigate = useNavigate();
@@ -207,7 +208,7 @@ const ApplicantTestPage = () => {
       if (selectedAnswers.length === 0) {
         openModal(
           'validation',
-          '⚠️ Validation',
+          '⚠️ Selection Needed',
           'Please select at least one answer before proceeding.',
           closeModal
         );
@@ -217,7 +218,7 @@ const ApplicantTestPage = () => {
       if (selectedAnswer === null) {
         openModal(
           'validation',
-          '⚠️ Validation',
+          '⚠️ Answer Required',
           'Please select an answer before proceeding.',
           closeModal
         );
@@ -232,6 +233,8 @@ const ApplicantTestPage = () => {
       newUserAnswers[currentQuestionIndex] = selectedAnswer;
     }
     setUserAnswers(newUserAnswers);
+
+    localStorage.setItem('userAnswers', JSON.stringify(userAnswers));
 
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -254,37 +257,10 @@ const ApplicantTestPage = () => {
         return;
       }
 
-      const formattedAnswers = questions.map((question, index) => {
-        const userAnswer = answers[index];
+      const formattedAnswers = formatAnswers(questions, answers)
+      const answeredCount = countAnswer(formattedAnswers)
 
-        if (question.question_type === "CB") {
-          return {
-            question_id: question.question_id,
-            selected_answer: Array.isArray(userAnswer) ? userAnswer : [],
-          };
-        } else if (question.question_type === "DESC") {
-          return {
-            question_id: question.question_id,
-            selected_answer:
-              typeof userAnswer === "string" ? userAnswer.trim() : "",
-          };
-        } else {
-          return {
-            question_id: question.question_id,
-            selected_answer: userAnswer || null,
-          };
-        }
-      });
-
-      const answeredCount = formattedAnswers.filter((ans) => {
-        if (Array.isArray(ans.selected_answer)) {
-          return ans.selected_answer.length > 0;
-        }
-        return ans.selected_answer !== null && ans.selected_answer !== "";
-      }).length;
-
-      const status =
-        answeredCount < questions.length ? "ABANDONED" : "COMPLETED";
+      const status = answeredCount < questions.length ? "ABANDONED" : "COMPLETED";
 
       const payload = {
         examiner_id: applicantData.examiner_id,
@@ -293,13 +269,9 @@ const ApplicantTestPage = () => {
         status: status,
       };
 
-      console.log("Submitting test:", payload);
-
       const resultData = await addResult(payload)
 
-      await addBridge({ examiner_id: applicantData.examiner_id,
-                        quiz_id: quizData.quiz_id,
-                        result_id: resultData.result_id })
+      await addBridge({ examiner_id: applicantData.examiner_id, quiz_id: quizData.quiz_id, result_id: resultData.result_id })
 
       navigate("/completed-test", {
         state: {
@@ -331,15 +303,6 @@ const ApplicantTestPage = () => {
       },
       true // Show cancel button
     );
-  };
-
-  const getQuestionTypeLabel = (type) => {
-    const labels = {
-      MC: "Multiple Choice",
-      CB: "Multiple Select",
-      TF: "True/False",
-    };
-    return labels[type] || "Question";
   };
 
   if (loading) {
