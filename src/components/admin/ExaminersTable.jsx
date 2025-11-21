@@ -78,13 +78,13 @@ function CandidateTable({
                 </td>
                 <td className="px-6 py-4">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
-                    <Building2 className="w-3 h-3 flex-shrink-0" />
+                    <Building2 className="w-3 h-3 shrink-0" />
                     <span className="truncate">{row.department || "N/A"}</span>
                   </span>
                 </td>
                 <td className="px-6 py-4">
                   <span className="inline-flex items-center gap-1.5 text-sm text-slate-600">
-                    <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+                    <Calendar className="w-3.5 h-3.5 shrink-0" />
                     <span className="truncate">
                       {row.date
                         ? new Date(row.date).toLocaleDateString("en-US", {
@@ -123,7 +123,7 @@ function CandidateTable({
 
             {/* Email */}
             <div className="flex items-center gap-2 mb-2">
-              <Mail className="w-4 h-4 text-slate-400 flex-shrink-0" />
+              <Mail className="w-4 h-4 text-slate-400 shrink-0" />
               <span className="text-sm text-slate-600 truncate">
                 {row.email || "N/A"}
               </span>
@@ -132,12 +132,12 @@ function CandidateTable({
             {/* Department and Date */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium w-fit">
-                <Building2 className="w-3 h-3 flex-shrink-0" />
+                <Building2 className="w-3 h-3 shrink-0" />
                 <span className="truncate">{row.department || "N/A"}</span>
               </span>
               
               <span className="inline-flex items-center gap-1.5 text-xs text-slate-600 w-fit">
-                <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+                <Calendar className="w-3.5 h-3.5 shrink-0" />
                 <span>
                   {row.date
                     ? new Date(row.date).toLocaleDateString("en-US", {
