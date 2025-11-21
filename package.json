@@ -19,6 +19,7 @@
     "axios": "^1.13.2",
     "dotenv": "^17.2.3",
     "lucide-react": "^0.552.0",
+    "pdfjs-dist": "^5.4.394",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hot-toast": "^2.6.0",

@@ -24,23 +24,26 @@ const TestInstructions = () => {
       return;
     }
 
-    console.log('Selected Quiz:', selectedQuiz)
-    console.log('Applicant Data', applicantData)
+    console.log('Selected Quiz:', selectedQuiz);
+    console.log('Quiz has pdf_link:', selectedQuiz?.pdf_link);
+    console.log('Applicant Data', applicantData);
 
     setQuizData(selectedQuiz);
-  }, []);
+  }, [location, navigate]);
 
   const handleStartTest = () => {
     console.log("Starting test...");
+    console.log("Quiz data being passed:", quizData);
 
     const elem = document.documentElement;
     if (elem.requestFullscreen) elem.requestFullscreen();
     else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
     else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
-    // Navigate to the test page
+    
+    // Navigate to the test page with complete quiz data
     navigate("/test-page", {
       state: {
-        quizData,
+        quizData: quizData, // This should now include pdf_link
         applicantData: location.state?.applicantData,
       },
     });
@@ -108,6 +111,11 @@ const TestInstructions = () => {
               <div className="mb-4">
                 <p className="text-gray-900 font-semibold text-lg">
                   {quizData.quiz_name}
+                  {quizData.pdf_link && (
+                    <span className="ml-2 px-2 py-1 bg-cyan-100 text-cyan-800 text-xs rounded-md">
+                      PDF Test
+                    </span>
+                  )}
                 </p>
                 <p className="text-gray-600 text-sm">
                   Time Limit: {formatTimeLimit(quizData.time_limit)}
@@ -124,7 +132,7 @@ const TestInstructions = () => {
             </p>
 
             {/* Checklist */}
-              <InstructionChecklist />
+            <InstructionChecklist />
           </div>
         </div>
 
@@ -132,7 +140,7 @@ const TestInstructions = () => {
         <div className="mt-auto pt-8 sm:pt-0 sm:mt-0 w-full max-w-3xl lg:mx-auto">
           <button
             onClick={handleStartTest}
-            className="bg-cyan-600 hover:bg-cyan-700 text-white  font-semibold px-10 py-3 rounded-lg shadow-lg transition-colors duration-200 flex items-center gap-2 text-sm group"
+            className="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-10 py-3 rounded-lg shadow-lg transition-colors duration-200 flex items-center gap-2 text-sm group"
             style={{ boxShadow: "4px 4px 0px 0px rgba(0, 0, 0, 1)" }}
           >
             Start Test

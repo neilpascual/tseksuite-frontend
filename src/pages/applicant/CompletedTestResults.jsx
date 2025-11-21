@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   CheckCircle2,
   Trophy,
-  Clock,
-  FileText,
-  AlertCircle,
   Award,
   XCircle,
+  Download,
+  Sparkles,
 } from "lucide-react";
 import Footer from "../../components/applicant/Footer";
 
@@ -19,6 +18,8 @@ const CompletedTestResults = () => {
   const [quizData, setQuizData] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [detailedResults, setDetailedResults] = useState([]);
+  const [applicantData, setApplicantData] = useState(null);
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     loadResults();
@@ -26,7 +27,6 @@ const CompletedTestResults = () => {
 
   const loadResults = () => {
     try {
-      // Get data from navigation state
       const { resultData, quizData, questions, applicantData } =
         location.state || {};
 
@@ -39,6 +39,7 @@ const CompletedTestResults = () => {
       setResultData(resultData);
       setQuizData(quizData);
       setQuestions(questions);
+      setApplicantData(applicantData);
       setDetailedResults(resultData.detailed_results || []);
       setLoading(false);
     } catch (error) {
@@ -48,25 +49,19 @@ const CompletedTestResults = () => {
     }
   };
 
-  const handleBackToHome = () => {
-    localStorage.removeItem("selectedQuiz");
-    localStorage.removeItem("applicantData");
-    navigate("/");
-  };
-
   const getPerformanceLevel = (percentage) => {
     if (percentage >= 90)
-      return { level: "Master", color: "text-green-600", bg: "bg-green-100" };
+      return { level: "Master", color: "#10B981", bgColor: "#D1FAE5" };
     if (percentage >= 80)
-      return { level: "Excellent", color: "text-teal-600", bg: "bg-teal-100" };
+      return { level: "Excellent", color: "#14B8A6", bgColor: "#CCFBF1" };
     if (percentage >= 70)
-      return { level: "Great", color: "text-blue-600", bg: "bg-blue-100" };
+      return { level: "Great", color: "#3B82F6", bgColor: "#DBEAFE" };
     if (percentage >= 60)
-      return { level: "Good", color: "text-cyan-600", bg: "bg-cyan-100" };
+      return { level: "Good", color: "#06B6D4", bgColor: "#CFFAFE" };
     return {
       level: "Keep Trying",
-      color: "text-amber-600",
-      bg: "bg-amber-100",
+      color: "#F59E0B",
+      bgColor: "#FEF3C7",
     };
   };
 
@@ -80,7 +75,6 @@ const CompletedTestResults = () => {
         return "No answer provided";
       }
 
-      // For checkbox questions, match IDs to option text
       if (question.question_type === "CB") {
         const selectedOptions = question.options.filter((opt) =>
           userAnswer.includes(opt.answer_id)
@@ -93,7 +87,6 @@ const CompletedTestResults = () => {
       return userAnswer.join(", ");
     }
 
-    // For single choice questions (MC/TF), match ID to option text
     if (
       (question.question_type === "MC" || question.question_type === "TF") &&
       typeof userAnswer === "number"
@@ -105,6 +98,165 @@ const CompletedTestResults = () => {
     }
 
     return userAnswer.toString().trim() || "No answer provided";
+  };
+
+  const downloadCertificate = () => {
+    setGenerating(true);
+    
+    setTimeout(() => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Set canvas size (A4 landscape proportions)
+      canvas.width = 1200;
+      canvas.height = 850;
+
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      gradient.addColorStop(0, '#ffffff');
+      gradient.addColorStop(1, '#f0f9ff');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Outer border
+      ctx.strokeStyle = '#217486';
+      ctx.lineWidth = 8;
+      ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
+      
+      // Inner border
+      ctx.strokeStyle = '#2E99B0';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
+
+      // Corner decorations
+      const drawCorner = (x, y) => {
+        ctx.save();
+        
+        // Outer circle
+        ctx.fillStyle = '#217486';
+        ctx.beginPath();
+        ctx.arc(x, y, 30, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Inner circle
+        ctx.fillStyle = '#FFD700';
+        ctx.beginPath();
+        ctx.arc(x, y, 20, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.restore();
+      };
+
+      drawCorner(100, 100);
+      drawCorner(canvas.width - 100, 100);
+      drawCorner(canvas.width - 100, canvas.height - 100);
+      drawCorner(100, canvas.height - 100);
+
+      // Main heading
+      ctx.fillStyle = '#217486';
+      ctx.font = 'bold 56px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.letterSpacing = '4px';
+      ctx.fillText('CERTIFICATE', canvas.width / 2, 150);
+      
+      // Subheading
+      ctx.font = '32px Arial, sans-serif';
+      ctx.fillStyle = '#2E99B0';
+      ctx.letterSpacing = '2px';
+      ctx.fillText('OF ACHIEVEMENT', canvas.width / 2, 195);
+
+      // Decorative line
+      ctx.strokeStyle = '#FFD700';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(canvas.width / 2 - 200, 220);
+      ctx.lineTo(canvas.width / 2 + 200, 220);
+      ctx.stroke();
+
+      // Text: "This is to certify that"
+      ctx.fillStyle = '#374151';
+      ctx.font = '24px Arial, sans-serif';
+      ctx.fillText('This is to certify that', canvas.width / 2, 280);
+
+      // Applicant name
+      const applicantName = applicantData?.name || 'Applicant';
+      ctx.fillStyle = '#217486';
+      ctx.font = 'bold 48px Arial, sans-serif';
+      ctx.letterSpacing = '2px';
+      ctx.fillText(applicantName.toUpperCase(), canvas.width / 2, 350);
+      
+      // Underline for name
+      ctx.strokeStyle = '#217486';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      const nameMetrics = ctx.measureText(applicantName.toUpperCase());
+      ctx.moveTo(canvas.width / 2 - nameMetrics.width / 2, 365);
+      ctx.lineTo(canvas.width / 2 + nameMetrics.width / 2, 365);
+      ctx.stroke();
+
+      // Text: "has successfully completed the"
+      ctx.fillStyle = '#374151';
+      ctx.font = '22px Arial, sans-serif';
+      ctx.fillText('has successfully completed the', canvas.width / 2, 420);
+
+      // Quiz name
+      ctx.fillStyle = '#2E99B0';
+      ctx.font = 'bold 32px Arial, sans-serif';
+      const quizName = quizData.quiz_name || 'Quiz';
+      const quizMetrics = ctx.measureText(quizName);
+      
+      // Wrap text if too long
+      if (quizMetrics.width > 800) {
+        ctx.font = 'bold 26px Arial, sans-serif';
+      }
+      ctx.fillText(quizName, canvas.width / 2, 470);
+
+      // Text: "with a score of"
+      ctx.fillStyle = '#374151';
+      ctx.font = '22px Arial, sans-serif';
+      ctx.fillText('with a score of', canvas.width / 2, 530);
+      
+      // Score percentage
+      const percentage = Math.round((resultData.score / resultData.max_score) * 100);
+      ctx.fillStyle = '#217486';
+      ctx.font = 'bold 52px Arial, sans-serif';
+      ctx.fillText(`${percentage}%`, canvas.width / 2, 600);
+
+      // Performance badge
+      const performance = getPerformanceLevel(percentage);
+      
+      // Badge background
+      ctx.fillStyle = '#FFD700';
+      ctx.beginPath();
+      ctx.ellipse(canvas.width / 2, 670, 90, 35, 0, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Badge text
+      ctx.fillStyle = '#217486';
+      ctx.font = 'bold 20px Arial, sans-serif';
+      ctx.fillText(performance.level, canvas.width / 2, 678);
+
+      // Date
+      ctx.fillStyle = '#6B7280';
+      ctx.font = '18px Arial, sans-serif';
+      const currentDate = new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      ctx.fillText(`Date: ${currentDate}`, canvas.width / 2, 760);
+
+      // Download
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = `Certificate_${quizData.quiz_name.replace(/\s+/g, '_')}.png`;
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+        setGenerating(false);
+      });
+    }, 100);
   };
 
   if (loading) {
@@ -128,32 +280,47 @@ const CompletedTestResults = () => {
   const incorrectAnswers = detailedResults.filter(
     (r) => r.is_correct === false
   ).length;
-  const descriptiveQuestions = detailedResults.filter(
-    (r) => r.is_correct === null
-  ).length;
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <div className="flex-1 px-4 py-6">
         <div className="max-w-4xl mx-auto">
           {/* Main Header Card */}
-          <div className="bg-linear-to-r from-[#217486] to-[#2c8fa3] rounded-2xl shadow-lg p-6 mb-6 text-white">
+          <div className="bg-gradient-to-r from-[#217486] to-[#2c8fa3] rounded-2xl shadow-lg p-6 mb-6 text-white">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h1 className="text-2xl font-bold">{quizData.quiz_name}</h1>
-
               </div>
               <div className="flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full">
+                <CheckCircle2 className="w-4 h-4" />
                 <span className="text-sm font-medium">Completed</span>
               </div>
             </div>
 
-            <div className="flex items-center justify-start">
+            <div className="flex items-center justify-between">
               <div className="flex items-baseline gap-3">
                 <div className="text-5xl font-black">{percentage}%</div>
                 <div className="text-white/80 text-lg">/ 100%</div>
               </div>
-         
+              
+              {/* Download Certificate Button */}
+              <button
+                onClick={downloadCertificate}
+                disabled={generating}
+                className="flex items-center gap-2 bg-white text-[#217486] px-5 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {generating ? (
+                  <>
+                    <Sparkles className="w-5 h-5 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-5 h-5" />
+                    Download Certificate
+                  </>
+                )}
+              </button>
             </div>
           </div>
 
@@ -278,12 +445,9 @@ const CompletedTestResults = () => {
                             </div>
                             <div className="text-blue-800 text-sm">
                               {question.explanation}
-                              {console.log(question)}
                             </div>
                           </div>
                         )}
-
-
                       </div>
                     </div>
                   </div>

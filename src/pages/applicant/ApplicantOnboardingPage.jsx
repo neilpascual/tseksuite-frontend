@@ -59,13 +59,11 @@ const ApplicantOnboardingPage = () => {
       const response = await validateInvitationLink(token)
 
       if (!response.status === 200) {
-
         if (response.status === 404) {
           throw new Error(
             "Invitation validation endpoint not found. Please ensure your backend has the /api/invitation/validate/:token route."
           );
         }
-
         throw new Error("Invalid or expired invitation link");
       }
 
@@ -106,8 +104,6 @@ const ApplicantOnboardingPage = () => {
 
   const handleSubmit = async () => {
     if (!inviteData) {
-      //TODO
-      // wag alert dito ayusin UI
       toast.error("Invalid invitation. Please use a valid invite link.");
       return;
     }
@@ -135,8 +131,6 @@ const ApplicantOnboardingPage = () => {
     }
 
     if (!formData.department) {
-      // TODO
-      // pati dito
       toast.error("Please select a department");
       return;
     }
@@ -151,7 +145,9 @@ const ApplicantOnboardingPage = () => {
         email: formData.email,
       };
 
+      console.log("Submitting examiner data...");
       const result = await submitExaminerData(applicantData)
+      console.log("API Response:", result);
 
       const applicantDataForStorage = {
         firstName: formData.firstName,
@@ -161,30 +157,40 @@ const ApplicantOnboardingPage = () => {
         examiner_id: result.examiner.examiner_id,
       };
 
+      // Clear existing storage
       if (localStorage.getItem("applicantData")) {
         localStorage.removeItem("applicantData");
       }
-
       if (localStorage.getItem("selectedQuiz")) {
         localStorage.removeItem("selectedQuiz");
       }
 
-      // Validate if there the localStorage Exists and if so then override
+      // Ensure quiz data includes pdf_link
+      const quizDataForStorage = {
+        quiz_id: result.quiz.quiz_id,
+        quiz_name: result.quiz.quiz_name,
+        time_limit: result.quiz.time_limit,
+        pdf_link: result.quiz.pdf_link || null // Ensure pdf_link is included
+      };
+
+      console.log("Storing quiz data:", quizDataForStorage);
+
+      // Store data
       localStorage.setItem(
         "applicantData",
         JSON.stringify(applicantDataForStorage)
       );
-      localStorage.setItem("selectedQuiz", JSON.stringify(result.quiz));
+      localStorage.setItem("selectedQuiz", JSON.stringify(quizDataForStorage));
 
       navigate("/test-instructions", {
         state: {
           applicantData: applicantDataForStorage,
-          selectedQuiz: result.quiz,
+          selectedQuiz: quizDataForStorage,
         },
       });
     } catch (error) {
       console.error("Error submitting form:", error);
-      alert(`Error: ${error.message}. Please try again.`);
+      toast.error(`Error: ${error.message}. Please try again.`);
     } finally {
       setIsSubmitting(false);
     }
@@ -349,7 +355,6 @@ const ApplicantOnboardingPage = () => {
                   </div>
                   <div className="hidden sm:flex justify-end">
                     <button
-                      // onClick={handleSubmit}
                       onClick={() => setShowModal(true)}
                       disabled={isSubmitting}
                       className="bg-cyan-600 hover:bg-cyan-700 text-white
