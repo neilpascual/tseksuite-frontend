@@ -102,48 +102,53 @@ const CompletedTestResults = () => {
 
   const downloadCertificate = () => {
     setGenerating(true);
-    
+
     setTimeout(() => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
       // Set canvas size (A4 landscape proportions)
       canvas.width = 1200;
       canvas.height = 850;
 
       // Background gradient
-      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-      gradient.addColorStop(0, '#ffffff');
-      gradient.addColorStop(1, '#f0f9ff');
+      const gradient = ctx.createLinearGradient(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+      gradient.addColorStop(0, "#ffffff");
+      gradient.addColorStop(1, "#f0f9ff");
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Outer border
-      ctx.strokeStyle = '#217486';
+      ctx.strokeStyle = "#217486";
       ctx.lineWidth = 8;
       ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
-      
+
       // Inner border
-      ctx.strokeStyle = '#2E99B0';
+      ctx.strokeStyle = "#2E99B0";
       ctx.lineWidth = 2;
       ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
 
       // Corner decorations
       const drawCorner = (x, y) => {
         ctx.save();
-        
+
         // Outer circle
-        ctx.fillStyle = '#217486';
+        ctx.fillStyle = "#217486";
         ctx.beginPath();
         ctx.arc(x, y, 30, 0, Math.PI * 2);
         ctx.fill();
-        
+
         // Inner circle
-        ctx.fillStyle = '#FFD700';
+        ctx.fillStyle = "#FFD700";
         ctx.beginPath();
         ctx.arc(x, y, 20, 0, Math.PI * 2);
         ctx.fill();
-        
+
         ctx.restore();
       };
 
@@ -153,20 +158,20 @@ const CompletedTestResults = () => {
       drawCorner(100, canvas.height - 100);
 
       // Main heading
-      ctx.fillStyle = '#217486';
-      ctx.font = 'bold 56px Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.letterSpacing = '4px';
-      ctx.fillText('CERTIFICATE', canvas.width / 2, 150);
-      
+      ctx.fillStyle = "#217486";
+      ctx.font = "bold 56px Arial, sans-serif";
+      ctx.textAlign = "center";
+      ctx.letterSpacing = "4px";
+      ctx.fillText("CERTIFICATE", canvas.width / 2, 150);
+
       // Subheading
-      ctx.font = '32px Arial, sans-serif';
-      ctx.fillStyle = '#2E99B0';
-      ctx.letterSpacing = '2px';
-      ctx.fillText('OF ACHIEVEMENT', canvas.width / 2, 195);
+      ctx.font = "32px Arial, sans-serif";
+      ctx.fillStyle = "#2E99B0";
+      ctx.letterSpacing = "2px";
+      ctx.fillText("OF ACHIEVEMENT", canvas.width / 2, 195);
 
       // Decorative line
-      ctx.strokeStyle = '#FFD700';
+      ctx.strokeStyle = "#FFD700";
       ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.moveTo(canvas.width / 2 - 200, 220);
@@ -174,19 +179,19 @@ const CompletedTestResults = () => {
       ctx.stroke();
 
       // Text: "This is to certify that"
-      ctx.fillStyle = '#374151';
-      ctx.font = '24px Arial, sans-serif';
-      ctx.fillText('This is to certify that', canvas.width / 2, 280);
+      ctx.fillStyle = "#374151";
+      ctx.font = "24px Arial, sans-serif";
+      ctx.fillText("This is to certify that", canvas.width / 2, 280);
 
       // Applicant name
-      const applicantName = applicantData?.name || 'Applicant';
-      ctx.fillStyle = '#217486';
-      ctx.font = 'bold 48px Arial, sans-serif';
-      ctx.letterSpacing = '2px';
+      const applicantName = applicantData.name || "Applicant";
+      ctx.fillStyle = "#217486";
+      ctx.font = "bold 48px Arial, sans-serif";
+      ctx.letterSpacing = "2px";
       ctx.fillText(applicantName.toUpperCase(), canvas.width / 2, 350);
-      
+
       // Underline for name
-      ctx.strokeStyle = '#217486';
+      ctx.strokeStyle = "#217486";
       ctx.lineWidth = 2;
       ctx.beginPath();
       const nameMetrics = ctx.measureText(applicantName.toUpperCase());
@@ -195,62 +200,67 @@ const CompletedTestResults = () => {
       ctx.stroke();
 
       // Text: "has successfully completed the"
-      ctx.fillStyle = '#374151';
-      ctx.font = '22px Arial, sans-serif';
-      ctx.fillText('has successfully completed the', canvas.width / 2, 420);
+      ctx.fillStyle = "#374151";
+      ctx.font = "22px Arial, sans-serif";
+      ctx.fillText("has successfully completed the", canvas.width / 2, 420);
 
       // Quiz name
-      ctx.fillStyle = '#2E99B0';
-      ctx.font = 'bold 32px Arial, sans-serif';
-      const quizName = quizData.quiz_name || 'Quiz';
+      ctx.fillStyle = "#2E99B0";
+      ctx.font = "bold 32px Arial, sans-serif";
+      const quizName = quizData.quiz_name || "Quiz";
       const quizMetrics = ctx.measureText(quizName);
-      
+
       // Wrap text if too long
       if (quizMetrics.width > 800) {
-        ctx.font = 'bold 26px Arial, sans-serif';
+        ctx.font = "bold 26px Arial, sans-serif";
       }
       ctx.fillText(quizName, canvas.width / 2, 470);
 
       // Text: "with a score of"
-      ctx.fillStyle = '#374151';
-      ctx.font = '22px Arial, sans-serif';
-      ctx.fillText('with a score of', canvas.width / 2, 530);
-      
+      ctx.fillStyle = "#374151";
+      ctx.font = "22px Arial, sans-serif";
+      ctx.fillText("with a score of", canvas.width / 2, 530);
+
       // Score percentage
-      const percentage = Math.round((resultData.score / resultData.max_score) * 100);
-      ctx.fillStyle = '#217486';
-      ctx.font = 'bold 52px Arial, sans-serif';
+      const percentage = Math.round(
+        (resultData.score / resultData.max_score) * 100
+      );
+      ctx.fillStyle = "#217486";
+      ctx.font = "bold 52px Arial, sans-serif";
       ctx.fillText(`${percentage}%`, canvas.width / 2, 600);
 
       // Performance badge
       const performance = getPerformanceLevel(percentage);
-      
+
       // Badge background
-      ctx.fillStyle = '#FFD700';
+      ctx.fillStyle = "#FFD700";
       ctx.beginPath();
       ctx.ellipse(canvas.width / 2, 670, 90, 35, 0, 0, Math.PI * 2);
       ctx.fill();
-      
+
       // Badge text
-      ctx.fillStyle = '#217486';
-      ctx.font = 'bold 20px Arial, sans-serif';
+      ctx.fillStyle = "#217486";
+      ctx.font = "bold 20px Arial, sans-serif";
       ctx.fillText(performance.level, canvas.width / 2, 678);
 
       // Date
-      ctx.fillStyle = '#6B7280';
-      ctx.font = '18px Arial, sans-serif';
-      const currentDate = new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+      ctx.fillStyle = "#6B7280";
+      ctx.font = "18px Arial, sans-serif";
+      const currentDate = new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       });
       ctx.fillText(`Date: ${currentDate}`, canvas.width / 2, 760);
 
       // Download
       canvas.toBlob((blob) => {
         const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = `Certificate_${quizData.quiz_name.replace(/\s+/g, '_')}.png`;
+        const link = document.createElement("a");
+        link.download = `Certificate_${quizData.quiz_name.replace(
+          /\s+/g,
+          "_"
+        )}.png`;
         link.href = url;
         link.click();
         URL.revokeObjectURL(url);
@@ -302,7 +312,7 @@ const CompletedTestResults = () => {
                 <div className="text-5xl font-black">{percentage}%</div>
                 <div className="text-white/80 text-lg">/ 100%</div>
               </div>
-              
+
               {/* Download Certificate Button */}
               <button
                 onClick={downloadCertificate}
@@ -333,7 +343,7 @@ const CompletedTestResults = () => {
               </div>
               <div className="text-[#2E99B0] text-sm">Points</div>
             </div>
-        
+
             <div className="bg-white border border-gray-200 rounded-xl p-4 text-center shadow-sm">
               <CheckCircle2 className="w-6 h-6 text-green-600 mx-auto mb-2" />
               <div className="text-xl font-bold text-green-600">
