@@ -119,7 +119,7 @@ const LoginForm = () => {
                   </div>
                 </button>
               </div>
-            </form>
+            </div>
           </div>
 
             <div className="pt-6 2xl:pt-8">
