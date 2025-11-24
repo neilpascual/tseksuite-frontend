@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Filter, Search, BookOpen } from "lucide-react";
+import { Building, Plus, Search, Filter, Download, X } from "lucide-react";
 import QuizManagement from "./QuizManagement";
 import {
   addDepartment,
@@ -160,33 +160,131 @@ const TestBankPage = () => {
     <div className="min-h-screen bg-white px-6 py-6 mb-17 sm:mb-0 sm:mt-0">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 mb-15">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-            <div className="flex items-center">
+        <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 mb-8">
+          {/* Header Section */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="flex items-start space-x-4">
               <div>
-                <h1 className="text-3xl text-[#217486] mb-5">Departments</h1>
-                <p className="text-sm text-gray-600">
-                  Manage departments
+                <h1 className="text-3xl bg-cyan-700 bg-clip-text text-transparent mb-2">
+                  Departments
+                </h1>
+                <p className="text-gray-600 text-sm font-small">
+                  Manage departments and their assessments.
                 </p>
               </div>
             </div>
+
+            {/* Add Department Button */}
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center justify-center gap-2 bg-[#217486] text-white px-3 py-3 rounded-xl shadow-lg shadow-[#217486]/30 hover:shadow-xl hover:shadow-[#217486]/40 hover:bg-[#1a5d6d] transition-all transform hover:-translate-y-0.5"
+              className="group relative flex items-center justify-center gap-3 bg-cyan-700 text-white px-6 py-4 rounded-2xl shadow-lg shadow-[#217486]/25 hover:shadow-xl hover:shadow-[#217486]/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 font-semibold min-w-[180px]"
             >
-              <Plus className="w-5 h-5" strokeWidth={2.5} />
-              <span className="font-medium">Add Department</span>
+              <div className="absolute inset-0 bg-white/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+              <Plus
+                className="w-5 h-5 transition-transform group-hover:scale-110"
+                strokeWidth={2.5}
+              />
+              <span className="relative">Add Department</span>
             </button>
           </div>
 
-          {/* Search and Filter */}
-          <div className="mt-4">
-            <SearchAndFilter
-              searchTerm={searchTerm}
-              filterActive={filterActive}
-              onChangeSearchValue={(e) => setSearchTerm(e.target.value)}
-              onFilterClicked={(value) => setFilterActive(value)}
-            />
+          {/* Search and Filter Section */}
+          <div className="mt-8 bg-gradient-to-r from-gray-50 to-blue-50/30 rounded-2xl p-6 border border-gray-200/50">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div className="flex-1">
+                <div className="relative max-w-md">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search departments"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#217486]/20 focus:border-[#217486] transition-all duration-200 placeholder-gray-400"
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm("")}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 bg-white rounded-xl border border-gray-300 p-1">
+                  <button
+                    onClick={() => setFilterActive("all")}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      filterActive === "all"
+                        ? "bg-[#217486] text-white shadow-sm"
+                        : "text-gray-600 hover:text-gray-800"
+                    }`}
+                  >
+                    All
+                  </button>
+                  <button
+                    onClick={() => setFilterActive("active")}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      filterActive === "active"
+                        ? "bg-[#217486] text-white shadow-sm"
+                        : "text-gray-600 hover:text-gray-800"
+                    }`}
+                  >
+                    Active
+                  </button>
+                  <button
+                    onClick={() => setFilterActive("inactive")}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      filterActive === "inactive"
+                        ? "bg-[#217486] text-white shadow-sm"
+                        : "text-gray-600 hover:text-gray-800"
+                    }`}
+                  >
+                    Inactive
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Active Filters */}
+            {(searchTerm || filterActive !== "all") && (
+              <div className="flex items-center gap-2 mt-4 flex-wrap">
+                <span className="text-sm text-gray-500">Active filters:</span>
+                {searchTerm && (
+                  <div className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
+                    Search: "{searchTerm}"
+                    <button
+                      onClick={() => setSearchTerm("")}
+                      className="ml-1 hover:text-blue-900"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+                {filterActive !== "all" && (
+                  <div className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                    Status: {filterActive}
+                    <button
+                      onClick={() => setFilterActive("all")}
+                      className="ml-1 hover:text-green-900"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+                <button
+                  onClick={() => {
+                    setSearchTerm("");
+                    setFilterActive("all");
+                  }}
+                  className="text-sm text-gray-500 hover:text-gray-700 underline"
+                >
+                  Clear all
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
