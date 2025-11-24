@@ -21,7 +21,14 @@ import {
   updateQuestion,
 } from "../../../../api/api";
 
-const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave, isPdfTest }) => {
+const QuestionModal = ({
+  isOpen,
+  onClose,
+  question,
+  setQuestion,
+  onSave,
+  isPdfTest,
+}) => {
   if (!isOpen) return null;
 
   const updateField = (field, value) => {
@@ -40,7 +47,13 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave, isPdfTe
   const addOption = () => {
     setQuestion((prev) => ({
       ...prev,
-      options: [...prev.options, { option_text: "", is_correct: false }],
+      options: [
+        ...prev.options,
+        {
+          option_text: "",
+          is_correct: prev.question_type === "DESC" ? true : false,
+        },
+      ],
     }));
   };
 
@@ -52,7 +65,7 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave, isPdfTe
   };
 
   const setCorrectAnswer = (index) => {
-    if (question.question_type === "CB") {
+    if (question.question_type === "CB" || question.question_type === "DESC") {
       updateOption(index, "is_correct", !question.options[index].is_correct);
     } else {
       setQuestion((prev) => ({
@@ -78,7 +91,10 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave, isPdfTe
     } else if (type === "DESC") {
       setQuestion((prev) => ({
         ...prev,
-        options: [{ option_text: "", is_correct: true }],
+        options: [
+          { option_text: "", is_correct: true },
+          { option_text: "", is_correct: true },
+        ],
       }));
     } else {
       setQuestion((prev) => ({
@@ -98,20 +114,42 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave, isPdfTe
           <div className="space-y-3">
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-900 mb-2">
-                <span className="font-semibold">Note:</span> This is a descriptive question. Enter the correct/expected answer below.
+                <span className="font-semibold">Note:</span> This is a
+                descriptive question. Enter the correct/expected answer below.
               </p>
             </div>
             <div>
               <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                Correct Answer
+                Correct Answers
               </label>
-              <textarea
-                value={question.options[0]?.option_text || ""}
-                onChange={(e) => updateOption(0, "option_text", e.target.value)}
-                placeholder="Enter the correct/expected answer..."
-                className="w-full px-3 py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#217486] focus:border-transparent resize-none"
-                rows={4}
-              />
+              <div className="space-y-2">
+                {question.options.map((opt, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <input
+                      value={opt.option_text}
+                      onChange={(e) =>
+                        updateOption(i, "option_text", e.target.value)
+                      }
+                      placeholder={`Key Answer ${i + 1}`}
+                      className="flex-1 px-2.5 sm:px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#217486] focus:border-transparent"
+                    />
+                    {question.options.length > 2 && (
+                      <button
+                        onClick={() => removeOption(i)}
+                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors shrink-0"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  onClick={addOption}
+                  className="w-full py-2 text-sm sm:text-base border-2 border-dashed border-gray-300 rounded-lg hover:border-[#217486] hover:bg-gray-50 text-gray-600 transition-colors"
+                >
+                  + Add Option
+                </button>
+              </div>
             </div>
           </div>
         );
@@ -181,17 +219,22 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave, isPdfTe
     }
   };
 
-  const questionTypes = isPdfTest 
+  const questionTypes = isPdfTest
     ? ["MC", "CB", "TF", "DESC"]
     : ["MC", "CB", "TF"];
 
   const getTypeLabel = (type) => {
     switch (type) {
-      case "MC": return "Multiple Choice";
-      case "CB": return "Checkbox";
-      case "TF": return "True/False";
-      case "DESC": return "Descriptive";
-      default: return type;
+      case "MC":
+        return "Multiple Choice";
+      case "CB":
+        return "Checkbox";
+      case "TF":
+        return "True/False";
+      case "DESC":
+        return "Descriptive";
+      default:
+        return type;
     }
   };
 
@@ -216,7 +259,11 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave, isPdfTe
             <label className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 block">
               Question Type
             </label>
-            <div className={`grid ${isPdfTest ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'} gap-2`}>
+            <div
+              className={`grid ${
+                isPdfTest ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-3"
+              } gap-2`}
+            >
               {questionTypes.map((t) => (
                 <button
                   key={t}
@@ -272,7 +319,9 @@ const QuestionModal = ({ isOpen, onClose, question, setQuestion, onSave, isPdfTe
           {/* Options */}
           <div>
             <label className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 block">
-              {question.question_type === "DESC" ? "Expected Answer" : "Answer Options"}
+              {question.question_type === "DESC"
+                ? "Expected Answer"
+                : "Answer Options"}
             </label>
             {renderOptions()}
           </div>
@@ -433,7 +482,9 @@ const QuestionManagement = ({ quiz, onBack }) => {
 
     if (q.question_type === "DESC") {
       if (!q.options[0]?.option_text.trim()) {
-        return toast.error("Correct answer is required for descriptive questions");
+        return toast.error(
+          "Correct answer is required for descriptive questions"
+        );
       }
     } else if (q.question_type === "MC" || q.question_type === "CB") {
       if (!q.options || q.options.length < 2) {
@@ -450,7 +501,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
       if (editingIndex !== null) {
         await updateQuestion(quiz.quiz_id, q.question_id, q);
         toast.success("Question Updated!");
-        
+
         const original = questions[editingIndex];
         const originalIds = original.options
           .map((o) => o.answer_id)
@@ -533,7 +584,9 @@ const QuestionManagement = ({ quiz, onBack }) => {
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
                 {isPdfTest && (
                   <span className="flex items-center gap-1 bg-[#2a8fa5]/10 px-2 py-1 rounded-lg">
-                    <span className="font-semibold text-[#2a8fa5]">PDF Test</span>
+                    <span className="font-semibold text-[#2a8fa5]">
+                      PDF Test
+                    </span>
                   </span>
                 )}
                 <span className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-lg">
@@ -581,7 +634,8 @@ const QuestionManagement = ({ quiz, onBack }) => {
               No Questions Yet
             </h3>
             <p className="text-sm sm:text-base text-gray-500 mb-6">
-              Start building your {isPdfTest ? "test" : "quiz"} by adding your first question.
+              Start building your {isPdfTest ? "test" : "quiz"} by adding your
+              first question.
             </p>
             <button
               onClick={openAdd}
@@ -621,10 +675,22 @@ const QuestionManagement = ({ quiz, onBack }) => {
                       <div className="ml-9 sm:ml-11 space-y-2">
                         {q.question_type === "DESC" ? (
                           <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p className="text-xs font-semibold text-blue-900 mb-1">Expected Answer:</p>
-                            <p className="text-sm text-blue-800 break-words">
-                              {q.options[0]?.option_text || "No answer provided"}
+                            <p className="text-xs font-semibold text-blue-900 mb-1">
+                              Expected Answers:
                             </p>
+                            <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
+                              {q.options && q.options.length > 0 ? (
+                                q.options.map((opt, index) => (
+                                  <li key={index} className="wrap-break-word">
+                                    {opt.option_text}
+                                  </li>
+                                ))
+                              ) : (
+                                <li className="list-none">
+                                  No answer provided
+                                </li>
+                              )}
+                            </ul>
                           </div>
                         ) : (
                           q.options.map((opt, j) => (
