@@ -26,20 +26,20 @@ const LoginForm = () => {
           {/* Logo Section */}
           <div className="flex justify-center items-center mb-8">
             <div className="relative group">
-              <div className="w-28 h-28 rounded-3xl flex items-center justify-center shadow-2xl relative z-10 bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-md border border-white/20">
+              <div className="w-28 h-28 rounded-3xl flex items-center justify-center shadow-2xl relative z-10 bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-md border border-white/20 hover:scale-105 hover:rotate-3 transition-all duration-500 group">
                 <img
-                  src="/assets/Suitetest.png"
+                  src="/assets/Tsek.png"
                   alt="SuiteTest Logo"
-                  className="w-16 h-16 object-contain drop-shadow-lg"
+                  className="w-20 h-20 object-contain drop-shadow-lg group-hover:rotate-12 group-hover:scale-110 transition-transform duration-500 ease-out"
                 />
               </div>
 
               {/* FullSuite Logo */}
-              <div className="absolute -bottom-5 -right-7 w-12 h-12 flex items-center justify-center bg-gradient-to-br from-white/30 to-white/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <div className="absolute -bottom-5 -right-7 w-12 h-12 flex items-center justify-center bg-gradient-to-br from-white/30 to-white/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-lg group-hover:scale-110 transition-all duration-300">
                 <img
                   src="/assets/Suitelifer.png"
                   alt="FullSuite Logo"
-                  className="w-8 h-8 object-contain"
+                  className="w-8 h-10 object-contain group-hover:rotate-360 transition-transform duration-500"
                 />
               </div>
 
@@ -61,9 +61,15 @@ const LoginForm = () => {
             </p>
           </div>
 
-          <div className="space-y-6">
+          <div
+            className="rounded-3xl p-8 2xl:p-10 shadow-2xl border border-white/20 backdrop-blur-md"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05))",
+            }}
+          >
             {/* Email Field */}
-            <div>
+            <div className="mb-4">
               <label className="block text-white text-sm mb-2 pl-1 font-medium">
                 Email Address
               </label>
@@ -91,7 +97,7 @@ const LoginForm = () => {
             </div>
 
             {/* Password Field */}
-            <div>
+            <div className="mb-4">
               <label className="block text-white text-sm mb-2 pl-1 font-medium">
                 Password
               </label>
