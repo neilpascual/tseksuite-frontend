@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Document, Page, pdfjs } from 'react-pdf';
+
 import ClockIcon from "../../assets/Clock.svg";
 import Footer from "../../components/applicant/Footer";
 import { Breadcrumbs, Stack, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material'

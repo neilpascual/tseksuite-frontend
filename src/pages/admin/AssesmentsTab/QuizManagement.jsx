@@ -75,6 +75,17 @@ const QuizManagement = ({ department, onBack }) => {
     }
   };
 
+  //added URL validation function
+  const isValidURL = (url) => {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch (err) {
+    return false;
+  }
+};
+
+
   const handleAddQuiz = async () => {
     if (!newQuiz.quiz_name.trim()) {
       toast.error("Please enter a quiz name");
@@ -147,10 +158,23 @@ const QuizManagement = ({ department, onBack }) => {
     }
 
     // PDF test: pdf_link required
-    if (editingQuiz.pdf_link && !editingQuiz.pdf_link.trim()) {
-      toast.error("Please enter PDF link for PDF test");
-      return;
-    }
+    // if (editingQuiz.pdf_link && !editingQuiz.pdf_link.trim()) {
+    //   toast.error("Please enter PDF link for PDF test");
+    //   return;
+    // }
+
+    // PDF test: pdf_link required and must be valid URL
+if (editingQuiz.is_pdf_test) {
+  if (!editingQuiz.pdf_link.trim()) {
+    toast.error("Please enter PDF link for PDF test");
+    return;
+  }
+  if (!isValidURL(editingQuiz.pdf_link.trim())) {
+    toast.error("Please enter a valid URL");
+    return;
+  }
+}
+
 
     try {
       let payload;
@@ -246,6 +270,10 @@ const QuizManagement = ({ department, onBack }) => {
     setGeneratedLink("");
     setCopied(false);
   };
+
+  // const filteredQuizzes = quizzes.filter((quiz) =>
+  //   quiz.quiz_name.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
 
   const filteredQuizzes = quizzes.filter((quiz) =>
     quiz.quiz_name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -353,10 +381,10 @@ const QuizManagement = ({ department, onBack }) => {
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1 pr-2">
-                      <h3 className="text-lg sm:text-xl font-bold text-white leading-tight break-words">
+                      <h3 className="text-lg sm:text-xl text-white leading-tight wrap-break-word">
                         {quiz.quiz_name}
                       </h3>
-                      {quiz.pdf_link ? (
+                      {/* {quiz.pdf_link ? (
                           <span className="inline-block mt-2 px-2 py-1 bg-white/20 text-white text-xs rounded-md font-medium">
                             PDF Test
                           </span>
@@ -364,7 +392,7 @@ const QuizManagement = ({ department, onBack }) => {
                           <span className="inline-block mt-2 px-2 py-1 bg-white/20 text-white text-xs rounded-md font-medium">
                             Standard Test
                           </span>
-                        )}
+                        )} */}
                     </div>
                     <div className="relative shrink-0">
                       <button
@@ -383,14 +411,15 @@ const QuizManagement = ({ department, onBack }) => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setEditingQuiz({ ...quiz });
+                              //added
+                              setEditingQuiz({ ...quiz, is_pdf_test: !!quiz.pdf_link });
                               setShowEditModal(true);
                               setOpenMenuId(null);
                             }}
                             className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-left text-gray-700 hover:bg-gray-50 transition-colors"
                           >
                             <Edit2 className="w-4 h-4 text-[#217486]" />
-                            Edit {quiz.pdf_link ? "Test" : "Quiz"}
+                            Edit {quiz.pdf_link ? "PDF Test" : "Quiz"}
                           </button>
                           <button
                             onClick={(e) => {
@@ -402,22 +431,29 @@ const QuizManagement = ({ department, onBack }) => {
                             className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-left text-red-600 hover:bg-red-50 transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
-                            Delete {quiz.pdf_link ? "Test" : "Quiz"}
+                            Delete {quiz.pdf_link ? "PDF Test" : "Quiz"}
                           </button>
                         </div>
                       )}
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2 text-white/90">
-                    {quiz.time_limit && (
-                      <Clock className="w-4 h-4" />
-                    )}
-                    <span className="text-sm font-medium">
-                      {quiz.time_limit}{" "}
-                      {!quiz.pdf_link && (quiz.time_limit === 1 ? "minute" : "minutes")}
+               <div className="flex justify-between items-center mt-3 text-white/90">
+                    {/* Left side: Test type */}
+                    <span className="inline-block px-2 py-1 bg-white/20 text-white text-xs rounded-md font-medium">
+                      {quiz.pdf_link ? "PDF Test" : "Standard Test"}
                     </span>
+
+                    {/* Right side: Clock + time */}
+                    <div className="flex items-center gap-2">
+                      {quiz.time_limit && <Clock className="w-4 h-4" />}
+                      <span className="text-sm font-medium">
+                        {quiz.time_limit}{" "}
+                        {!quiz.pdf_link && (quiz.time_limit === 1 ? "minute" : "minutes")}
+                      </span>
+                    </div>
                   </div>
+
                 </div>
 
                 <div className="p-4 sm:p-5">
@@ -474,7 +510,7 @@ const QuizManagement = ({ department, onBack }) => {
                         </button>
                       </>
                     ) : (
-                      <div className="flex gap-2">
+                      <div className="flex flex-col gap-2">
                         <button
                           onClick={() => setSelectedQuiz(quiz)}
                           className="flex-1 flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors"
@@ -632,7 +668,8 @@ const QuizManagement = ({ department, onBack }) => {
                 disabled={
                   !newQuiz.quiz_name.trim() || 
                   (!newQuiz.is_pdf_test && !newQuiz.time_limit) ||
-                  (newQuiz.is_pdf_test && !newQuiz.pdf_link.trim())
+                  // (newQuiz.is_pdf_test && !newQuiz.pdf_link.trim())
+                  (newQuiz.is_pdf_test && (!newQuiz.pdf_link.trim() || !isValidURL(newQuiz.pdf_link.trim())))
                 }
                 className={`flex-1 px-4 py-3 text-white rounded-xl transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-sm sm:text-base ${
                   newQuiz.is_pdf_test 
@@ -653,17 +690,17 @@ const QuizManagement = ({ department, onBack }) => {
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
             <div className="bg-gradient-to-r from-[#217486] to-[#2a8fa5] p-6">
               <h2 className="text-xl sm:text-2xl font-bold text-white">
-                Edit {editingQuiz.pdf_link ? "PDF Test" : "Quiz"}
+                Edit {editingQuiz.is_pdf_test ? "PDF Test" : "Quiz"}
               </h2>
               <p className="text-white/80 text-sm mt-1">
-                Update {editingQuiz.pdf_link ? "test" : "quiz"} information
+                Update {editingQuiz.is_pdf_test ? "pdf test" : "quiz"} information
               </p>
             </div>
 
             <div className="p-4 sm:p-6 space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  {editingQuiz.pdf_link ? "Test" : "Quiz"} Name
+                  {editingQuiz.is_pdf_test ? "PDF Test" : "Quiz"} Name
                 </label>
                 <input
                   type="text"
@@ -674,14 +711,14 @@ const QuizManagement = ({ department, onBack }) => {
                       quiz_name: e.target.value,
                     })
                   }
-                  placeholder={`${editingQuiz.pdf_link ? "Test" : "Quiz"} name`}
+                  placeholder={`${editingQuiz.is_pdf_test ? "PDF Test" : "Quiz"} name`}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#217486] focus:border-transparent text-sm sm:text-base"
                   autoFocus
                 />
               </div>
               
               {/* Conditional Fields */}
-              {!editingQuiz.pdf_link ? (
+              {!editingQuiz.is_pdf_test ? (
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Time Limit (minutes)
@@ -736,11 +773,12 @@ const QuizManagement = ({ department, onBack }) => {
                 disabled={
                   !editingQuiz.quiz_name.trim() || 
                   (!editingQuiz.pdf_link && !editingQuiz.time_limit) ||
-                  (editingQuiz.pdf_link && !editingQuiz.pdf_link.trim())
+                  // (editingQuiz.pdf_link && !editingQuiz.pdf_link.trim())
+                   (editingQuiz.is_pdf_test && (!editingQuiz.pdf_link.trim() || !isValidURL(editingQuiz.pdf_link.trim())))
                 }
                 className="flex-1 px-4 py-3 bg-[#217486] hover:bg-[#1a5d6d] text-white rounded-xl transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#217486]/30 text-sm sm:text-base"
               >
-                Update {editingQuiz.pdf_link ? "Test" : "Quiz"}
+                Update {editingQuiz.is_pdf_test ? "PDF Test" : "Quiz"}
               </button>
             </div>
           </div>
