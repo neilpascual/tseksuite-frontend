@@ -2,7 +2,8 @@ import { FileText } from "lucide-react";
 
 function EmptyState({ hasActiveFilters, onClearFilters }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-16 flex flex-col items-center justify-center text-center">
+    <div className="bg-white rounded-xl p-8 sm:p-12 lg:p-16 flex flex-col items-center justify-center text-center">
+      {" "}
       <div className="bg-slate-100 p-4 rounded-full mb-4">
         <FileText className="w-10 h-10 text-slate-400" />
       </div>

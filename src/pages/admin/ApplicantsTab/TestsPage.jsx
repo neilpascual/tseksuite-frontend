@@ -401,7 +401,7 @@ function TestsPage() {
               </p>
             </div>
           ) : data.length === 0 ? (
-            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-8 sm:p-12 lg:p-16 flex flex-col items-center justify-center text-center">
+            <div className="bg-white rounded-xl p-8 sm:p-12 lg:p-16 flex flex-col items-center justify-center text-center">
               <div className="bg-slate-100 p-3 sm:p-4 rounded-full mb-3 sm:mb-4">
                 <FileText className="w-8 h-8 sm:w-10 sm:h-10 text-slate-400" />
               </div>
