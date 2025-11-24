@@ -1,22 +1,14 @@
 import React, { useState } from "react";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
+import { useAuthContext } from "../../contexts/AuthProvider";
 
 const LoginForm = () => {
-  const [formData, setFormData] = useState({
-    user_email: "",
-    password: "",
-  });
+  const { formData, setFormData, isLoading, handleLogin } = useAuthContext();
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    // Simulate login
-    setTimeout(() => {
-      setIsLoading(false);
-      alert("Login functionality would be handled here");
-    }, 1500);
+    handleLogin();
   };
 
   return (
