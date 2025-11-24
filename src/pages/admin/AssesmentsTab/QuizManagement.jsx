@@ -75,6 +75,17 @@ const QuizManagement = ({ department, onBack }) => {
     }
   };
 
+  //added URL validation function
+  const isValidURL = (url) => {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch (err) {
+    return false;
+  }
+};
+
+
   const handleAddQuiz = async () => {
     if (!newQuiz.quiz_name.trim()) {
       toast.error("Please enter a quiz name");
@@ -147,10 +158,23 @@ const QuizManagement = ({ department, onBack }) => {
     }
 
     // PDF test: pdf_link required
-    if (editingQuiz.pdf_link && !editingQuiz.pdf_link.trim()) {
-      toast.error("Please enter PDF link for PDF test");
-      return;
-    }
+    // if (editingQuiz.pdf_link && !editingQuiz.pdf_link.trim()) {
+    //   toast.error("Please enter PDF link for PDF test");
+    //   return;
+    // }
+
+    // PDF test: pdf_link required and must be valid URL
+if (editingQuiz.is_pdf_test) {
+  if (!editingQuiz.pdf_link.trim()) {
+    toast.error("Please enter PDF link for PDF test");
+    return;
+  }
+  if (!isValidURL(editingQuiz.pdf_link.trim())) {
+    toast.error("Please enter a valid URL");
+    return;
+  }
+}
+
 
     try {
       let payload;
@@ -383,7 +407,8 @@ const QuizManagement = ({ department, onBack }) => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setEditingQuiz({ ...quiz });
+                              //added
+                              setEditingQuiz({ ...quiz, is_pdf_test: !!quiz.pdf_link });
                               setShowEditModal(true);
                               setOpenMenuId(null);
                             }}
@@ -632,7 +657,8 @@ const QuizManagement = ({ department, onBack }) => {
                 disabled={
                   !newQuiz.quiz_name.trim() || 
                   (!newQuiz.is_pdf_test && !newQuiz.time_limit) ||
-                  (newQuiz.is_pdf_test && !newQuiz.pdf_link.trim())
+                  // (newQuiz.is_pdf_test && !newQuiz.pdf_link.trim())
+                  (newQuiz.is_pdf_test && (!newQuiz.pdf_link.trim() || !isValidURL(newQuiz.pdf_link.trim())))
                 }
                 className={`flex-1 px-4 py-3 text-white rounded-xl transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-sm sm:text-base ${
                   newQuiz.is_pdf_test 
@@ -653,17 +679,17 @@ const QuizManagement = ({ department, onBack }) => {
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
             <div className="bg-gradient-to-r from-[#217486] to-[#2a8fa5] p-6">
               <h2 className="text-xl sm:text-2xl font-bold text-white">
-                Edit {editingQuiz.pdf_link ? "PDF Test" : "Quiz"}
+                Edit {editingQuiz.is_pdf_test ? "PDF Test" : "Quiz"}
               </h2>
               <p className="text-white/80 text-sm mt-1">
-                Update {editingQuiz.pdf_link ? "test" : "quiz"} information
+                Update {editingQuiz.is_pdf_test ? "pdf test" : "quiz"} information
               </p>
             </div>
 
             <div className="p-4 sm:p-6 space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  {editingQuiz.pdf_link ? "Test" : "Quiz"} Name
+                  {editingQuiz.is_pdf_test ? "PDF Test" : "Quiz"} Name
                 </label>
                 <input
                   type="text"
@@ -674,14 +700,14 @@ const QuizManagement = ({ department, onBack }) => {
                       quiz_name: e.target.value,
                     })
                   }
-                  placeholder={`${editingQuiz.pdf_link ? "Test" : "Quiz"} name`}
+                  placeholder={`${editingQuiz.is_pdf_test ? "PDF Test" : "Quiz"} name`}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#217486] focus:border-transparent text-sm sm:text-base"
                   autoFocus
                 />
               </div>
               
               {/* Conditional Fields */}
-              {!editingQuiz.pdf_link ? (
+              {!editingQuiz.is_pdf_test ? (
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Time Limit (minutes)
@@ -736,11 +762,12 @@ const QuizManagement = ({ department, onBack }) => {
                 disabled={
                   !editingQuiz.quiz_name.trim() || 
                   (!editingQuiz.pdf_link && !editingQuiz.time_limit) ||
-                  (editingQuiz.pdf_link && !editingQuiz.pdf_link.trim())
+                  // (editingQuiz.pdf_link && !editingQuiz.pdf_link.trim())
+                   (editingQuiz.is_pdf_test && (!editingQuiz.pdf_link.trim() || !isValidURL(editingQuiz.pdf_link.trim())))
                 }
                 className="flex-1 px-4 py-3 bg-[#217486] hover:bg-[#1a5d6d] text-white rounded-xl transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#217486]/30 text-sm sm:text-base"
               >
-                Update {editingQuiz.pdf_link ? "Test" : "Quiz"}
+                Update {editingQuiz.is_pdf_test ? "PDF Test" : "Quiz"}
               </button>
             </div>
           </div>
