@@ -377,10 +377,10 @@ if (editingQuiz.is_pdf_test) {
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1 pr-2">
-                      <h3 className="text-lg sm:text-xl font-bold text-white leading-tight break-words">
+                      <h3 className="text-lg sm:text-xl text-white leading-tight wrap-break-word">
                         {quiz.quiz_name}
                       </h3>
-                      {quiz.pdf_link ? (
+                      {/* {quiz.pdf_link ? (
                           <span className="inline-block mt-2 px-2 py-1 bg-white/20 text-white text-xs rounded-md font-medium">
                             PDF Test
                           </span>
@@ -388,7 +388,7 @@ if (editingQuiz.is_pdf_test) {
                           <span className="inline-block mt-2 px-2 py-1 bg-white/20 text-white text-xs rounded-md font-medium">
                             Standard Test
                           </span>
-                        )}
+                        )} */}
                     </div>
                     <div className="relative shrink-0">
                       <button
@@ -415,7 +415,7 @@ if (editingQuiz.is_pdf_test) {
                             className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-left text-gray-700 hover:bg-gray-50 transition-colors"
                           >
                             <Edit2 className="w-4 h-4 text-[#217486]" />
-                            Edit {quiz.pdf_link ? "Test" : "Quiz"}
+                            Edit {quiz.pdf_link ? "PDF Test" : "Quiz"}
                           </button>
                           <button
                             onClick={(e) => {
@@ -427,22 +427,29 @@ if (editingQuiz.is_pdf_test) {
                             className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-left text-red-600 hover:bg-red-50 transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
-                            Delete {quiz.pdf_link ? "Test" : "Quiz"}
+                            Delete {quiz.pdf_link ? "PDF Test" : "Quiz"}
                           </button>
                         </div>
                       )}
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2 text-white/90">
-                    {quiz.time_limit && (
-                      <Clock className="w-4 h-4" />
-                    )}
-                    <span className="text-sm font-medium">
-                      {quiz.time_limit}{" "}
-                      {!quiz.pdf_link && (quiz.time_limit === 1 ? "minute" : "minutes")}
+               <div className="flex justify-between items-center mt-3 text-white/90">
+                    {/* Left side: Test type */}
+                    <span className="inline-block px-2 py-1 bg-white/20 text-white text-xs rounded-md font-medium">
+                      {quiz.pdf_link ? "PDF Test" : "Standard Test"}
                     </span>
+
+                    {/* Right side: Clock + time */}
+                    <div className="flex items-center gap-2">
+                      {quiz.time_limit && <Clock className="w-4 h-4" />}
+                      <span className="text-sm font-medium">
+                        {quiz.time_limit}{" "}
+                        {!quiz.pdf_link && (quiz.time_limit === 1 ? "minute" : "minutes")}
+                      </span>
+                    </div>
                   </div>
+
                 </div>
 
                 <div className="p-4 sm:p-5">
@@ -499,7 +506,7 @@ if (editingQuiz.is_pdf_test) {
                         </button>
                       </>
                     ) : (
-                      <div className="flex gap-2">
+                      <div className="flex flex-col gap-2">
                         <button
                           onClick={() => setSelectedQuiz(quiz)}
                           className="flex-1 flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors"
