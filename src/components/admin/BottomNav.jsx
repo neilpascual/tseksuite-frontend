@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BottomNavLink from "./BottomNavLink";
-import { useAuth } from "../../hooks/useAuth";
+
 import toast from "react-hot-toast";
 import ConfirmationModal from "../ConfimationModal";
 
 const BottomNav = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const { logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem("token");
+    localStorage.removeItem("system_user_id");
     toast.success("You have been logged out successfully", {
       style: { width: "300px" },
     });

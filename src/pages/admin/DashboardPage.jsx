@@ -1,12 +1,12 @@
 import DashboardCard from "../../components/admin/Card";
-import { useAuth } from "../../hooks/useAuth";
 import { useMediaQuery } from "@mui/material";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { getAllExaminers, getAllResults } from "../../../api/api";
 import NoDataFound from "../../components/NoDataFound";
 import LoadingIndicator from "../../components/LoadingIndicator";
-import { User, CircleCheck, Ban, TrendingUp, Users } from "lucide-react";
+import { useAuthContext } from "../../contexts/AuthProvider";
+import { User, CircleCheck, Ban, X, Check, TrendingUp, Users } from "lucide-react";
 
 // Recharts imports
 import {
@@ -33,11 +33,11 @@ import {
 } from "@/components/ui/card";
 
 function DashboardPage() {
-  const { data: user, isLoading, isError } = useAuth();
   const isMobile = useMediaQuery("(max-width:600px)");
   const [examiners, setExaminers] = useState([]);
   const [results, setResults] = useState([]);
   const [isDataLoading, setIsDataLoading] = useState(false);
+  const { user, isLoading, error } = useAuthContext();
 
   const fetchAllExaminers = async () => {
     try {
@@ -219,7 +219,7 @@ function DashboardPage() {
   };
 
   if (isLoading) return <div>Loading user...</div>;
-  if (isError || !user) return <div>Failed to load user</div>;
+  // if (error || !user) return <div>Failed to load user</div>;
 
   return (
     <div className="h-screen w-full pb-3 px-4 lg:px-43 sm:px-6 md:px-1 py-6 sm:mt-0 md:mb-30 lg:mb-0 ">

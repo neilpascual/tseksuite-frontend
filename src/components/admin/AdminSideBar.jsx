@@ -13,7 +13,6 @@ import {
   CreditCard,
 } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
 
@@ -22,11 +21,11 @@ const AdminSideBar = () => {
   const [openTrainings, setOpenTrainings] = useState(false);
   const [openAssessments, setOpenAssessments] = useState(false);
 
-  const { logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem("token");
+    localStorage.removeItem("system_user_id");
     toast.success("You have been logged out successfully", {
       style: { width: "300px" },
     });

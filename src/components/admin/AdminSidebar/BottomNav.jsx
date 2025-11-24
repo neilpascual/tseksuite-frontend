@@ -5,7 +5,6 @@ import {
   LibraryBigIcon,
   LogOutIcon,
 } from "lucide-react";
-import { useAuth } from "../../../hooks/useAuth";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import ConfirmationModal from "../../ConfimationModal";
@@ -13,14 +12,14 @@ import ConfirmationModal from "../../ConfimationModal";
 const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuth();
 
   // Determine active tab based on current route
   const isActive = (path) => location.pathname === path;
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem("token");
+    localStorage.removeItem("system_user_id");
     toast.success("You have been logged out successfully", {
       style: { width: "300px" },
     });

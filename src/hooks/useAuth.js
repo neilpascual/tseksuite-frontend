@@ -1,38 +1,71 @@
-import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { fetchCurrentUser, loginUser } from "../../api/api";
+import { loginUser } from "../services/auth.service";
+import { jwtDecode } from "jwt-decode";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
-export function useAuth() {
-  const queryClient = useQueryClient();
-
-  const authQuery = useQuery({
-    queryKey: ["authUser"],
-    queryFn: fetchCurrentUser,
-    retry: false,
+const useAuth = () => {
+  const [token, setToken] = useState(null);
+  const [formData, setFormData] = useState({
+    user_email: "",
+    password: "",
+    service: "FU",
   });
 
-  const login = async (loginCredentials) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    setIsLoading(true);
     try {
-      const data = await loginUser(loginCredentials);
-      localStorage.setItem("token", data.token);
+      const response = await loginUser(formData);
+      const { token } = response.data;
 
-      await queryClient.invalidateQueries(["authUser"]);
+      //decode the token to get user info
+      const decoded = jwtDecode(token);
 
-      return { isSuccess: true, message: "Successfully logged in" };
+      localStorage.setItem("system_user_id", decoded.system_user_id);
+      localStorage.setItem("token", token);
+
+      setToken(token);
+
+      navigate("/admin/dashboard");
     } catch (error) {
-      return { isSuccess: false, message: error.message || "Login failed" };
+      console.log("Login error:", error);
+      setError(error);
+      toast.error(
+        "Login failed. Please check your credentials and try again.",
+        {
+          style: { width: "300px" },
+        }
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const logout = () => {
-    try {
-      localStorage.removeItem("token");
-      queryClient.removeQueries(["authUser"]);
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
 
-      return { isSuccess: true, message: "Successfully logged out" };
-    } catch (error) {
-      return { isSuccess: false, message: error.message || "Logout failed" };
+    if (storedToken) {
+      setToken(storedToken);
     }
-  };
 
-  return { ...authQuery, login, logout };
-}
+    setIsLoading(false);
+  }, []);
+
+  return {
+    formData,
+    setFormData,
+    isLoading,
+    setIsLoading,
+    error,
+    setError,
+    handleLogin,
+    token,
+    setToken,
+  };
+};
+
+export default useAuth;

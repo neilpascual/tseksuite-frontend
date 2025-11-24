@@ -1,10 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import {
-  Search,
-  Filter,
-  Download,
-  X,
-} from "lucide-react";
+import { Search, Filter, Download, X } from "lucide-react";
 import { getAllResults } from "../../../../../api/api";
 import toast from "react-hot-toast";
 import ConfirmationModal from "@/components/ConfimationModal";
@@ -220,7 +215,8 @@ function ResultsPage() {
               Test Results
             </h1>
             <p className="text-slate-600 text-xs sm:text-sm">
-              Total: <span className="font-semibold">{data.length}</span> results
+              Total: <span className="font-semibold">{data.length}</span>{" "}
+              results
             </p>
           </div>
 
@@ -232,7 +228,11 @@ function ResultsPage() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-[#217486]/60" />
                 <input
                   type="text"
-                  placeholder={isMobile ? "Search..." : "Search by name, email, department..."}
+                  placeholder={
+                    isMobile
+                      ? "Search..."
+                      : "Search by name, email, department..."
+                  }
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
                   className="border border-slate-200 p-2.5 sm:p-3 pl-9 sm:pl-10 pr-4 rounded-lg w-full bg-white focus:outline-none focus:ring-2 focus:ring-[#217486]/30 focus:border-[#217486] transition-all text-xs sm:text-sm"
@@ -340,7 +340,8 @@ function ResultsPage() {
                     <div className="flex items-center justify-between text-xs">
                       <p className="text-slate-600">
                         <span className="font-semibold text-slate-800">
-                          {paginationData.indexOfFirstRow + 1}-{Math.min(paginationData.indexOfLastRow, data.length)}
+                          {paginationData.indexOfFirstRow + 1}-
+                          {Math.min(paginationData.indexOfLastRow, data.length)}
                         </span>{" "}
                         of{" "}
                         <span className="font-semibold text-slate-800">
@@ -358,7 +359,7 @@ function ResultsPage() {
                         <option value={50}>50</option>
                       </select>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handlePageChange(currentPage - 1)}
@@ -367,7 +368,7 @@ function ResultsPage() {
                       >
                         Previous
                       </button>
-                      
+
                       <div className="px-3 py-2 bg-cyan-700 text-white rounded-lg text-xs font-medium min-w-[60px] text-center">
                         {currentPage} / {paginationData.totalPages}
                       </div>
@@ -387,10 +388,6 @@ function ResultsPage() {
                     <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm">
                       <p className="text-slate-600 whitespace-nowrap">
                         Showing{" "}
-                        <span className="font-semibold text-slate-800">
-                          {paginationData.indexOfFirstRow + 1}
-                        </span>{" "}
-                        to{" "}
                         <span className="font-semibold text-slate-800">
                           {Math.min(paginationData.indexOfLastRow, data.length)}
                         </span>{" "}

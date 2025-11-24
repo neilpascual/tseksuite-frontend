@@ -84,7 +84,7 @@ const QuestionModal = ({
       setQuestion((prev) => ({
         ...prev,
         options: [
-          { option_text: "True", is_correct: false },
+          { option_text: "True", is_correct: true },
           { option_text: "False", is_correct: false },
         ],
       }));
@@ -100,7 +100,7 @@ const QuestionModal = ({
       setQuestion((prev) => ({
         ...prev,
         options: [
-          { option_text: "", is_correct: false },
+          { option_text: "", is_correct: true },
           { option_text: "", is_correct: false },
         ],
       }));
@@ -320,7 +320,7 @@ const QuestionModal = ({
           <div>
             <label className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 block">
               {question.question_type === "DESC"
-                ? "Expected Answer"
+                ? "Expected Answers"
                 : "Answer Options"}
             </label>
             {renderOptions()}
