@@ -31,58 +31,64 @@ import TestBankPage from "./pages/admin/AssesmentsTab/TestBankPage";
 // Error & Utility Components
 import ErrorMessage from "./pages/admin/ErrorMessage";
 import AbandonTracker from "./components/AbandonTracker";
+import { AuthProvider } from "./contexts/AuthProvider";
 
 function App() {
   return (
     <BrowserRouter>
-      <Toaster position="top-center" reverseOrder={false} />
+      <AuthProvider>
+        <Toaster position="top-center" reverseOrder={false} />
 
-      <Routes>
-        {/* Root Redirect */}
-        <Route path="/" element={<Navigate to="/auth/login" replace />} />
+        <Routes>
+          {/* Root Redirect */}
+          <Route path="/" element={<Navigate to="/auth/login" replace />} />
 
-        {/* ==================== PUBLIC ROUTES ==================== */}
+          {/* ==================== PUBLIC ROUTES ==================== */}
 
-        {/* Authentication */}
-        <Route path="/auth/login" element={<LoginForm />} />
+          {/* Authentication */}
+          <Route path="/auth/login" element={<LoginForm />} />
 
-        {/* Applicant Routes */}
-        <Route path="/take-quiz/:token" element={<ApplicantOnboardingPage />} />
-        <Route path="/test-instructions" element={<TestInstructions />} />
-        <Route path="/completed-test" element={<CompletedTestResults />} />
-        <Route path="/abandoned" element={<AbandonedTestScreen />} />
+          {/* Applicant Routes */}
+          <Route
+            path="/take-quiz/:token"
+            element={<ApplicantOnboardingPage />}
+          />
+          <Route path="/test-instructions" element={<TestInstructions />} />
+          <Route path="/completed-test" element={<CompletedTestResults />} />
+          <Route path="/abandoned" element={<AbandonedTestScreen />} />
 
-        {/* Test Page with Abandon Tracking */}
-        <Route
-          path="/test-page"
-          element={
-            <AbandonTracker>
-              <ApplicantTestPage />
-            </AbandonTracker>
-          }
-        />
+          {/* Test Page with Abandon Tracking */}
+          <Route
+            path="/test-page"
+            element={
+              <AbandonTracker>
+                <ApplicantTestPage />
+              </AbandonTracker>
+            }
+          />
 
-        {/* ==================== PROTECTED ROUTES ==================== */}
+          {/* ==================== PROTECTED ROUTES ==================== */}
 
-        <Route element={<AdminProtectedRoutes />}>
-          <Route path="admin" element={<MainLayout />}>
-            <Route index path="dashboard" element={<DashboardPage />} />
+          <Route element={<AdminProtectedRoutes />}>
+            <Route path="admin" element={<MainLayout />}>
+              <Route index path="dashboard" element={<DashboardPage />} />
 
-            {/* Examiners Submenu */}
-            <Route path="examiners/exams" element={<ExamsDashboard />} />
-            <Route path="examiners/tests" element={<TestPage />} />
-            <Route path="examiners/results" element={<ResultsPage />} />
+              {/* Examiners Submenu */}
+              <Route path="examiners/exams" element={<ExamsDashboard />} />
+              <Route path="examiners/tests" element={<TestPage />} />
+              <Route path="examiners/results" element={<ResultsPage />} />
 
-            {/* Assessments Submenu */}
-            <Route path="assessments/test-bank" element={<TestBankPage />} />
+              {/* Assessments Submenu */}
+              <Route path="assessments/test-bank" element={<TestBankPage />} />
+            </Route>
           </Route>
-        </Route>
 
-        {/* ==================== ERROR HANDLING ==================== */}
+          {/* ==================== ERROR HANDLING ==================== */}
 
-        {/* 404 - Catch All */}
-        <Route path="*" element={<ErrorMessage />} />
-      </Routes>
+          {/* 404 - Catch All */}
+          <Route path="*" element={<ErrorMessage />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

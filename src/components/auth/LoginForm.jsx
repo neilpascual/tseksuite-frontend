@@ -1,48 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Eye, EyeOff, ArrowRight, Shield } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import toast from "react-hot-toast";
+import { Eye, EyeOff } from "lucide-react";
+import { useAuthContext } from "../../contexts/AuthProvider";
 
 const LoginForm = () => {
-  const navigate = useNavigate();
-  const { login } = useAuth();
-
+  const { formData, setFormData, isLoading, handleLogin } = useAuthContext();
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) navigate("/admin/dashboard");
-  }, [navigate]);
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    const validEmail = "admin@getfullsuite.com";
-    const validPassword = "password";
-
-    if (email !== validEmail || password !== validPassword) {
-      toast.error("Invalid email or password");
-      setIsLoading(false);
-      return;
-    }
-
-    const data = await login({
-      email,
-      password,
-    });
-
-    if (data.isSuccess) {
-      toast.success(data.message);
-      navigate("/admin/dashboard");
-    } else {
-      toast.error(data.message);
-    }
-    setIsLoading(false);
+    handleLogin();
   };
 
   return (
@@ -95,63 +61,41 @@ const LoginForm = () => {
             </p>
           </div>
 
-          {/* Login Card */}
-          <div
-            className="rounded-3xl p-8 2xl:p-10 shadow-2xl border border-white/20 backdrop-blur-md"
-            style={{
-              background:
-                "linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05))",
-            }}
-          >
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Email Field */}
-              <div className="space-y-2">
-                <label className="block text-white/90 text-sm font-medium pl-1 2xl:text-base">
-                  Email Address
-                </label>
-                <div className="relative group">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="francis@getfullsuite.com"
-                    className="w-full px-5 py-4 2xl:py-5 rounded-2xl text-gray-800 focus:outline-none focus:ring-3 focus:ring-white/30 transition-all duration-300 placeholder-gray-500 bg-white/95 backdrop-blur-sm border border-white/30 shadow-lg group-hover:bg-white"
-                    required
-                    disabled={isLoading}
-                  />
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 to-white/0 group-hover:from-white/10 group-hover:to-white/5 transition-all duration-300 pointer-events-none"></div>
-                </div>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-white text-sm mb-2 pl-1 2xl:text-lg font-medium">
+                Email Address
+              </label>
+              <div className="relative">
+                <input
+                  type="email"
+                  value={formData.user_email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, user_email: e.target.value })
+                  }
+                  placeholder="enter your email"
+                  className="w-full px-4 py-3.5 2xl:py-4 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-200 placeholder-gray-400"
+                  style={{ backgroundColor: "#E8F4F6" }}
+                  required
+                />
               </div>
 
-              {/* Password Field */}
-              <div className="space-y-2">
-                <label className="block text-white/90 text-sm font-medium pl-1 2xl:text-base">
-                  Password
-                </label>
-                <div className="relative group">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    className="w-full px-5 py-4 2xl:py-5 pr-12 rounded-2xl text-gray-800 focus:outline-none focus:ring-3 focus:ring-white/30 transition-all duration-300 placeholder-gray-500 bg-white/95 backdrop-blur-sm border border-white/30 shadow-lg group-hover:bg-white"
-                    required
-                    disabled={isLoading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors duration-200 p-1 rounded-lg hover:bg-white/50"
-                    disabled={isLoading}
-                  >
-                    {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
-                  </button>
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 to-white/0 group-hover:from-white/10 group-hover:to-white/5 transition-all duration-300 pointer-events-none"></div>
-                </div>
-              </div>
-
-              {/* Login Button */}
-              <div className="pt-4">
+            <div>
+              <label className="block text-white text-sm mb-2 pl-1 2xl:text-lg font-medium">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3.5 2xl:py-4 pr-12 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-200 placeholder-gray-400"
+                  style={{ backgroundColor: "#E8F4F6" }}
+                  required
+                />
                 <button
                   type="submit"
                   disabled={isLoading}
@@ -175,13 +119,23 @@ const LoginForm = () => {
                   </div>
                 </button>
               </div>
-            </form>
+            </div>
           </div>
 
-          {/* Footer */}
-          <div className="text-center mt-8">
-            <p className="text-white/60 text-sm">Secure Admin Access Only</p>
-          </div>
+            <div className="pt-6 2xl:pt-8">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full text-white font-semibold py-4 2xl:py-5 rounded-full transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 2xl:text-xl"
+                style={{
+                  backgroundColor: "#2E99B0",
+                  boxShadow: "0 4px 15px rgba(46, 153, 176, 0.4)",
+                }}
+              >
+                Login
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
