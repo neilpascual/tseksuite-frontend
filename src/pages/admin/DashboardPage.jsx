@@ -456,7 +456,7 @@ function DashboardPage() {
   if (isLoading) return <div>Loading user...</div>;
 
   return (
-    <div className="min-h-screen w-full pb-3 px-3 sm:px-4 lg:px-43 py-6 sm:mt-0 mb-10">
+    <div className="min-h-screen w-full pb-3 px-3 sm:px-4 xl:px-43 py-6 sm:mt-0 mb-10">
       {/* Header */}
       <div className="mb-6 sm:mb-8">
         <div className="flex items-center justify-between">
