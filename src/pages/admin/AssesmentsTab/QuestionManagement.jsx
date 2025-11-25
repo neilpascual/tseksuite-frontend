@@ -15,7 +15,7 @@ import {
   addQuestion,
   deleteAnswer,
   deleteQuestion,
-  getAnswer,
+  getAnswers,
   getQuestions,
   updateAnswer,
   updateQuestion,
@@ -435,24 +435,32 @@ const QuestionManagement = ({ quiz, onBack }) => {
   const fetchQuestions = async () => {
     setLoading(true);
     try {
-      const res = await getQuestions(quiz.quiz_id);
+      // Fetch questions
+      const questionsRes = await getQuestions(quiz.quiz_id);
 
-      const withOptions = await Promise.all(
-        res.map(async (q) => {
-          let options = [];
-          try {
-            options = await getAnswer(q.question_id);
-          } catch (err) {
-            options = [];
-          }
+      // Fetch all answers for the quiz at once
+      const answersRes = await getAnswers(quiz.quiz_id);
 
-          if (q.question_type === "DESC" && options.length === 0) {
-            options = [{ option_text: "", is_correct: true }];
-          }
+      // Group answers by question_id
+      const answersByQuestion = {};
+      answersRes.forEach((answer) => {
+        if (!answersByQuestion[answer.question_id]) {
+          answersByQuestion[answer.question_id] = [];
+        }
+        answersByQuestion[answer.question_id].push(answer);
+      });
 
-          return { ...q, options };
-        })
-      );
+      // Attach options to each question
+      const withOptions = questionsRes.map((q) => {
+        let options = answersByQuestion[q.question_id] || [];
+
+        // Handle DESC type: if no options, provide a default
+        if (q.question_type === "DESC" && options.length === 0) {
+          options = [{ option_text: "", is_correct: true }];
+        }
+
+        return { ...q, options };
+      });
 
       setQuestions(withOptions);
     } catch (err) {
