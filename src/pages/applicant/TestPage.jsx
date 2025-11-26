@@ -654,14 +654,14 @@ const ApplicantTestPage = () => {
                     {getQuestionTypeLabel(question.question_type)}
                   </span>
                 </div>
-                <div className="flex gap-2">
+                {/* <div className="flex gap-2">
                   <button
                     onClick={() => jumpToQuestion(index)}
                     className="px-3 py-1 bg-cyan-600 hover:bg-cyan-700 text-white rounded text-xs font-medium transition-colors"
                   >
                     Go to Question
                   </button>
-                </div>
+                </div> */}
               </div>
 
               <h3 className="font-semibold text-gray-900 text-sm sm:text-base mb-3 line-clamp-2">
