@@ -117,9 +117,14 @@ const TestInstructions = () => {
                     </span>
                   )}
                 </p>
-                <p className="text-gray-600 text-sm">
+                {!quizData.time_limit || quizData.time_limit === 0 ? (
+                  <p className="text-gray-600 text-sm"></p>
+                ) : (
+                  <p className="text-gray-600 text-sm">
                   Time Limit: {formatTimeLimit(quizData.time_limit)}
                 </p>
+                )}
+                
               </div>
             )}
 

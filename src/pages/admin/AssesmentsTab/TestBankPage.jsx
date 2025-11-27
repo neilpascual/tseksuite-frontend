@@ -22,6 +22,7 @@ const TestBankPage = () => {
   const [departments, setDepartments] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -92,6 +93,7 @@ const TestBankPage = () => {
 
   const handleAddDepartment = async () => {
     if (!newDeptName.trim()) return;
+    setIsProcessing(true);
     try {
       await addDepartment(newDeptName);
       await fetchDepartments();
@@ -102,11 +104,14 @@ const TestBankPage = () => {
       console.error("Error creating department:", err);
       setError(err.response?.data?.message || "Failed to create department");
       toast.error("Department Creation Failed!");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleUpdateDepartment = async () => {
     if (!editingDept?.dept_name.trim()) return;
+    setIsProcessing(true);
     try {
       await editDepartment(editingDept);
       await fetchDepartments();
@@ -117,6 +122,8 @@ const TestBankPage = () => {
       console.error("Error updating department:", err);
       setError(err.response?.data?.message || "Failed to update department");
       toast.error("De[artment Update Failed!");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -178,6 +185,7 @@ const TestBankPage = () => {
             <button
               onClick={() => setShowAddModal(true)}
               className="group relative flex items-center justify-center gap-3 bg-cyan-700 text-white px-6 py-4 rounded-2xl shadow-lg shadow-[#217486]/25 hover:shadow-xl hover:shadow-[#217486]/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 font-semibold min-w-[180px]"
+              {...(isProcessing ? "disabled" : "")}
             >
               <div className="absolute inset-0 bg-white/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
               <Plus
@@ -403,6 +411,7 @@ const TestBankPage = () => {
           }
           handleUpdateDepartment={handleUpdateDepartment}
           onModalClosed={closeAllModals}
+          isProcessing={isProcessing}
         />
       )}
 

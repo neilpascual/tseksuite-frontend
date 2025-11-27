@@ -30,6 +30,7 @@ const QuestionModal = ({
   setQuestion,
   onSave,
   isPdfTest,
+  isProcessing,
 }) => {
   if (!isOpen) return null;
 
@@ -345,6 +346,7 @@ const QuestionModal = ({
           <button
             onClick={onSave}
             className="w-full sm:w-auto px-4 sm:px-6 py-2.5 bg-[#217486] text-white rounded-lg hover:bg-[#1a5d6d] font-medium transition-colors shadow-lg shadow-[#217486]/30 text-sm sm:text-base"
+            disabled={isProcessing}
           >
             Save Question
           </button>
@@ -763,6 +765,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
   const [editingIndex, setEditingIndex] = useState(null);
   const [deleteIndex, setDeleteIndex] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const isPdfTest = quiz?.pdf_link ? true : false;
 
@@ -850,6 +853,8 @@ const QuestionManagement = ({ quiz, onBack }) => {
       return toast.error("At least 2 options are required");
     }
 
+    setIsProcessing(true);
+
     try {
       if (editingIndex !== null) {
         await updateQuestion(quiz.quiz_id, q.question_id, q);
@@ -882,6 +887,8 @@ const QuestionManagement = ({ quiz, onBack }) => {
     } catch (err) {
       console.error("Save error:", err);
       toast.error("Failed to save question");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -1141,6 +1148,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
           setQuestion={setCurrentQuestion}
           onSave={handleSave}
           isPdfTest={isPdfTest}
+          isProcessing={isProcessing}
         />
 
         <DeleteModal

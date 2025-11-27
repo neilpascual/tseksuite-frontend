@@ -7,7 +7,6 @@ import {
   XCircle,
   Download,
   Sparkles,
-  GraduationCap,
 } from "lucide-react";
 import Footer from "../../components/applicant/Footer";
 
@@ -122,7 +121,7 @@ const CompletedTestResults = () => {
       // Load the logo image first
       const logoImg = new Image();
       logoImg.crossOrigin = "anonymous";
-      
+
       await new Promise((resolve, reject) => {
         logoImg.onload = resolve;
         logoImg.onerror = reject;
@@ -137,7 +136,12 @@ const CompletedTestResults = () => {
       canvas.height = 990;
 
       // Modern gradient background
-      const bgGradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      const bgGradient = ctx.createLinearGradient(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
       bgGradient.addColorStop(0, "#f0f9ff");
       bgGradient.addColorStop(0.5, "#ffffff");
       bgGradient.addColorStop(1, "#e0f2fe");
@@ -153,7 +157,12 @@ const CompletedTestResults = () => {
       }
 
       // Primary brand color border
-      const borderGradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      const borderGradient = ctx.createLinearGradient(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
       borderGradient.addColorStop(0, "#217486");
       borderGradient.addColorStop(0.5, "#2a93aa");
       borderGradient.addColorStop(1, "#217486");
@@ -191,8 +200,18 @@ const CompletedTestResults = () => {
       ctx.fillStyle = "rgba(33, 116, 134, 0.08)";
       ctx.beginPath();
       ctx.moveTo(0, canvas.height - 150);
-      ctx.quadraticCurveTo(canvas.width / 4, canvas.height - 200, canvas.width / 2, canvas.height - 150);
-      ctx.quadraticCurveTo(3 * canvas.width / 4, canvas.height - 100, canvas.width, canvas.height - 150);
+      ctx.quadraticCurveTo(
+        canvas.width / 4,
+        canvas.height - 200,
+        canvas.width / 2,
+        canvas.height - 150
+      );
+      ctx.quadraticCurveTo(
+        (3 * canvas.width) / 4,
+        canvas.height - 100,
+        canvas.width,
+        canvas.height - 150
+      );
       ctx.lineTo(canvas.width, canvas.height);
       ctx.lineTo(0, canvas.height);
       ctx.closePath();
@@ -202,28 +221,33 @@ const CompletedTestResults = () => {
       const logoSize = 90;
       const logoX = 80;
       const logoY = 80;
-      
+
       // Optional: Add a white circle background for the logo
       ctx.fillStyle = "#ffffff";
       ctx.beginPath();
-      ctx.arc(logoX + logoSize / 2, logoY + logoSize / 2, logoSize / 2 + 10, 0, Math.PI * 2);
+      ctx.arc(
+        logoX + logoSize / 2,
+        logoY + logoSize / 2,
+        logoSize / 2 + 10,
+        0,
+        Math.PI * 2
+      );
       ctx.fill();
-      
+
       // Add subtle shadow for depth
       ctx.shadowColor = "rgba(0, 0, 0, 0.1)";
       ctx.shadowBlur = 15;
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 5;
-      
+
       // Draw the logo
       ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
-      
+
       // Reset shadow
       ctx.shadowColor = "transparent";
       ctx.shadowBlur = 0;
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 0;
-
 
       // Company branding area
       ctx.fillStyle = "#217486";
@@ -233,10 +257,19 @@ const CompletedTestResults = () => {
 
       ctx.fillStyle = "#2a93aa";
       ctx.font = "16px Arial, sans-serif";
-      ctx.fillText("Excellence in Learning & Development", canvas.width / 2, 150);
+      ctx.fillText(
+        "Excellence in Learning & Development",
+        canvas.width / 2,
+        150
+      );
 
       // Modern CERTIFICATE title
-      const titleGradient = ctx.createLinearGradient(canvas.width / 2 - 300, 0, canvas.width / 2 + 300, 0);
+      const titleGradient = ctx.createLinearGradient(
+        canvas.width / 2 - 300,
+        0,
+        canvas.width / 2 + 300,
+        0
+      );
       titleGradient.addColorStop(0, "#217486");
       titleGradient.addColorStop(0.5, "#1a5f6f");
       titleGradient.addColorStop(1, "#217486");
@@ -276,14 +309,14 @@ const CompletedTestResults = () => {
       const applicantName = getApplicantName();
       ctx.fillStyle = "#1e293b";
       ctx.font = "italic 70px Georgia, serif";
-      
+
       // Name shadow for depth
       ctx.shadowColor = "rgba(33, 116, 134, 0.15)";
       ctx.shadowBlur = 20;
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 4;
       ctx.fillText(applicantName, canvas.width / 2, 490);
-      
+
       // Reset shadow
       ctx.shadowColor = "transparent";
       ctx.shadowBlur = 0;
@@ -311,8 +344,10 @@ const CompletedTestResults = () => {
       // Achievement description
       ctx.fillStyle = "#475569";
       ctx.font = "20px Arial, sans-serif";
-      const percentage = Math.round((resultData.score / resultData.max_score) * 100);
-      
+      const percentage = Math.round(
+        (resultData.score / resultData.max_score) * 100
+      );
+
       ctx.fillText(
         "has successfully completed the assessment",
         canvas.width / 2,
@@ -323,12 +358,17 @@ const CompletedTestResults = () => {
       const quizName = quizData?.quiz_name || "Online Assessment";
       ctx.fillStyle = "#217486";
       ctx.font = "bold 28px Arial, sans-serif";
-      
+
       // Badge background
       const quizWidth = ctx.measureText(quizName).width;
       ctx.fillStyle = "rgba(33, 116, 134, 0.08)";
-      ctx.fillRect(canvas.width / 2 - quizWidth / 2 - 35, 585, quizWidth + 70, 50);
-      
+      ctx.fillRect(
+        canvas.width / 2 - quizWidth / 2 - 35,
+        585,
+        quizWidth + 70,
+        50
+      );
+
       ctx.fillStyle = "#217486";
       ctx.fillText(quizName, canvas.width / 2, 618);
 
@@ -338,7 +378,14 @@ const CompletedTestResults = () => {
       ctx.fillText("with a rating of", canvas.width / 2, 670);
 
       // Modern score circle
-      const scoreGradient = ctx.createRadialGradient(canvas.width / 2, 750, 0, canvas.width / 2, 750, 70);
+      const scoreGradient = ctx.createRadialGradient(
+        canvas.width / 2,
+        750,
+        0,
+        canvas.width / 2,
+        750,
+        70
+      );
       scoreGradient.addColorStop(0, "#217486");
       scoreGradient.addColorStop(1, "#1a5f6f");
       ctx.fillStyle = scoreGradient;
@@ -382,7 +429,10 @@ const CompletedTestResults = () => {
         if (blob) {
           const url = URL.createObjectURL(blob);
           const link = document.createElement("a");
-          link.download = `FullSuite_University_Certificate_${applicantName.replace(/\s+/g, "_")}.png`;
+          link.download = `FullSuite_University_Certificate_${applicantName.replace(
+            /\s+/g,
+            "_"
+          )}.png`;
           link.href = url;
           document.body.appendChild(link);
           link.click();
@@ -455,7 +505,7 @@ const CompletedTestResults = () => {
                   </>
                 ) : (
                   <>
-                    <GraduationCap className="w-5 h-5" />
+                    <Download className="w-5 h-5" />
                     Download Certificate
                   </>
                 )}
