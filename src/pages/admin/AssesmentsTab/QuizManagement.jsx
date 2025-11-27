@@ -26,6 +26,7 @@ import {
 const QuizManagement = ({ department, onBack }) => {
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -192,6 +193,8 @@ const QuizManagement = ({ department, onBack }) => {
       }
     }
 
+    setIsProcessing(true);
+
     try {
       let payload;
 
@@ -309,6 +312,8 @@ const QuizManagement = ({ department, onBack }) => {
       setError(errorMessage);
       console.error("Error updating quiz:", err);
       toast.error("Quiz Update Failed!");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -419,6 +424,7 @@ const QuizManagement = ({ department, onBack }) => {
               <button
                 onClick={() => setShowAddModal(true)}
                 className="flex items-center justify-center gap-2 bg-[#217486] text-white px-6 py-3 rounded-xl hover:bg-[#1a5d6d] font-medium transition-all hover:shadow-xl hover:shadow-[#217486]/40"
+                {...(isProcessing ? "disabled" : "")}
               >
                 <Plus className="w-5 h-5 hidden sm:inline" />
                 Create Quiz
