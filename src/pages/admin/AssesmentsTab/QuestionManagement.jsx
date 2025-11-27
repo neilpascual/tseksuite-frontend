@@ -657,16 +657,90 @@ const ImportModal = ({ isOpen, onClose, onImport, quizId }) => {
                 </label>
               </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="font-semibold text-blue-900 mb-2">CSV Format:</h4>
-                <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
-                  <li><strong>Required:</strong> question_text, question_type, points</li>
-                  <li><strong>Types:</strong> MC, CB, TF, DESC</li>
-                  <li><strong>For MC/CB:</strong> option_1, is_correct_1, option_2, is_correct_2, etc.</li>
-                  <li><strong>For TF:</strong> Only is_correct_1 matters (true=Correct is True)</li>
-                  <li><strong>For DESC:</strong> Use option_1 or answer_text for the answer</li>
-                </ul>
-              </div>
+              <div className="space-y-6 p-4 sm:p-6 overflow-y-auto">
+
+  {/* Step-by-Step CSV Guide */}
+  <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 border-l-4 border-yellow-400 rounded-xl p-6 shadow-sm">
+    <div className="flex items-center gap-3 mb-4">
+      <div className="w-10 h-10 bg-yellow-400/20 text-yellow-700 rounded-full flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m2 0a2 2 0 110 4H7a2 2 0 110-4h10zM12 6v6" />
+        </svg>
+      </div>
+      <h3 className="text-lg font-semibold text-yellow-900">Step-by-Step: Create Your CSV</h3>
+    </div>
+
+    <ol className="space-y-3 text-sm text-yellow-800 list-decimal list-inside">
+      <li>Open Excel, Google Sheets, or any spreadsheet editor.</li>
+      <li>Create the main columns: <code>question_text</code>, <code>question_type</code>, <code>points</code>.</li>
+      <li>For MC/CB questions, add: <code>option_1, is_correct_1, option_2, is_correct_2, ...</code>.</li>
+      <li>For True/False questions, only <code>is_correct_1</code> matters (true/false).</li>
+      <li>For Descriptive questions, use <code>option_1</code> or <code>answer_text</code>.</li>
+      <li>Fill in each row with your questions and answers.</li>
+      <li>Double-check columns and data for correctness.</li>
+      <li>Save/export as CSV format.</li>
+      <li>Upload your CSV in the system to import questions.</li>
+    </ol>
+
+    {/* Example Table */}
+    <div className="mt-4 overflow-x-auto">
+      <table className="min-w-full border border-gray-200 rounded-lg">
+        <thead className="bg-yellow-100 text-yellow-900 text-xs font-semibold uppercase">
+          <tr>
+            <th className="p-2 border">question_text</th>
+            <th className="p-2 border">question_type</th>
+            <th className="p-2 border">points</th>
+            <th className="p-2 border">option_1</th>
+            <th className="p-2 border">is_correct_1</th>
+            <th className="p-2 border">option_2</th>
+            <th className="p-2 border">is_correct_2</th>
+          </tr>
+        </thead>
+        <tbody className="text-gray-700 text-xs">
+          <tr className="bg-white border-b">
+            <td className="p-2 border">What is 2 + 2?</td>
+            <td className="p-2 border">MC</td>
+            <td className="p-2 border">5</td>
+            <td className="p-2 border">3</td>
+            <td className="p-2 border">false</td>
+            <td className="p-2 border">4</td>
+            <td className="p-2 border">true</td>
+          </tr>
+          <tr className="bg-gray-50 border-b">
+            <td className="p-2 border">The earth is flat?</td>
+            <td className="p-2 border">TF</td>
+            <td className="p-2 border">2</td>
+            <td className="p-2 border">True</td>
+            <td className="p-2 border">false</td>
+            <td className="p-2 border">False</td>
+            <td className="p-2 border">true</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {/* CSV Format Reference */}
+  <div className="bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-400 rounded-xl p-6 shadow-sm">
+    <div className="flex items-center gap-3 mb-4">
+      <div className="w-10 h-10 bg-blue-400/20 text-blue-700 rounded-full flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M4 12V5a2 2 0 012-2h12a2 2 0 012 2v7M8 21h8" />
+        </svg>
+      </div>
+      <h3 className="text-lg font-semibold text-blue-900">CSV Format Reference</h3>
+    </div>
+
+    <ul className="text-sm text-blue-800 space-y-2 list-disc list-inside">
+      <li><strong>Required Columns:</strong> question_text, question_type, points</li>
+      <li><strong>Question Types:</strong> MC (Multiple Choice), CB (Checkbox), TF (True/False), DESC (Descriptive)</li>
+      <li><strong>MC/CB:</strong> option_1, is_correct_1, option_2, is_correct_2, ...</li>
+      <li><strong>TF:</strong> Only is_correct_1 matters (true = correct)</li>
+      <li><strong>DESC:</strong> Use option_1 or answer_text</li>
+    </ul>
+  </div>
+</div>
+
             </div>
           )}
 
