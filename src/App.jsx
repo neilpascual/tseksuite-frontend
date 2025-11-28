@@ -12,7 +12,7 @@ import AdminProtectedRoutes from "../routes/AdminProtectedRoutes";
 
 // Applicant Pages
 import ApplicantOnboardingPage from "./pages/applicant/ApplicantOnboardingPage";
-import ApplicantTestPage from "./pages/applicant/TestPage";
+import ApplicantTestPage from "./pages/applicant/TestPage/index";
 import TestInstructions from "./pages/applicant/TestInstructions";
 import CompletedTestResults from "./pages/applicant/CompletedTestResults";
 import AbandonedTestScreen from "./pages/applicant/AbandonTestScreen";
