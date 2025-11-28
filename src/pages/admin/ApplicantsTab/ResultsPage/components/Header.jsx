@@ -1,5 +1,4 @@
 import React from "react";
-import { Clock as ClockIcon } from "lucide-react";
 
 const Header = ({ totalExaminees, totalAttempts }) => {
   return (
@@ -11,14 +10,9 @@ const Header = ({ totalExaminees, totalAttempts }) => {
           </h1>
           <p className="text-gray-600 text-sm">
             Total examinees:{" "}
-            <span className="font-semibold">{totalExaminees}</span> • Total attempts:{" "}
-            <span className="font-semibold">{totalAttempts}</span>
+            <span className="font-semibold">{totalExaminees}</span> • Total
+            attempts: <span className="font-semibold">{totalAttempts}</span>
           </p>
-        </div>
-
-        <div className="flex items-center gap-2 text-sm text-gray-500 bg-white px-3 py-2 rounded-lg border border-gray-200">
-          <ClockIcon className="w-4 h-4 text-cyan-600" />
-          <span>Last updated: {new Date().toLocaleTimeString()}</span>
         </div>
       </div>
     </div>
