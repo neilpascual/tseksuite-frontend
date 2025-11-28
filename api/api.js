@@ -19,33 +19,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// export const fetchCurrentUser = async () => {
-//   const token = localStorage.getItem("token");
-
-//   if (!token) {
-//     throw new Error("No token");
-//   }
-
-//   console.log("Token", token);
-
-//   return {
-//     id: 1,
-//     name: "Francis Alex",
-//     role: "Admin",
-//     token,
-//   };
-// };
-
-// export const loginUser = async (loginCredentials) => {
-//   return {
-//     token: "thisissampletoken",
-//     id: 1,
-//     name: "Francis alex",
-//     role: "Admin",
-//     ...loginCredentials,
-//   };
-// };
-
 export const getAllResults = async () => {
   try {
     const response = await api.get(`/result/get`);
@@ -337,3 +310,18 @@ export const submitAbandonTest = async (payload) => {
     console.error(err);
   }
 };
+
+export const deleteExamineeAttempt = async(examinee_id) => {
+  try {
+    await api.delete(`/examiner/delete/${examinee_id}`)
+  } catch (err) {
+    console.error(err)
+  }
+}
+export const deleteExamineeTestResult = async(attempt_id) => {
+  try {
+    await api.delete(`/result/delete/${attempt_id}`)
+  } catch (err) {
+    console.error(err)
+  }
+}

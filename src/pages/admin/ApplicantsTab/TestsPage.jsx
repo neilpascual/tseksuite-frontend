@@ -2,8 +2,7 @@ import toast from "react-hot-toast";
 import { useEffect, useMemo, useState } from "react";
 import {
  getAllExaminers,
- // Placeholder function names; implement these in your api module:
- // deleteAttemptById, deleteAttemptsByEmail
+ deleteExamineeAttempt
 } from "../../../../api/api";
 import {
  Search,
@@ -289,6 +288,7 @@ function TestsPage() {
      if (modalPayload.type === "attempt") {
        const { attemptId } = modalPayload;
 
+       await deleteExamineeAttempt(attemptId);
 
        setRawData((prev) => prev.filter((r) => {
          const candidateId = r.attempt_id || r.attemptId || r.attempt || r.id || `${r.date}|${r.time}`;
@@ -303,14 +303,7 @@ function TestsPage() {
 
 
        toast.success("Attempt deleted successfully");
-     } else if (modalPayload.type === "all") {
-       const { email } = modalPayload;
-
-
-       setRawData((prev) => prev.filter((r) => (r.email || "").toLowerCase() !== (email || "").toLowerCase()));
-       setFilteredRawData((prev) => prev.filter((r) => (r.email || "").toLowerCase() !== (email || "").toLowerCase()));
-       toast.success("All attempts deleted for the examinee");
-     }
+     } 
 
 
      setModalPayload(null);
@@ -373,15 +366,10 @@ function TestsPage() {
        {/* Header */}
        <div className="flex items-start justify-between mb-3">
          <div className="flex items-center gap-3 flex-1 min-w-0">
-           <div className="relative flex-shrink-0">
-             <div className="w-10 h-10 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-sm">
+           <div className="relative fshrink-0">
+             <div className="w-10 h-10 bg-linear-to-br from-cyan-600 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-sm">
                {group.name?.charAt(0)?.toUpperCase() || "E"}
              </div>
-             {group.attempts.length > 0 && (
-               <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm">
-                 {group.attempts.length}
-               </div>
-             )}
            </div>
           
            <div className="flex-1 min-w-0">
@@ -470,7 +458,7 @@ function TestsPage() {
                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
                >
                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                   <div className="w-6 h-6 bg-cyan-100 text-cyan-700 rounded flex items-center justify-center text-xs font-semibold flex-shrink-0">
+                   <div className="w-6 h-6 bg-cyan-100 text-cyan-700 rounded flex items-center justify-center text-xs font-semibold shrink-0">
                      #{index + 1}
                    </div>
                    <div className="min-w-0 flex-1">
@@ -485,7 +473,7 @@ function TestsPage() {
                      email: group.email,
                      name: group.name
                    })}
-                   className="flex items-center gap-1 px-2 py-1.5 bg-red-50 text-red-700 rounded text-xs font-medium hover:bg-red-100 transition-colors flex-shrink-0 ml-2"
+                   className="flex items-center gap-1 px-2 py-1.5 bg-red-50 text-red-700 rounded text-xs font-medium hover:bg-red-100 transition-colors shrink-0 ml-2"
                  >
                    <Trash2 className="w-3 h-3" />
                    Delete
@@ -509,15 +497,10 @@ function TestsPage() {
        {/* Header */}
        <div className="flex items-start justify-between mb-4">
          <div className="flex items-center gap-3 flex-1 min-w-0">
-           <div className="relative flex-shrink-0">
-             <div className="w-12 h-12 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-sm">
+           <div className="relative shrink-0">
+             <div className="w-12 h-12 bg-linear-to-br from-cyan-600 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-sm">
                {group.name?.charAt(0)?.toUpperCase() || "E"}
              </div>
-             {group.attempts.length > 0 && (
-               <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm">
-                 {group.attempts.length}
-               </div>
-             )}
            </div>
           
            <div className="flex-1 min-w-0">
@@ -548,16 +531,6 @@ function TestsPage() {
            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
            {isExpanded ? "Show Less" : `Show All (${group.attempts.length})`}
          </button>
-        
-         <div className="flex gap-2">
-           <button
-             onClick={() => deleteAllAttempts({ email: group.email, name: group.name })}
-             className="flex items-center gap-2 px-3 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
-           >
-             <Trash2 className="w-4 h-4" />
-             Delete All
-           </button>
-         </div>
        </div>
 
 
@@ -569,7 +542,7 @@ function TestsPage() {
              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
            >
              <div className="flex items-center gap-3 flex-1 min-w-0">
-               <div className="w-6 h-6 bg-cyan-100 text-cyan-700 rounded flex items-center justify-center text-xs font-semibold flex-shrink-0">
+               <div className="w-6 h-6 bg-cyan-100 text-cyan-700 rounded flex items-center justify-center text-xs font-semibold shrink-0">
                  #{index + 1}
                </div>
                <div className="flex items-center gap-4 min-w-0 flex-1">
@@ -584,7 +557,7 @@ function TestsPage() {
                  email: group.email,
                  name: group.name
                })}
-               className="flex items-center gap-1 px-2.5 py-1.5 bg-red-50 text-red-700 rounded text-sm font-medium hover:bg-red-100 transition-colors flex-shrink-0 ml-2"
+               className="flex items-center gap-1 px-2.5 py-1.5 bg-red-50 text-red-700 rounded text-sm font-medium hover:bg-red-100 transition-colors shrink-0 ml-2"
              >
                <Trash2 className="w-4 h-4" />
                Delete
@@ -605,15 +578,15 @@ function TestsPage() {
        <tr className="border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200">
          <td className="px-4 py-4">
            <div className="flex items-center gap-3">
-             <div className="relative flex-shrink-0">
+             <div className="relative shrink-0">
                <div className="w-10 h-10 bg-cyan-600 rounded-lg flex items-center justify-center text-white font-bold shadow-sm">
                  {group.name?.charAt(0)?.toUpperCase() || "E"}
                </div>
-               {group.attempts.length > 0 && (
+               {/* {group.attempts.length > 0 && (
                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm">
                    {group.attempts.length}
                  </div>
-               )}
+               )} */}
              </div>
              <div className="min-w-0 flex-1">
                <p className="text-sm font-semibold text-gray-900 truncate mb-1">
@@ -666,18 +639,6 @@ function TestsPage() {
                </>
              )}
            </button>
-         </td>
-        
-         <td className="px-4 py-4">
-           <div className="flex gap-2">
-             <button
-               onClick={() => deleteAllAttempts({ email: group.email, name: group.name })}
-               className="flex items-center gap-2 px-3 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors duration-200"
-             >
-               <Trash2 className="w-4 h-4" />
-               Delete All
-             </button>
-           </div>
          </td>
        </tr>
 
@@ -965,9 +926,6 @@ function TestsPage() {
                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                          Details
                        </th>
-                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                         Actions
-                       </th>
                      </tr>
                    </thead>
                    <tbody className="divide-y divide-gray-200">
@@ -1043,8 +1001,6 @@ function TestsPage() {
                        return null;
                      })}
                    </div>
-
-
                    <button 
                      onClick={() => handlePageChange(currentPage + 1)} 
                      disabled={currentPage === totalPages}

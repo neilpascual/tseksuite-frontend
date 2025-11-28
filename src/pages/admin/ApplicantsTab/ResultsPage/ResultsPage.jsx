@@ -18,7 +18,7 @@ import {
   XCircle,
   Clock as ClockIcon,
 } from "lucide-react";
-import { getAllResults } from "../../../../../api/api";
+import { deleteExamineeTestResult, getAllResults } from "../../../../../api/api";
 import toast from "react-hot-toast";
 import ConfirmationModal from "@/components/ConfimationModal";
 
@@ -97,9 +97,10 @@ function ResultsPage() {
         time:
           row.time ||
           (row.created_at ? new Date(row.created_at).toLocaleTimeString() : ""),
-        score: row.score || "N/A",
+        score: row.score || 0,
         status: row.status || "Unknown",
         quiz: row.quiz_name || "Unknown Quiz",
+        total_points: row.total_points || 0,
         raw: row,
       });
     });
@@ -227,7 +228,7 @@ function ResultsPage() {
 
       if (modalPayload.type === "attempt") {
         const { attemptId } = modalPayload;
-
+        await deleteExamineeTestResult(attemptId)
         // Remove from both data and allData
         setAllData((prev) =>
           prev.filter((item) => {
@@ -246,6 +247,7 @@ function ResultsPage() {
         toast.success("Result deleted successfully");
       } else if (modalPayload.type === "all") {
         const { email } = modalPayload;
+        console.log(modalPayload)
 
         // Remove all results for this email
         setAllData((prev) =>
@@ -438,15 +440,10 @@ function ResultsPage() {
           {/* Header */}
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="relative flex-shrink-0">
-                <div className="w-10 h-10 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold shadow-sm">
+              <div className="relative shrink-0">
+                <div className="w-10 h-10 bg-linear-to-br from-cyan-600 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold shadow-sm">
                   {group.name?.charAt(0)?.toUpperCase() || "E"}
                 </div>
-                {group.attempts.length > 0 && (
-                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm">
-                    {group.attempts.length}
-                  </div>
-                )}
               </div>
 
               <div className="flex-1 min-w-0">
@@ -543,7 +540,7 @@ function ResultsPage() {
                     className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="w-6 h-6 bg-cyan-100 text-cyan-700 rounded flex items-center justify-center text-xs font-semibold flex-shrink-0">
+                      <div className="w-6 h-6 bg-cyan-100 text-cyan-700 rounded flex items-center justify-center text-xs font-semibold shrink-0">
                         #{index + 1}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -557,7 +554,7 @@ function ResultsPage() {
                         <div className="flex items-center gap-2 mt-2 flex-wrap">
                           <StatusBadge status={attempt.status} />
                           <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-                            Score: {attempt.score}
+                            Score: {attempt.score} / {attempt.total_points}
                           </span>
                         </div>
                       </div>
@@ -571,7 +568,7 @@ function ResultsPage() {
                           name: group.name,
                         })
                       }
-                      className="flex items-center gap-1 px-2 py-1.5 bg-red-50 text-red-700 rounded text-xs font-medium hover:bg-red-100 transition-colors flex-shrink-0 ml-2"
+                      className="flex items-center gap-1 px-2 py-1.5 bg-red-50 text-red-700 rounded text-xs font-medium hover:bg-red-100 transition-colors shrink-0 ml-2"
                     >
                       <Trash2 className="w-3 h-3" />
                       Delete
@@ -597,15 +594,10 @@ function ResultsPage() {
           <tr className="border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200">
             <td className="px-4 py-4">
               <div className="flex items-center gap-3">
-                <div className="relative flex-shrink-0">
+                <div className="relative shrink-0">
                   <div className="w-10 h-10 bg-cyan-600 rounded-lg flex items-center justify-center text-white font-bold shadow-sm">
                     {group.name?.charAt(0)?.toUpperCase() || "E"}
                   </div>
-                  {group.attempts.length > 0 && (
-                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm">
-                      {group.attempts.length}
-                    </div>
-                  )}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-gray-900 truncate mb-1">
@@ -660,20 +652,6 @@ function ResultsPage() {
                 )}
               </button>
             </td>
-
-            <td className="px-4 py-4">
-              <div className="flex gap-2">
-                <button
-                  onClick={() =>
-                    deleteAllResults({ email: group.email, name: group.name })
-                  }
-                  className="flex items-center gap-2 px-3 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors duration-200"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Delete All
-                </button>
-              </div>
-            </td>
           </tr>
 
           {/* Expanded Attempts Section */}
@@ -726,7 +704,7 @@ function ResultsPage() {
                                   <div className="flex items-center gap-2">
                                     <StatusBadge status={attempt.status} />
                                     <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-                                      Score: {attempt.score}
+                                      Score: {attempt.score} / {attempt.total_points}
                                     </span>
                                   </div>
                                 </div>
@@ -1024,9 +1002,7 @@ function ResultsPage() {
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                           Details
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                          Actions
-                        </th>
+                       
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
