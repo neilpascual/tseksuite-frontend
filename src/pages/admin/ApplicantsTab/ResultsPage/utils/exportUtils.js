@@ -1,7 +1,13 @@
-export const exportToCSV = (data) => {
+import toast from "react-hot-toast";
+
+export const exportResultsToCSV = (data) => {
+  if (data.length === 0) {
+    toast.error("No data to export");
+    return;
+  }
+
   const headers = [
-    "ID",
-    "Name",
+    "Examinee",
     "Email",
     "Department",
     "Quiz",
@@ -10,17 +16,16 @@ export const exportToCSV = (data) => {
     "Date",
     "Time",
   ];
-
+  
   const csvContent = [
     headers.join(","),
     ...data.map((row) =>
       [
-        row.id,
-        `"${row.examiner_name || ""}"`,
+        `"${row.examinee_name || row.name || ""}"`,
         row.email || "",
         row.department || "",
-        `"${row.quiz_name || ""}"`,
-        row.score || 0,
+        row.quiz_name || "",
+        row.score || "",
         row.status || "",
         row.date || "",
         row.time || "",
@@ -37,14 +42,5 @@ export const exportToCSV = (data) => {
   a.click();
   document.body.removeChild(a);
   window.URL.revokeObjectURL(url);
-};
-
-/**
- * Get unique values from array of objects for a specific key
- * @param {Array} data - Array of objects
- * @param {string} key - Key to extract unique values from
- * @returns {Array} Array of unique values
- */
-export const getUniqueValues = (data, key) => {
-  return [...new Set(data.map((item) => item[key]).filter(Boolean))];
+  toast.success("Results exported successfully");
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Building, Plus, Search, Filter, Download, X } from "lucide-react";
-import QuizManagement from "./QuizManagement";
+import QuizManagement from "./QuizManagement/index.jsx";
 import {
   addDepartment,
   deleteDepartment,

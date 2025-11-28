@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Tabs, Tab, Box } from "@mui/material";
-import TestsPage from "../admin/ApplicantsTab/TestsPage"; // adjust path if needed
-import ResultsPage from "./ApplicantsTab/ResultsPage/ResultsPage"; // adjust path if needed
+import TestsPage from "../admin/ApplicantsTab/TestPage/index"; // adjust path if needed
+import ResultsPage from "./ApplicantsTab/ResultsPage/index"; // adjust path if needed
 
 function ExamsDashboard() {
   const [activeTab, setActiveTab] = useState(0);
