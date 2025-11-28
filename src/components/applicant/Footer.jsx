@@ -1,5 +1,5 @@
 const Footer = ({ 
-  companyName = "SuiteTest.com", 
+  companyName = "Suitelifer.com", 
   copyrightYear = "2025", 
   className = "",
   bgColor = "bg-cyan-600",

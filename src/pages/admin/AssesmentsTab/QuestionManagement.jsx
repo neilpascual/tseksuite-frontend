@@ -8,6 +8,8 @@ import {
   CheckCircle,
   Circle,
   FileText,
+  Upload,
+  Download,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import {
@@ -28,6 +30,7 @@ const QuestionModal = ({
   setQuestion,
   onSave,
   isPdfTest,
+  isProcessing,
 }) => {
   if (!isOpen) return null;
 
@@ -63,20 +66,6 @@ const QuestionModal = ({
       options: prev.options.filter((_, i) => i !== index),
     }));
   };
-
-  // const setCorrectAnswer = (index) => {
-  //   if (question.question_type === "CB" || question.question_type === "DESC") {
-  //     updateOption(index, "is_correct", !question.options[index].is_correct);
-  //   } else {
-  //     setQuestion((prev) => ({
-  //       ...prev,
-  //       options: prev.options.map((opt, i) => ({
-  //         ...opt,
-  //         is_correct: i === index,
-  //       })),
-  //     }));
-  //   }
-  // };
 
   const setCorrectAnswer = (index) => {
     if (question.question_type === "CB") {
@@ -236,7 +225,6 @@ const QuestionModal = ({
     }
   };
 
-  // Always include all question types including DESC
   const questionTypes = ["MC", "CB", "TF", "DESC"];
 
   const getTypeLabel = (type) => {
@@ -270,7 +258,6 @@ const QuestionModal = ({
         </div>
 
         <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto">
-          {/* Type Selector */}
           <div>
             <label className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 block">
               Question Type
@@ -292,7 +279,6 @@ const QuestionModal = ({
             </div>
           </div>
 
-          {/* Question Text */}
           <div>
             <label className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 block">
               Question Text
@@ -306,7 +292,6 @@ const QuestionModal = ({
             />
           </div>
 
-          {/* Points */}
           <div>
             <label className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 block">
               Points
@@ -328,7 +313,6 @@ const QuestionModal = ({
             </div>
           </div>
 
-          {/* Options */}
           <div>
             <label className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 block">
               {question.question_type === "DESC"
@@ -338,7 +322,6 @@ const QuestionModal = ({
             {renderOptions()}
           </div>
 
-          {/* Explanation */}
           <div>
             <label className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 block">
               Explanation (Optional)
@@ -363,6 +346,7 @@ const QuestionModal = ({
           <button
             onClick={onSave}
             className="w-full sm:w-auto px-4 sm:px-6 py-2.5 bg-[#217486] text-white rounded-lg hover:bg-[#1a5d6d] font-medium transition-colors shadow-lg shadow-[#217486]/30 text-sm sm:text-base"
+            disabled={isProcessing}
           >
             Save Question
           </button>
@@ -406,14 +390,456 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, questionText }) => {
   );
 };
 
+const ImportModal = ({ isOpen, onClose, onImport, quizId }) => {
+  const [file, setFile] = useState(null);
+  const [previewData, setPreviewData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState(1);
+
+  if (!isOpen) return null;
+
+  // Simple CSV parser
+  const parseCSV = (text) => {
+    const lines = text.split('\n').filter(line => line.trim() !== '');
+    if (lines.length < 2) {
+      throw new Error('CSV must have at least header and one data row');
+    }
+
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+    
+    // Check required headers
+    const requiredHeaders = ['question_text', 'question_type', 'points'];
+    const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
+    if (missingHeaders.length > 0) {
+      throw new Error(`Missing required columns: ${missingHeaders.join(', ')}`);
+    }
+
+    const questions = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+      const values = line.split(',').map(v => v.trim());
+      
+      const row = {};
+      headers.forEach((header, index) => {
+        row[header] = values[index] || '';
+      });
+
+      // Basic validation
+      if (!row.question_text) {
+        console.warn(`Skipping row ${i + 1}: missing question_text`);
+        continue;
+      }
+
+      const question = {
+        question_text: row.question_text,
+        question_type: (row.question_type || 'MC').toUpperCase(),
+        points: parseInt(row.points) || 1,
+        explanation: row.explanation || '',
+        options: []
+      };
+
+      // Validate question type
+      const validTypes = ['MC', 'CB', 'TF', 'DESC'];
+      if (!validTypes.includes(question.question_type)) {
+        console.warn(`Invalid question type "${question.question_type}" in row ${i + 1}, using MC`);
+        question.question_type = 'MC';
+      }
+
+      // Handle different question types
+      if (question.question_type === 'DESC') {
+        // Descriptive question - use answer_text or option_1
+        const answer = row.answer_text || row.option_1 || 'Sample answer';
+        question.options = [
+          { option_text: answer, is_correct: true }
+        ];
+      } 
+      else if (question.question_type === 'TF') {
+        // True/False question
+        const trueCorrect = (row.is_correct_1 === 'true' || row.is_correct_1 === '1');
+        question.options = [
+          { option_text: 'True', is_correct: trueCorrect },
+          { option_text: 'False', is_correct: !trueCorrect }
+        ];
+      }
+      else {
+        // MC or CB questions
+        for (let optNum = 1; optNum <= 4; optNum++) {
+          const optionText = row[`option_${optNum}`];
+          if (optionText && optionText.trim()) {
+            const isCorrect = (
+              row[`is_correct_${optNum}`] === 'true' || 
+              row[`is_correct_${optNum}`] === '1' ||
+              row[`is_correct_${optNum}`] === 'yes'
+            );
+            question.options.push({
+              option_text: optionText,
+              is_correct: !!isCorrect
+            });
+          }
+        }
+
+        // Ensure at least 2 options for MC/CB
+        if (question.options.length < 2) {
+          question.options = [
+            { option_text: 'Option 1', is_correct: true },
+            { option_text: 'Option 2', is_correct: false }
+          ];
+        }
+      }
+
+      questions.push(question);
+    }
+
+    return questions;
+  };
+
+  const handleFileSelect = (e) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    // Check file type
+    if (!selectedFile.name.match(/\.(csv)$/i)) {
+      toast.error("Please select a CSV file");
+      return;
+    }
+
+    setFile(selectedFile);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const questions = parseCSV(e.target.result);
+        setPreviewData(questions);
+        setStep(2);
+        toast.success(`Found ${questions.length} questions to import`);
+      } catch (error) {
+        console.error('Parse error:', error);
+        toast.error(`Error: ${error.message}`);
+      }
+    };
+    reader.onerror = () => toast.error('Error reading file');
+    reader.readAsText(selectedFile);
+  };
+
+  const handleImport = async () => {
+    if (previewData.length === 0) {
+      toast.error('No questions to import');
+      return;
+    }
+
+    setLoading(true);
+    let successCount = 0;
+    let errorCount = 0;
+
+    try {
+      for (const questionData of previewData) {
+        try {
+          // Add question
+          const { question_id } = await addQuestion(quizId, {
+            question_text: questionData.question_text,
+            question_type: questionData.question_type,
+            points: questionData.points,
+            explanation: questionData.explanation
+          });
+          
+          // Add options
+          for (const option of questionData.options) {
+            await addAnswer(question_id, option);
+          }
+          
+          successCount++;
+        } catch (error) {
+          console.error('Error importing question:', error);
+          errorCount++;
+        }
+      }
+
+      toast.success(`Imported ${successCount} questions successfully${errorCount > 0 ? `, ${errorCount} failed` : ''}`);
+      setStep(3);
+      onImport(successCount);
+    } catch (error) {
+      toast.error('Import failed: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const downloadTemplate = () => {
+    const template = `question_text,question_type,points,explanation,option_1,is_correct_1,option_2,is_correct_2,option_3,is_correct_3,option_4,is_correct_4
+"What is the capital of France?",MC,1,"Paris is the capital",Paris,true,London,false,Berlin,false,Madrid,false
+"Select all prime numbers",CB,2,"Numbers divisible by 1 and themselves",2,true,3,true,4,false,5,true
+"JavaScript is a compiled language",TF,1,"It's an interpreted language",True,false,False,true,,
+"Explain photosynthesis",DESC,2,"Process in plants","Photosynthesis converts light to chemical energy",true,,,,
+"What is 2 + 2?",MC,1,"Basic math",4,true,5,false,6,false,,
+"Select colors",CB,1,"Primary colors",Red,true,Blue,true,Green,false,Yellow,true`;
+
+    const blob = new Blob([template], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'quiz_template.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const resetModal = () => {
+    setFile(null);
+    setPreviewData([]);
+    setStep(1);
+    setLoading(false);
+  };
+
+  const handleClose = () => {
+    resetModal();
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="p-4 sm:p-5 bg-linear-to-r from-[#217486] to-[#2a8fa5] flex justify-between items-center">
+          <h2 className="text-lg sm:text-xl font-bold text-white">
+            Import Questions from CSV
+          </h2>
+          <button
+            onClick={handleClose}
+            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+          >
+            <X className="w-5 h-5 text-white" />
+          </button>
+        </div>
+
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1">
+          {step === 1 && (
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-[#217486]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Upload className="w-8 h-8 text-[#217486]" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  Upload CSV File
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Upload a CSV file with your questions and answers.
+                </p>
+                
+                <button
+                  onClick={downloadTemplate}
+                  className="flex items-center gap-2 px-4 py-2 text-[#217486] border border-[#217486] rounded-lg hover:bg-[#217486]/10 transition-colors mx-auto mb-4"
+                >
+                  <Download className="w-4 h-4" />
+                  Download Template
+                </button>
+              </div>
+
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#217486] transition-colors">
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  id="csv-upload"
+                />
+                <label
+                  htmlFor="csv-upload"
+                  className="cursor-pointer block"
+                >
+                  <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <p className="text-sm text-gray-600 mb-1">
+                    <span className="text-[#217486] font-semibold">Click to upload</span> or drag and drop
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    CSV files only
+                  </p>
+                </label>
+              </div>
+
+              <div className="space-y-6 p-4 sm:p-6 overflow-y-auto">
+
+  {/* Step-by-Step CSV Guide */}
+  <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 border-l-4 border-yellow-400 rounded-xl p-6 shadow-sm">
+    <div className="flex items-center gap-3 mb-4">
+      <div className="w-10 h-10 bg-yellow-400/20 text-yellow-700 rounded-full flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m2 0a2 2 0 110 4H7a2 2 0 110-4h10zM12 6v6" />
+        </svg>
+      </div>
+      <h3 className="text-lg font-semibold text-yellow-900">Step-by-Step: Create Your CSV</h3>
+    </div>
+
+    <ol className="space-y-3 text-sm text-yellow-800 list-decimal list-inside">
+      <li>Open Excel, Google Sheets, or any spreadsheet editor.</li>
+      <li>Create the main columns: <code>question_text</code>, <code>question_type</code>, <code>points</code>.</li>
+      <li>For MC/CB questions, add: <code>option_1, is_correct_1, option_2, is_correct_2, ...</code>.</li>
+      <li>For True/False questions, only <code>is_correct_1</code> matters (true/false).</li>
+      <li>For Descriptive questions, use <code>option_1</code> or <code>answer_text</code>.</li>
+      <li>Fill in each row with your questions and answers.</li>
+      <li>Double-check columns and data for correctness.</li>
+      <li>Save/export as CSV format.</li>
+      <li>Upload your CSV in the system to import questions.</li>
+    </ol>
+
+    {/* Example Table */}
+    <div className="mt-4 overflow-x-auto">
+      <table className="min-w-full border border-gray-200 rounded-lg">
+        <thead className="bg-yellow-100 text-yellow-900 text-xs font-semibold uppercase">
+          <tr>
+            <th className="p-2 border">question_text</th>
+            <th className="p-2 border">question_type</th>
+            <th className="p-2 border">points</th>
+            <th className="p-2 border">option_1</th>
+            <th className="p-2 border">is_correct_1</th>
+            <th className="p-2 border">option_2</th>
+            <th className="p-2 border">is_correct_2</th>
+          </tr>
+        </thead>
+        <tbody className="text-gray-700 text-xs">
+          <tr className="bg-white border-b">
+            <td className="p-2 border">What is 2 + 2?</td>
+            <td className="p-2 border">MC</td>
+            <td className="p-2 border">5</td>
+            <td className="p-2 border">3</td>
+            <td className="p-2 border">false</td>
+            <td className="p-2 border">4</td>
+            <td className="p-2 border">true</td>
+          </tr>
+          <tr className="bg-gray-50 border-b">
+            <td className="p-2 border">The earth is flat?</td>
+            <td className="p-2 border">TF</td>
+            <td className="p-2 border">2</td>
+            <td className="p-2 border">True</td>
+            <td className="p-2 border">false</td>
+            <td className="p-2 border">False</td>
+            <td className="p-2 border">true</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {/* CSV Format Reference */}
+  <div className="bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-400 rounded-xl p-6 shadow-sm">
+    <div className="flex items-center gap-3 mb-4">
+      <div className="w-10 h-10 bg-blue-400/20 text-blue-700 rounded-full flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M4 12V5a2 2 0 012-2h12a2 2 0 012 2v7M8 21h8" />
+        </svg>
+      </div>
+      <h3 className="text-lg font-semibold text-blue-900">CSV Format Reference</h3>
+    </div>
+
+    <ul className="text-sm text-blue-800 space-y-2 list-disc list-inside">
+      <li><strong>Required Columns:</strong> question_text, question_type, points</li>
+      <li><strong>Question Types:</strong> MC (Multiple Choice), CB (Checkbox), TF (True/False), DESC (Descriptive)</li>
+      <li><strong>MC/CB:</strong> option_1, is_correct_1, option_2, is_correct_2, ...</li>
+      <li><strong>TF:</strong> Only is_correct_1 matters (true = correct)</li>
+      <li><strong>DESC:</strong> Use option_1 or answer_text</li>
+    </ul>
+  </div>
+</div>
+
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                Preview Import ({previewData.length} questions)
+              </h3>
+              
+              <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg">
+                {previewData.map((question, index) => (
+                  <div key={index} className="p-4 border-b border-gray-200 last:border-b-0">
+                    <div className="flex items-start gap-3 mb-2">
+                      <span className="w-6 h-6 bg-[#217486] text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0">
+                        {index + 1}
+                      </span>
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-800 text-sm mb-1">
+                          {question.question_text}
+                        </p>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="px-2 py-1 bg-[#217486]/10 text-[#217486] rounded text-xs font-medium">
+                            {question.question_type}
+                          </span>
+                          <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
+                            {question.points} pts
+                          </span>
+                        </div>
+                        <div className="space-y-1">
+                          {question.options.map((opt, optIndex) => (
+                            <div key={optIndex} className={`flex items-center gap-2 text-xs ${
+                              opt.is_correct ? 'text-green-700 font-medium' : 'text-gray-600'
+                            }`}>
+                              <div className={`w-2 h-2 rounded-full ${
+                                opt.is_correct ? 'bg-green-500' : 'bg-gray-400'
+                              }`} />
+                              {opt.option_text}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setStep(1)}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 font-medium transition-colors"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={handleImport}
+                  disabled={loading}
+                  className="px-4 py-2 bg-[#217486] text-white rounded-lg hover:bg-[#1a5d6d] font-medium transition-colors disabled:opacity-50"
+                >
+                  {loading ? 'Importing...' : `Import ${previewData.length} Questions`}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                Import Completed!
+              </h3>
+              <p className="text-sm text-gray-600 mb-6">
+                Your questions have been imported successfully.
+              </p>
+              <button
+                onClick={handleClose}
+                className="px-4 py-2 bg-[#217486] text-white rounded-lg hover:bg-[#1a5d6d] font-medium transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const QuestionManagement = ({ quiz, onBack }) => {
   const [questions, setQuestions] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null);
   const [deleteIndex, setDeleteIndex] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const isPdfTest = quiz?.pdf_link ? true : false;
 
@@ -435,13 +861,9 @@ const QuestionManagement = ({ quiz, onBack }) => {
   const fetchQuestions = async () => {
     setLoading(true);
     try {
-      // Fetch questions
       const questionsRes = await getQuestions(quiz.quiz_id);
-
-      // Fetch all answers for the quiz at once
       const answersRes = await getAnswers(quiz.quiz_id);
 
-      // Group answers by question_id
       const answersByQuestion = {};
       answersRes.forEach((answer) => {
         if (!answersByQuestion[answer.question_id]) {
@@ -450,11 +872,9 @@ const QuestionManagement = ({ quiz, onBack }) => {
         answersByQuestion[answer.question_id].push(answer);
       });
 
-      // Attach options to each question
       const withOptions = questionsRes.map((q) => {
         let options = answersByQuestion[q.question_id] || [];
 
-        // Handle DESC type: if no options, provide a default
         if (q.question_type === "DESC" && options.length === 0) {
           options = [{ option_text: "", is_correct: true }];
         }
@@ -496,65 +916,6 @@ const QuestionManagement = ({ quiz, onBack }) => {
     }
   };
 
-  // const handleSave = async () => {
-  //   const q = currentQuestion;
-  //   if (!q.question_text.trim()) return toast.error("Question text required");
-
-  //   if (q.question_type === "DESC") {
-  //     if (!q.options[0]?.option_text.trim()) {
-  //       return toast.error(
-  //         "Correct answer is required for descriptive questions"
-  //       );
-  //     }
-  //   } else if (q.question_type === "MC" || q.question_type === "CB") {
-  //     if (!q.options || q.options.length < 2) {
-  //       return toast.error("At least 2 options are required");
-  //     }
-  //     for (let i = 0; i < q.options.length; i++) {
-  //       if (!q.options[i].option_text.trim()) {
-  //         return toast.error(`All options must have text!`);
-  //       }
-  //     }
-  //   }
-
-  //   try {
-  //     if (editingIndex !== null) {
-  //       await updateQuestion(quiz.quiz_id, q.question_id, q);
-  //       toast.success("Question Updated!");
-
-  //       const original = questions[editingIndex];
-  //       const originalIds = original.options
-  //         .map((o) => o.answer_id)
-  //         .filter(Boolean);
-
-  //       for (const opt of q.options) {
-  //         if (opt.answer_id) {
-  //           await updateAnswer(opt.answer_id, opt);
-  //         } else {
-  //           await addAnswer(q.question_id, opt);
-  //         }
-  //       }
-
-  //       for (const oldId of originalIds) {
-  //         if (!q.options.find((o) => o.answer_id === oldId)) {
-  //           await deleteAnswer(oldId);
-  //         }
-  //       }
-  //     } else {
-  //       const { question_id } = await addQuestion(quiz.quiz_id, q);
-  //       toast.success("Question Added!");
-  //       for (const opt of q.options) {
-  //         await addAnswer(question_id, opt);
-  //       }
-  //     }
-  //     setModalOpen(false);
-  //     fetchQuestions();
-  //   } catch (err) {
-  //     console.error("Save error:", err);
-  //     toast.error("Failed to save question");
-  //   }
-  // };
-
   const handleSave = async () => {
     const q = currentQuestion;
     if (!q.question_text.trim()) return toast.error("Question text required");
@@ -566,12 +927,13 @@ const QuestionManagement = ({ quiz, onBack }) => {
       return toast.error("At least 2 options are required");
     }
 
+    setIsProcessing(true);
+
     try {
       if (editingIndex !== null) {
         await updateQuestion(quiz.quiz_id, q.question_id, q);
         toast.success("Question Updated!");
 
-        // Sync options
         const originalOptions = questions[editingIndex].options || [];
         const originalIds = originalOptions
           .map((o) => o.answer_id)
@@ -599,6 +961,15 @@ const QuestionManagement = ({ quiz, onBack }) => {
     } catch (err) {
       console.error("Save error:", err);
       toast.error("Failed to save question");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleImportComplete = (importedCount) => {
+    setImportModalOpen(false);
+    if (importedCount > 0) {
+      fetchQuestions();
     }
   };
 
@@ -671,14 +1042,24 @@ const QuestionManagement = ({ quiz, onBack }) => {
               </div>
             </div>
 
-            <button
-              onClick={openAdd}
-              className="flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-[#217486] text-white rounded-xl hover:bg-[#1a5d6d] font-medium transition-all hover:shadow-xl hover:shadow-[#217486]/40 text-sm sm:text-base whitespace-nowrap"
-            >
-              <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="hidden sm:inline">Add Question</span>
-              <span className="sm:hidden">Add</span>
-            </button>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                onClick={() => setImportModalOpen(true)}
+                className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 bg-white text-[#217486] border border-[#217486] rounded-xl hover:bg-[#217486]/10 font-medium transition-all text-sm sm:text-base whitespace-nowrap"
+              >
+                <Upload className="w-4 h-4" />
+                <span className="hidden sm:inline">Import CSV</span>
+                <span className="sm:hidden">Import</span>
+              </button>
+              <button
+                onClick={openAdd}
+                className="flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-[#217486] text-white rounded-xl hover:bg-[#1a5d6d] font-medium transition-all hover:shadow-xl hover:shadow-[#217486]/40 text-sm sm:text-base whitespace-nowrap"
+              >
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">Add Question</span>
+                <span className="sm:hidden">Add</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -704,12 +1085,22 @@ const QuestionManagement = ({ quiz, onBack }) => {
               Start building your {isPdfTest ? "test" : "quiz"} by adding your
               first question.
             </p>
-            <button
-              onClick={openAdd}
-              className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[#217486] text-white rounded-xl hover:bg-[#1a5d6d] font-medium transition-all shadow-lg shadow-[#217486]/30 text-sm sm:text-base"
-            >
-              <Plus className="w-4 h-4 sm:w-5 sm:h-5" /> Add First Question
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => setImportModalOpen(true)}
+                className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-[#217486] border border-[#217486] rounded-xl hover:bg-[#217486]/10 font-medium transition-all text-sm sm:text-base"
+              >
+                <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
+                Import from CSV
+              </button>
+              <button
+                onClick={openAdd}
+                className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[#217486] text-white rounded-xl hover:bg-[#1a5d6d] font-medium transition-all shadow-lg shadow-[#217486]/30 text-sm sm:text-base"
+              >
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                Add First Question
+              </button>
+            </div>
           </div>
         ) : (
           <div className="space-y-3 sm:space-y-4">
@@ -831,6 +1222,7 @@ const QuestionManagement = ({ quiz, onBack }) => {
           setQuestion={setCurrentQuestion}
           onSave={handleSave}
           isPdfTest={isPdfTest}
+          isProcessing={isProcessing}
         />
 
         <DeleteModal
@@ -838,6 +1230,13 @@ const QuestionManagement = ({ quiz, onBack }) => {
           onClose={() => setDeleteModalOpen(false)}
           onConfirm={handleDelete}
           questionText={questions[deleteIndex]?.question_text}
+        />
+
+        <ImportModal
+          isOpen={importModalOpen}
+          onClose={() => setImportModalOpen(false)}
+          onImport={handleImportComplete}
+          quizId={quiz.quiz_id}
         />
       </div>
     </div>
