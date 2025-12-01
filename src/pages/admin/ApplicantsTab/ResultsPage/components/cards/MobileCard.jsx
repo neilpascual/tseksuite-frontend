@@ -23,7 +23,7 @@ const MobileCard = ({
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900 truncate mb-1">
+            <p className="text-sm font-semibold text-cyan-600 truncate mb-1">
               {group.name}
             </p>
             {group.email && (

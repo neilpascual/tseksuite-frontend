@@ -181,7 +181,7 @@ function TestsPage() {
                   onDeleteAllAttempts={handleDeleteAllAttempts}
                 />
               ) : isTablet ? (
-                <TableView
+                <TabletView
                   currentGroups={currentGroups}
                   expandedGroups={expandedGroups}
                   onToggleGroup={toggleGroupExpansion}
