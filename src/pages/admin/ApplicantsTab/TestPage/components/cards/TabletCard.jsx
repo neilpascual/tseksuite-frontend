@@ -16,7 +16,7 @@ const TabletCard = ({ group, isExpanded, onToggleExpand, onDeleteAttempt }) => {
           </div>
         
           <div className="flex-1 min-w-0">
-            <p className="text-base font-semibold text-gray-900 mb-1">{group.name}</p>
+            <p className="text-base font-semibold text-cyan-600 mb-1">{group.name}</p>
             {group.email && (
               <p className="text-sm text-gray-600 truncate mb-2">{group.email}</p>
             )}
