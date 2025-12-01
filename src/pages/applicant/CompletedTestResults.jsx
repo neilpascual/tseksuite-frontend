@@ -9,6 +9,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import Footer from "../../components/applicant/Footer";
+import { getTypeLabel } from "../admin/AssesmentsTab/QuestionManagement/utils/questionUtils";
 
 const CompletedTestResults = () => {
   const navigate = useNavigate();
@@ -588,7 +589,7 @@ const CompletedTestResults = () => {
                           </p>
                           <div className="flex gap-1">
                             <span className="px-2 py-1 bg-[#217486] text-white rounded text-xs font-medium">
-                              {question.question_type}
+                              {getTypeLabel(question.question_type)}
                             </span>
                             <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-medium">
                               {question.points} pt
