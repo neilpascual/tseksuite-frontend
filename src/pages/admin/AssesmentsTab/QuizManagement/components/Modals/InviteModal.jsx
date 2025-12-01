@@ -67,9 +67,9 @@ const InviteModal = ({
   const isPdfTest = selectedQuizForInvite.pdf_links && selectedQuizForInvite.pdf_links.length > 0;
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-        <div className="bg-gradient-to-r from-[#217486] to-[#2a8fa5] p-6">
+    <div className="fixed inset-0 bg-blur bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform animate-in zoom-in-95 duration-200">
+        <div className="bg-linear-to-r from-[#217486] to-[#2a8fa5] p-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
               <LinkIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />

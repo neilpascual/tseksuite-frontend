@@ -206,8 +206,8 @@ const QuestionModal = ({
   const questionTypes = ["MC", "CB", "TF", "DESC"];
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-3 sm:p-4">
-      <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden max-h-[95vh] sm:max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-blur bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden max-h-[95vh] sm:max-h-[90vh] flex flex-col transform animate-in zoom-in-95 duration-200">
         <div className="p-4 sm:p-5 bg-linear-to-r from-[#217486] to-[#2a8fa5] flex justify-between items-center">
           <h2 className="text-lg sm:text-2xl font-bold text-white">
             {question.question_id ? "Edit Question" : "Add New Question"}

@@ -56,9 +56,9 @@ const EditQuizModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-        <div className="bg-gradient-to-r from-[#217486] to-[#2a8fa5] p-6">
+    <div className="fixed inset-0 bg-blur bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform animate-in zoom-in-95 duration-200">
+        <div className="bg-linear-to-r from-[#217486] to-[#2a8fa5] p-6">
           <h2 className="text-xl sm:text-2xl font-bold text-white">
             Edit {editingQuiz.is_pdf_test ? 'PDF Test' : 'Quiz'}
           </h2>

@@ -1,6 +1,8 @@
 import React from "react";
 import { Search, Filter, Download, X } from "lucide-react";
-
+import { useState } from "react";
+import ConfirmationModal from "/src/components/ConfimationModal";
+ 
 const FiltersPanel = ({
   searchQuery,
   filters,
@@ -14,6 +16,7 @@ const FiltersPanel = ({
   onExport,
   hasData
 }) => {
+  const [showConfirm, setShowConfirm] = useState(false);
   return (
     <div className="mb-6">
       <div className="flex flex-col lg:flex-row gap-4">
@@ -49,7 +52,7 @@ const FiltersPanel = ({
           </button>
 
           <button
-            onClick={onExport}
+             onClick={() => setShowConfirm(true)}
             disabled={!hasData}
             className="flex items-center gap-2 px-4 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-all text-sm whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -123,6 +126,25 @@ const FiltersPanel = ({
           </div>
         </div>
       )}
+
+            {showConfirm && (
+              <ConfirmationModal
+                title="Export CSV?"
+                message="Are you sure you want to export this data as a CSV file?"
+                checklist={[
+                  "All filtered data will be included",
+                  "CSV will download immediately"
+                ]}
+                confirmLabel="Export"
+                cancelLabel="Cancel"
+                confirmColor="cyan"
+                onClose={() => setShowConfirm(false)}
+                onConfirm={() => {
+                  setShowConfirm(false);
+                  onExport(); // actually perform the export
+                }}
+              />
+            )}
     </div>
   );
 };

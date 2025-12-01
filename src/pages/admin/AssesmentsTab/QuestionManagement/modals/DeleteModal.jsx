@@ -4,8 +4,8 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, questionText }) => {
   if (!isOpen) return null;
   
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-      <div className="bg-white rounded-xl sm:rounded-2xl p-5 sm:p-6 w-full max-w-md shadow-2xl mx-4">
+    <div className="fixed inset-0 bg-blur bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+      <div className="bg-white rounded-xl sm:rounded-2xl p-5 sm:p-6 w-full max-w-md shadow-2xl mx-4  transform animate-in zoom-in-95 duration-200">
         <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-3">
           Delete Question
         </h3>
