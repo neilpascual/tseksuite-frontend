@@ -96,8 +96,8 @@ const ImportModal = ({ isOpen, onClose, onImport, quizId }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-      <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-blur bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col transform animate-in zoom-in-95 duration-200">
         <div className="p-4 sm:p-5 bg-linear-to-r from-[#217486] to-[#2a8fa5] flex justify-between items-center">
           <h2 className="text-lg sm:text-xl font-bold text-white">
             Import Questions from CSV
@@ -158,13 +158,13 @@ const ImportModal = ({ isOpen, onClose, onImport, quizId }) => {
               {/* CSV Guide */}
               <div className="space-y-6 p-4 sm:p-6 overflow-y-auto">
                 {/* Step-by-Step CSV Guide */}
-                <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 border-l-4 border-yellow-400 rounded-xl p-6 shadow-sm">
+                <div className="bg-linear-to-r from-yellow-50 to-yellow-100 border-l-4 border-yellow-400 rounded-xl p-6 shadow-sm">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-yellow-400/20 text-yellow-700 rounded-full flex items-center justify-center">
+                    {/* <div className="w-10 h-10 bg-yellow-400/20 text-yellow-700 rounded-full flex items-center justify-center">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m2 0a2 2 0 110 4H7a2 2 0 110-4h10zM12 6v6" />
                       </svg>
-                    </div>
+                    </div> */}
                     <h3 className="text-lg font-semibold text-yellow-900">Step-by-Step: Create Your CSV</h3>
                   </div>
 
@@ -221,11 +221,11 @@ const ImportModal = ({ isOpen, onClose, onImport, quizId }) => {
                 {/* CSV Format Reference */}
                 <div className="bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-400 rounded-xl p-6 shadow-sm">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-blue-400/20 text-blue-700 rounded-full flex items-center justify-center">
+                    {/* <div className="w-10 h-10 bg-blue-400/20 text-blue-700 rounded-full flex items-center justify-center">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M4 12V5a2 2 0 012-2h12a2 2 0 012 2v7M8 21h8" />
                       </svg>
-                    </div>
+                    </div> */}
                     <h3 className="text-lg font-semibold text-blue-900">CSV Format Reference</h3>
                   </div>
 

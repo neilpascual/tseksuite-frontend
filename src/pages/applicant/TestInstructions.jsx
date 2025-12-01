@@ -62,7 +62,7 @@ const TestInstructions = () => {
   const formatTimeLimit = (minutes) => {
     if (!minutes) return "N/A";
     if (minutes < 60) {
-      return `${minutes} minutes`;
+      return `${minutes} minute${minutes === 1 ? "" : "s"}`;
     }
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;

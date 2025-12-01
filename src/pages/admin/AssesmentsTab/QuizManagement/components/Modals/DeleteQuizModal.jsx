@@ -12,8 +12,8 @@ const DeleteQuizModal = ({
   const isPdfTest = deletingQuiz.pdf_links && deletingQuiz.pdf_links.length > 0;
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8">
+    <div className="fixed inset-0 bg-blur bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 transform animate-in zoom-in-95 duration-200">
         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <Trash2 className="w-8 h-8 text-red-600" />
         </div>
