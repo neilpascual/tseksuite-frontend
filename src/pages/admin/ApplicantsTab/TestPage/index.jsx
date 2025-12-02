@@ -14,7 +14,7 @@ import Pagination from "./components/Pagination";
 import LoadingState from "./components/LoadingState";
 import EmptyState from "./components/EmptyState";
 import MobileView from "./components/views/MobileView";
-import TabletView from "./components/views/TableView";
+import TableView from "./components/views/TableView";
 import DesktopView from "./components/views/DesktopView";
 
 function TestsPage() {
@@ -181,7 +181,7 @@ function TestsPage() {
                   onDeleteAllAttempts={handleDeleteAllAttempts}
                 />
               ) : isTablet ? (
-                <TabletView
+                <TableView
                   currentGroups={currentGroups}
                   expandedGroups={expandedGroups}
                   onToggleGroup={toggleGroupExpansion}
