@@ -1,7 +1,7 @@
 import React from "react";
 import TabletCard from "../cards/TabletCard";
 
-const TableView = ({
+const TabletView = ({
   currentGroups,
   expandedGroups,
   onToggleGroup,
@@ -22,4 +22,4 @@ const TableView = ({
   );
 };
 
-export default TableView;
+export default TabletView;
