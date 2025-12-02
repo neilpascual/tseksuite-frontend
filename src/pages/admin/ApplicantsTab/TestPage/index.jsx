@@ -14,13 +14,13 @@ import Pagination from "./components/Pagination";
 import LoadingState from "./components/LoadingState";
 import EmptyState from "./components/EmptyState";
 import MobileView from "./components/views/MobileView";
-import TableView from "./components/views/TableView";
+import TabletView from "./components/views/TableView";
 import DesktopView from "./components/views/DesktopView";
 
 function TestsPage() {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const isTablet = useMediaQuery("(max-width: 1024px)");
-  
+
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -29,8 +29,14 @@ function TestsPage() {
   const [expandedGroups, setExpandedGroups] = useState(new Set());
   const [activeDropdown, setActiveDropdown] = useState(null);
 
-  const { rawData, filteredRawData, isDataLoading, setFilteredRawData, deleteAttempt } = useTestsData();
-  
+  const {
+    rawData,
+    filteredRawData,
+    isDataLoading,
+    setFilteredRawData,
+    deleteAttempt,
+  } = useTestsData();
+
   const {
     searchQuery,
     filters,
@@ -97,7 +103,7 @@ function TestsPage() {
   const handlePageChange = (newPage) => {
     if (newPage < 1 || newPage > totalPages) return;
     setCurrentPage(newPage);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleRowsPerPageChange = (e) => {
@@ -119,19 +125,27 @@ function TestsPage() {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = () => setActiveDropdown(null);
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
   return (
     <>
       {showModal && modalPayload && (
         <ConfirmationModal
-          title={modalPayload.type === "attempt" ? "Delete attempt?" : "Delete all attempts?"}
+          title={
+            modalPayload.type === "attempt"
+              ? "Delete attempt?"
+              : "Delete all attempts?"
+          }
           message={
             modalPayload.type === "attempt"
-              ? `Delete this attempt by ${modalPayload.name || modalPayload.email}? This action cannot be undone.`
-              : `Delete ALL attempts for ${modalPayload.name || modalPayload.email}? This action cannot be undone and will permanently remove all examination data for this user.`
+              ? `Delete this attempt by ${
+                  modalPayload.name || modalPayload.email
+                }? This action cannot be undone.`
+              : `Delete ALL attempts for ${
+                  modalPayload.name || modalPayload.email
+                }? This action cannot be undone and will permanently remove all examination data for this user.`
           }
           confirmLabel="Delete"
           cancelLabel="Cancel"
@@ -143,9 +157,9 @@ function TestsPage() {
 
       <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-6">
         <div className="max-w-7xl mx-auto">
-          <Header 
-            totalExaminees={groupedByExaminee.length} 
-            totalAttempts={rawData.length} 
+          <Header
+            totalExaminees={groupedByExaminee.length}
+            totalAttempts={rawData.length}
           />
 
           <FiltersPanel
@@ -181,7 +195,7 @@ function TestsPage() {
                   onDeleteAllAttempts={handleDeleteAllAttempts}
                 />
               ) : isTablet ? (
-                <TableView
+                <TabletView
                   currentGroups={currentGroups}
                   expandedGroups={expandedGroups}
                   onToggleGroup={toggleGroupExpansion}
