@@ -88,14 +88,14 @@ const QuestionItem = ({ question, index, onEdit, onDelete }) => {
           <div className="flex sm:flex-col gap-2 ml-4 sm:ml-4">
             <button
               onClick={() => onEdit(question, index)}
-              className="flex-1 sm:flex-none p-2 sm:p-2.5 text-[#217486] hover:bg-[#217486]/10 rounded-lg transition-colors"
+              className="flex-1 sm:flex-none p-2 sm:p-2.5 text-[#217486] hover:bg-[#217486]/10 rounded-lg transition-colors cursor-pointer"
               title="Edit Question"
             >
               <Edit2 className="w-4 h-4 sm:w-5 sm:h-5 mx-auto" />
             </button>
             <button
               onClick={() => onDelete(index)}
-              className="flex-1 sm:flex-none p-2 sm:p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              className="flex-1 sm:flex-none p-2 sm:p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
               title="Delete Question"
             >
               <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 mx-auto" />
