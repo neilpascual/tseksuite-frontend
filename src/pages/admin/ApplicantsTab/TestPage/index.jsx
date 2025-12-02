@@ -14,8 +14,9 @@ import Pagination from "./components/Pagination";
 import LoadingState from "./components/LoadingState";
 import EmptyState from "./components/EmptyState";
 import MobileView from "./components/views/MobileView";
-import TabletView from "./components/views/TabletView";
+
 import DesktopView from "./components/views/DesktopView";
+import TabletView from "./components/views/Tabletview";
 
 function TestsPage() {
   const isMobile = useMediaQuery("(max-width: 768px)");
